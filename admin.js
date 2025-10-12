@@ -31,6 +31,13 @@ const DEFAULT_CAROUSEL = [
     'Mini-Closed.png'
 ];
 
+// Admin building filters
+let buildingFilters = {
+    search: '',
+    status: 'all',
+    type: 'all'
+};
+
 // Initialize admin panel
 document.addEventListener('DOMContentLoaded', () => {
     initializeTabs();
@@ -38,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadWelcomeMessage();
     loadCarousel();
     loadBuildings();
+    initializeBuildingFilters();
 });
 
 // Tab Management
@@ -202,6 +210,34 @@ function addDragAndDrop() {
     });
 }
 
+// Building Filter Initialization
+function initializeBuildingFilters() {
+    const searchInput = document.getElementById('building-search');
+    const statusFilter = document.getElementById('building-status-filter');
+    const typeFilter = document.getElementById('building-type-filter');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            buildingFilters.search = e.target.value.toLowerCase();
+            loadBuildings();
+        });
+    }
+
+    if (statusFilter) {
+        statusFilter.addEventListener('change', (e) => {
+            buildingFilters.status = e.target.value;
+            loadBuildings();
+        });
+    }
+
+    if (typeFilter) {
+        typeFilter.addEventListener('change', (e) => {
+            buildingFilters.type = e.target.value;
+            loadBuildings();
+        });
+    }
+}
+
 // Buildings Management
 function loadBuildings() {
     const inventory = window.PROCESSED_INVENTORY || [];
@@ -213,7 +249,45 @@ function loadBuildings() {
         return;
     }
 
-    container.innerHTML = inventory.map(building => {
+    // Apply filters
+    const filteredBuildings = inventory.filter(building => {
+        const override = overrides[building.serialNumber] || {};
+        const status = override.status || 'available';
+        const isHidden = override.hidden || false;
+
+        // Search filter
+        if (buildingFilters.search) {
+            const searchText = buildingFilters.search;
+            const matches =
+                building.serialNumber.toLowerCase().includes(searchText) ||
+                building.sizeDisplay.toLowerCase().includes(searchText) ||
+                building.title.toLowerCase().includes(searchText) ||
+                building.typeName.toLowerCase().includes(searchText);
+
+            if (!matches) return false;
+        }
+
+        // Status filter
+        if (buildingFilters.status !== 'all') {
+            if (buildingFilters.status === 'hidden' && !isHidden) return false;
+            if (buildingFilters.status !== 'hidden' && status !== buildingFilters.status) return false;
+        }
+
+        // Type filter (new vs repo)
+        if (buildingFilters.type !== 'all') {
+            if (buildingFilters.type === 'new' && building.isRepo) return false;
+            if (buildingFilters.type === 'repo' && !building.isRepo) return false;
+        }
+
+        return true;
+    });
+
+    if (filteredBuildings.length === 0) {
+        container.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-light);">No buildings match your filters.</p>';
+        return;
+    }
+
+    container.innerHTML = filteredBuildings.map(building => {
         const override = overrides[building.serialNumber] || {};
         const status = override.status || 'available';
         const isHidden = override.hidden || false;

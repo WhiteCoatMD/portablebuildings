@@ -97,6 +97,26 @@
             <div class="card">
                 <h2>Manage Buildings</h2>
 
+                <div class="admin-filters">
+                    <div class="admin-filter-group">
+                        <input type="text" id="building-search" class="form-control" placeholder="Search by serial number, size, or type...">
+                    </div>
+                    <div class="admin-filter-group">
+                        <select id="building-status-filter" class="form-control">
+                            <option value="all">All Buildings</option>
+                            <option value="available">Available</option>
+                            <option value="pending">Pending</option>
+                            <option value="sold">Sold</option>
+                            <option value="hidden">Hidden</option>
+                        </select>
+                        <select id="building-type-filter" class="form-control">
+                            <option value="all">All Types</option>
+                            <option value="new">New Inventory</option>
+                            <option value="repo">Pre-Owned (Repo)</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="buildings-list" id="buildings-list">
                     <!-- Will be populated by JavaScript -->
                 </div>
