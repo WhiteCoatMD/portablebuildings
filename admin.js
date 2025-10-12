@@ -774,17 +774,30 @@ async function loadLots() {
             return;
         }
 
+        // Count buildings for each lot from the actual inventory
+        const inventory = window.PROCESSED_INVENTORY || [];
+        const lotCounts = {};
+        inventory.forEach(building => {
+            const location = building.location;
+            if (location) {
+                lotCounts[location] = (lotCounts[location] || 0) + 1;
+            }
+        });
+
         container.innerHTML = lots.map((lot, index) => {
             const syncStatus = lot.lastSync ?
                 `Last synced: ${new Date(lot.lastSync).toLocaleString()}` :
                 'Will sync automatically during next scheduled sync';
+
+            // Get actual building count from inventory
+            const buildingCount = lotCounts[lot.name] || 0;
 
             return `
                 <div class="lot-item">
                     <div class="lot-info">
                         <h3>
                             ${lot.name}
-                            <span class="lot-badge">${lot.buildingCount || 0} buildings</span>
+                            <span class="lot-badge">${buildingCount} buildings</span>
                         </h3>
                         <p class="sync-status">${syncStatus}</p>
                     </div>
