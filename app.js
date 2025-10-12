@@ -10,12 +10,14 @@ class InventoryApp {
         this.filters = {
             type: 'all',
             size: 'all',
+            location: 'all',
             status: 'all'
         };
 
         this.elements = {
             typeFilter: document.getElementById('type-filter'),
             sizeFilter: document.getElementById('size-filter'),
+            locationFilter: document.getElementById('location-filter'),
             statusFilter: document.getElementById('status-filter'),
             buildingsGrid: document.getElementById('buildings-grid'),
             countDisplay: document.getElementById('count')
@@ -44,6 +46,7 @@ class InventoryApp {
     init() {
         this.loadWelcomeMessage();
         this.populateSizeFilter();
+        this.populateLocationFilter();
         this.attachEventListeners();
         this.renderBuildings();
     }
@@ -76,6 +79,19 @@ class InventoryApp {
         });
     }
 
+    populateLocationFilter() {
+        // Get unique locations from inventory
+        const locations = [...new Set(this.inventory.map(item => item.location))];
+        locations.sort();
+
+        locations.forEach(location => {
+            const option = document.createElement('option');
+            option.value = location;
+            option.textContent = location;
+            this.elements.locationFilter.appendChild(option);
+        });
+    }
+
     attachEventListeners() {
         this.elements.typeFilter.addEventListener('change', (e) => {
             this.filters.type = e.target.value;
@@ -84,6 +100,11 @@ class InventoryApp {
 
         this.elements.sizeFilter.addEventListener('change', (e) => {
             this.filters.size = e.target.value;
+            this.applyFilters();
+        });
+
+        this.elements.locationFilter.addEventListener('change', (e) => {
+            this.filters.location = e.target.value;
             this.applyFilters();
         });
 
@@ -101,11 +122,12 @@ class InventoryApp {
 
             const typeMatch = this.filters.type === 'all' || item.typeCode === this.filters.type;
             const sizeMatch = this.filters.size === 'all' || item.sizeDisplay === this.filters.size;
+            const locationMatch = this.filters.location === 'all' || item.location === this.filters.location;
             const statusMatch = this.filters.status === 'all' ||
                 (this.filters.status === 'repo' && item.isRepo) ||
                 (this.filters.status === 'available' && !item.isRepo);
 
-            return typeMatch && sizeMatch && statusMatch;
+            return typeMatch && sizeMatch && locationMatch && statusMatch;
         });
 
         this.renderBuildings();
@@ -236,6 +258,10 @@ class InventoryApp {
                     <div class="building-details">
                         ${priceSection}
                         ${rtoSection}
+                        <div class="building-detail-item">
+                            <span class="label">Location:</span>
+                            <span class="value">${building.location || 'GPB Sales'}</span>
+                        </div>
                         <div class="building-detail-item">
                             <span class="label">Status:</span>
                             <span class="value">${building.isRepo ? 'Pre-Owned' : status.charAt(0).toUpperCase() + status.slice(1)}</span>
