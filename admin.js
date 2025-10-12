@@ -756,35 +756,48 @@ document.addEventListener('click', (e) => {
 });
 
 // Lot Management Functions
-function loadLots() {
-    const lots = getLots();
+async function loadLots() {
     const container = document.getElementById('lots-list');
 
-    if (!lots || lots.length === 0) {
-        container.innerHTML = '<p style="text-align: center; padding: 1rem; color: var(--text-light);">No other lots added yet. Add one below to start syncing inventory.</p>';
-        return;
+    try {
+        // Fetch latest lot data from server
+        const response = await fetch('/api/get-lot-config');
+        const data = await response.json();
+
+        const lots = data.success && data.lots ? data.lots : [];
+
+        // Also update localStorage with latest data
+        localStorage.setItem(STORAGE_KEYS.LOTS, JSON.stringify(lots));
+
+        if (!lots || lots.length === 0) {
+            container.innerHTML = '<p style="text-align: center; padding: 1rem; color: var(--text-light);">No other lots added yet. Add one below to start syncing inventory.</p>';
+            return;
+        }
+
+        container.innerHTML = lots.map((lot, index) => {
+            const syncStatus = lot.lastSync ?
+                `Last synced: ${new Date(lot.lastSync).toLocaleString()}` :
+                'Will sync automatically during next scheduled sync';
+
+            return `
+                <div class="lot-item">
+                    <div class="lot-info">
+                        <h3>
+                            ${lot.name}
+                            <span class="lot-badge">${lot.buildingCount || 0} buildings</span>
+                        </h3>
+                        <p class="sync-status">${syncStatus}</p>
+                    </div>
+                    <div class="lot-actions">
+                        <button class="btn btn-sm btn-danger" onclick="removeLot(${index})">Remove</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Failed to load lots:', error);
+        container.innerHTML = '<p style="text-align: center; padding: 1rem; color: var(--text-light);">Failed to load lots</p>';
     }
-
-    container.innerHTML = lots.map((lot, index) => {
-        const syncStatus = lot.lastSync ?
-            `Last synced: ${new Date(lot.lastSync).toLocaleString()}` :
-            'Will sync automatically during next scheduled sync';
-
-        return `
-            <div class="lot-item">
-                <div class="lot-info">
-                    <h3>
-                        ${lot.name}
-                        <span class="lot-badge">${lot.buildingCount || 0} buildings</span>
-                    </h3>
-                    <p class="sync-status">${syncStatus}</p>
-                </div>
-                <div class="lot-actions">
-                    <button class="btn btn-sm btn-danger" onclick="removeLot(${index})">Remove</button>
-                </div>
-            </div>
-        `;
-    }).join('');
 }
 
 function getLots() {
