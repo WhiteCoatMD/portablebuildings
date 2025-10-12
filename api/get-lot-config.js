@@ -20,16 +20,23 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // List all blobs and find lots-config.json
+        // List all blobs and find the most recent lots-config.json
         const { blobs } = await list();
-        const configBlob = blobs.find(b => b.pathname === 'lots-config.json');
 
-        if (!configBlob) {
+        // Find all blobs that start with 'lots-config.json'
+        const configBlobs = blobs
+            .filter(b => b.pathname.startsWith('lots-config.json'))
+            .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+
+        if (configBlobs.length === 0) {
             return res.status(200).json({
                 success: true,
                 lots: []
             });
         }
+
+        // Use the most recent blob
+        const configBlob = configBlobs[0];
 
         // Fetch the blob content
         const response = await fetch(configBlob.url);

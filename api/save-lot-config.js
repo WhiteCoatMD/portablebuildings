@@ -40,9 +40,10 @@ module.exports = async (req, res) => {
         const configContent = JSON.stringify(lots, null, 2);
 
         // Save to Vercel Blob storage so sync.js can fetch it
+        // Use addRandomSuffix to avoid conflicts (we'll use the latest blob)
         const blob = await put('lots-config.json', configContent, {
             access: 'public',
-            addRandomSuffix: false
+            addRandomSuffix: true
         });
 
         return res.status(200).json({
