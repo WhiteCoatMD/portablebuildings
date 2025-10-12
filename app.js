@@ -25,6 +25,9 @@ class InventoryApp {
         this.settings = this.loadSettings();
         this.buildingOverrides = this.loadBuildingOverrides();
 
+        // Cache for building images
+        this.imageCache = {};
+
         this.init();
     }
 
@@ -280,9 +283,64 @@ class InventoryApp {
     }
 
     getBuildingImages(serialNumber) {
-        const key = `cpb_images_${serialNumber}`;
-        const stored = localStorage.getItem(key);
-        return stored ? JSON.parse(stored) : [];
+        // Return cached images if available
+        if (this.imageCache[serialNumber]) {
+            return this.imageCache[serialNumber];
+        }
+
+        // Load images async and update the card when ready
+        this.loadBuildingImagesAsync(serialNumber);
+
+        // Return empty array for now (will show emoji placeholder)
+        return [];
+    }
+
+    async loadBuildingImagesAsync(serialNumber) {
+        try {
+            const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}`);
+            const data = await response.json();
+
+            if (data.success && data.images.length > 0) {
+                // Cache the images
+                this.imageCache[serialNumber] = data.images;
+
+                // Update the specific card
+                const card = document.querySelector(`[data-serial="${serialNumber}"]`);
+                if (card) {
+                    const imageContainer = card.querySelector('.building-image');
+                    if (imageContainer) {
+                        // Create gallery HTML
+                        const galleryHTML = `
+                            <div class="building-image-gallery">
+                                ${data.images.map((img, index) => `
+                                    <img src="${img}" alt="Building ${index + 1}"
+                                         class="gallery-image ${index === 0 ? 'active' : ''}"
+                                         data-index="${index}">
+                                `).join('')}
+                                ${data.images.length > 1 ? `
+                                    <button class="gallery-nav prev" onclick="prevImage(event, '${serialNumber}')">❮</button>
+                                    <button class="gallery-nav next" onclick="nextImage(event, '${serialNumber}')">❯</button>
+                                    <div class="gallery-indicators">
+                                        ${data.images.map((_, i) => `
+                                            <span class="indicator ${i === 0 ? 'active' : ''}" data-index="${i}"></span>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+
+                        // Find and keep the repo badge if it exists
+                        const repoBadge = imageContainer.querySelector('.repo-badge');
+                        const badgeHTML = repoBadge ? repoBadge.outerHTML : '';
+
+                        // Replace the emoji with the gallery
+                        imageContainer.innerHTML = badgeHTML + galleryHTML;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load images for', serialNumber, error);
+        }
     }
 }
 

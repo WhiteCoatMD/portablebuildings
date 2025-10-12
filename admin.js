@@ -328,35 +328,43 @@ function closeImageModal() {
     currentBuilding = null;
 }
 
-function loadBuildingImages(serialNumber) {
-    const images = getBuildingImages(serialNumber);
+async function loadBuildingImages(serialNumber) {
     const container = document.getElementById('building-images');
+    container.innerHTML = '<p style="text-align: center; color: var(--text-light);">Loading images...</p>';
 
-    if (images.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-light);">No images uploaded yet</p>';
-        container.classList.add('empty');
-        return;
+    try {
+        const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}`);
+        const data = await response.json();
+
+        if (!data.success || data.images.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-light);">No images uploaded yet</p>';
+            container.classList.add('empty');
+            return;
+        }
+
+        container.classList.remove('empty');
+        container.innerHTML = data.images.map((imageUrl, index) => `
+            <div class="image-item">
+                <img src="${imageUrl}" alt="Building ${index + 1}">
+                <button class="image-item-remove" onclick="removeBuildingImage('${imageUrl}')">×</button>
+                ${index === 0 ? '<div class="image-item-primary">Main</div>' : ''}
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Failed to load images:', error);
+        container.innerHTML = '<p style="text-align: center; color: var(--text-light);">Failed to load images</p>';
     }
-
-    container.classList.remove('empty');
-    container.innerHTML = images.map((imageData, index) => `
-        <div class="image-item">
-            <img src="${imageData}" alt="Building ${index + 1}">
-            <button class="image-item-remove" onclick="removeBuildingImage(${index})">×</button>
-            ${index === 0 ? '<div class="image-item-primary">Main</div>' : ''}
-        </div>
-    `).join('');
 }
 
-function getBuildingImages(serialNumber) {
-    const key = `cpb_images_${serialNumber}`;
-    const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : [];
-}
-
-function saveBuildingImages(serialNumber, images) {
-    const key = `cpb_images_${serialNumber}`;
-    localStorage.setItem(key, JSON.stringify(images));
+async function getBuildingImages(serialNumber) {
+    try {
+        const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}`);
+        const data = await response.json();
+        return data.success ? data.images : [];
+    } catch (error) {
+        console.error('Failed to get images:', error);
+        return [];
+    }
 }
 
 async function handleImageUpload(event) {
@@ -369,14 +377,16 @@ async function handleImageUpload(event) {
 
     console.log('Files selected:', files.length);
 
-    const currentImages = getBuildingImages(currentBuilding);
+    const currentImages = await getBuildingImages(currentBuilding);
 
     if (currentImages.length + files.length > MAX_IMAGES) {
         showToast(`Maximum ${MAX_IMAGES} images allowed per building`, true);
         return;
     }
 
-    showToast('Processing images...');
+    showToast('Uploading images...');
+
+    let uploadedCount = 0;
 
     try {
         for (const file of files) {
@@ -407,21 +417,40 @@ async function handleImageUpload(event) {
             const compressedImage = await compressImage(processedFile);
             console.log('Image compressed, original:', file.size, 'compressed:', compressedImage.length);
 
-            currentImages.push(compressedImage);
+            // Upload to Vercel Blob
+            try {
+                showToast(`Uploading ${file.name}...`);
+                const response = await fetch('/api/upload-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        serialNumber: currentBuilding,
+                        imageData: compressedImage,
+                        filename: processedFile.name
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Upload failed');
+                }
+
+                console.log('Uploaded successfully:', result.url);
+                uploadedCount++;
+            } catch (error) {
+                console.error('Upload error:', error);
+                showToast(`Failed to upload ${file.name}: ${error.message}`, true);
+            }
         }
 
-        if (currentImages.length === 0) {
-            showToast('No images were processed', true);
-            return;
-        }
-
-        try {
-            saveBuildingImages(currentBuilding, currentImages);
-            loadBuildingImages(currentBuilding);
-            showToast(`${files.length} image(s) uploaded successfully!`);
-        } catch (error) {
-            console.error('Save error:', error);
-            showToast('Failed to save images - may be too large', true);
+        if (uploadedCount > 0) {
+            await loadBuildingImages(currentBuilding);
+            showToast(`${uploadedCount} image(s) uploaded successfully!`);
+        } else {
+            showToast('No images were uploaded', true);
         }
 
     } catch (error) {
@@ -475,14 +504,31 @@ function compressImage(file) {
     });
 }
 
-function removeBuildingImage(index) {
+async function removeBuildingImage(imageUrl) {
     if (!confirm('Remove this image?')) return;
 
-    const images = getBuildingImages(currentBuilding);
-    images.splice(index, 1);
-    saveBuildingImages(currentBuilding, images);
-    loadBuildingImages(currentBuilding);
-    showToast('Image removed!');
+    try {
+        showToast('Deleting image...');
+        const response = await fetch('/api/images', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url: imageUrl })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || 'Delete failed');
+        }
+
+        await loadBuildingImages(currentBuilding);
+        showToast('Image removed!');
+    } catch (error) {
+        console.error('Delete error:', error);
+        showToast('Failed to delete image: ' + error.message, true);
+    }
 }
 
 // Close modal when clicking outside
