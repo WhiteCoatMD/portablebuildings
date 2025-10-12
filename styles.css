@@ -128,7 +128,7 @@ header .dealer-text {
 .gallery-slide img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .gallery-prev,
@@ -181,6 +181,33 @@ header .dealer-text {
 .dot:hover,
 .dot.active {
     background: rgba(255, 255, 255, 1);
+}
+
+/* Welcome Section */
+.welcome-section {
+    background: #f8f9fa;
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.welcome-message {
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.welcome-message h2 {
+    font-size: 1.75rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.welcome-message p {
+    font-size: 1.15rem;
+    color: var(--text-light);
+    line-height: 1.6;
 }
 
 /* Main Content */
