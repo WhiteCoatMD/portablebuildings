@@ -924,6 +924,41 @@ footer {
     font-style: italic;
 }
 
+.social-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.75rem;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.social-link.facebook:hover {
+    background: #1877f2;
+}
+
+.social-link.instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.social-link.twitter:hover {
+    background: #000000;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     header .header-content {

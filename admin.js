@@ -15,7 +15,10 @@ const STORAGE_KEYS = {
     BUSINESS_PHONE: 'cpb_business_phone',
     BUSINESS_EMAIL: 'cpb_business_email',
     BUSINESS_ADDRESS: 'cpb_business_address',
-    BUTTON_COLOR: 'cpb_button_color'
+    BUTTON_COLOR: 'cpb_button_color',
+    SOCIAL_MEDIA: 'cpb_social_media',
+    FACEBOOK_CONFIG: 'cpb_facebook_config',
+    POSTED_BUILDINGS: 'cpb_posted_buildings'
 };
 
 // Default settings
@@ -56,6 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCarousel();
     loadColorScheme();
     loadBusinessInfo();
+    loadSocialMedia();
+    loadFacebookConfig();
     loadButtonColor();
     initializeColorInputSync();
     loadLots();
@@ -1146,6 +1151,68 @@ function getBusinessAddress() {
     return localStorage.getItem(STORAGE_KEYS.BUSINESS_ADDRESS) || '';
 }
 
+// Social Media Management
+function loadSocialMedia() {
+    const saved = localStorage.getItem(STORAGE_KEYS.SOCIAL_MEDIA);
+    const social = saved ? JSON.parse(saved) : {};
+
+    const facebookInput = document.getElementById('facebookUrl');
+    const instagramInput = document.getElementById('instagramUrl');
+    const twitterInput = document.getElementById('twitterUrl');
+
+    if (facebookInput) facebookInput.value = social.facebook || '';
+    if (instagramInput) instagramInput.value = social.instagram || '';
+    if (twitterInput) twitterInput.value = social.twitter || '';
+}
+
+function getSocialMedia() {
+    const saved = localStorage.getItem(STORAGE_KEYS.SOCIAL_MEDIA);
+    return saved ? JSON.parse(saved) : {};
+}
+
+// Facebook Auto-Post Configuration
+function loadFacebookConfig() {
+    const saved = localStorage.getItem(STORAGE_KEYS.FACEBOOK_CONFIG);
+    const config = saved ? JSON.parse(saved) : {
+        enabled: false,
+        pageId: '',
+        accessToken: '',
+        newOnly: true,
+        withImages: true,
+        availableOnly: true,
+        template: `🏠 New Arrival! {{name}}
+
+📐 Size: {{size}}
+💰 Cash Price: {{price}}
+📍 Location: {{location}}
+
+Call us at {{phone}} or visit our website to learn more!
+
+#PortableBuildings #{{type}} #ForSale`
+    };
+
+    const enabledInput = document.getElementById('enableAutoPost');
+    const pageIdInput = document.getElementById('facebookPageId');
+    const tokenInput = document.getElementById('facebookAccessToken');
+    const newOnlyInput = document.getElementById('autoPostNewOnly');
+    const withImagesInput = document.getElementById('autoPostWithImages');
+    const availableOnlyInput = document.getElementById('autoPostAvailableOnly');
+    const templateInput = document.getElementById('autoPostTemplate');
+
+    if (enabledInput) enabledInput.checked = config.enabled;
+    if (pageIdInput) pageIdInput.value = config.pageId;
+    if (tokenInput) tokenInput.value = config.accessToken;
+    if (newOnlyInput) newOnlyInput.checked = config.newOnly;
+    if (withImagesInput) withImagesInput.checked = config.withImages;
+    if (availableOnlyInput) availableOnlyInput.checked = config.availableOnly;
+    if (templateInput) templateInput.value = config.template;
+}
+
+function getFacebookConfig() {
+    const saved = localStorage.getItem(STORAGE_KEYS.FACEBOOK_CONFIG);
+    return saved ? JSON.parse(saved) : null;
+}
+
 // Button Color Management
 function loadButtonColor() {
     const saved = localStorage.getItem(STORAGE_KEYS.BUTTON_COLOR);
@@ -1241,6 +1308,26 @@ function saveCustomization() {
         localStorage.setItem(STORAGE_KEYS.BUSINESS_ADDRESS, businessAddress.value.trim());
     }
 
+    // Save social media
+    const social = {
+        facebook: document.getElementById('facebookUrl')?.value.trim() || '',
+        instagram: document.getElementById('instagramUrl')?.value.trim() || '',
+        twitter: document.getElementById('twitterUrl')?.value.trim() || ''
+    };
+    localStorage.setItem(STORAGE_KEYS.SOCIAL_MEDIA, JSON.stringify(social));
+
+    // Save Facebook auto-post configuration
+    const fbConfig = {
+        enabled: document.getElementById('enableAutoPost')?.checked || false,
+        pageId: document.getElementById('facebookPageId')?.value.trim() || '',
+        accessToken: document.getElementById('facebookAccessToken')?.value.trim() || '',
+        newOnly: document.getElementById('autoPostNewOnly')?.checked ?? true,
+        withImages: document.getElementById('autoPostWithImages')?.checked ?? true,
+        availableOnly: document.getElementById('autoPostAvailableOnly')?.checked ?? true,
+        template: document.getElementById('autoPostTemplate')?.value || ''
+    };
+    localStorage.setItem(STORAGE_KEYS.FACEBOOK_CONFIG, JSON.stringify(fbConfig));
+
     // Save color scheme
     const selectedScheme = document.querySelector('input[name="colorScheme"]:checked');
     if (selectedScheme) {
@@ -1262,6 +1349,95 @@ function saveCustomization() {
     showToast('Site customization saved successfully!');
 }
 
+// Facebook Auto-Posting
+async function checkAndPostToFacebook(building) {
+    const config = getFacebookConfig();
+
+    if (!config || !config.enabled) {
+        return; // Auto-posting disabled
+    }
+
+    // Get list of already posted buildings
+    const postedBuildings = JSON.parse(localStorage.getItem(STORAGE_KEYS.POSTED_BUILDINGS) || '[]');
+
+    // Check if already posted
+    if (postedBuildings.includes(building.serialNumber)) {
+        return; // Already posted
+    }
+
+    // Check conditions
+    const override = getBuildingOverrides()[building.serialNumber] || {};
+    const status = override.status || 'available';
+
+    // Check if building meets criteria
+    if (config.newOnly && building.isRepo) {
+        return; // Skip repos if newOnly is enabled
+    }
+
+    if (config.availableOnly && status !== 'available') {
+        return; // Skip if not available
+    }
+
+    if (config.withImages) {
+        const images = await getBuildingImages(building.serialNumber);
+        if (!images || images.length === 0) {
+            return; // Skip if no images
+        }
+        building.images = images; // Add images to building object
+    }
+
+    // Get business phone for template
+    const businessPhone = getBusinessPhone();
+
+    try {
+        // Call Facebook API
+        const response = await fetch('/api/post-to-facebook', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                building,
+                config,
+                businessPhone
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Mark as posted
+            postedBuildings.push(building.serialNumber);
+            localStorage.setItem(STORAGE_KEYS.POSTED_BUILDINGS, JSON.stringify(postedBuildings));
+
+            showToast(`✅ Posted ${building.title} to Facebook!`);
+            console.log('Facebook post successful:', result);
+        } else {
+            console.error('Facebook post failed:', result.error);
+            showToast(`❌ Failed to post to Facebook: ${result.error}`, true);
+        }
+    } catch (error) {
+        console.error('Facebook post error:', error);
+        showToast(`❌ Error posting to Facebook: ${error.message}`, true);
+    }
+}
+
+// Trigger auto-post when images are uploaded
+const originalHandleImageUpload = handleImageUpload;
+async function handleImageUploadWithAutoPost(event) {
+    await originalHandleImageUpload.call(this, event);
+
+    // After successful upload, check if we should post
+    if (currentBuilding) {
+        const inventory = window.PROCESSED_INVENTORY || [];
+        const building = inventory.find(b => b.serialNumber === currentBuilding);
+
+        if (building) {
+            await checkAndPostToFacebook(building);
+        }
+    }
+}
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveCustomization = saveCustomization;
@@ -1281,3 +1457,4 @@ window.removeLot = removeLot;
 window.syncLot = syncLot;
 window.triggerManualSync = triggerManualSync;
 window.resetButtonColor = resetButtonColor;
+window.checkAndPostToFacebook = checkAndPostToFacebook;

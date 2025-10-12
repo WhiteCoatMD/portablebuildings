@@ -56,6 +56,94 @@
                               placeholder="e.g., 123 Main St, West Monroe, LA 71291"></textarea>
                     <p class="help-text">Your business location (optional)</p>
                 </div>
+
+                <div class="form-group">
+                    <label for="facebookUrl">Facebook Page URL</label>
+                    <input type="url" id="facebookUrl" class="form-control"
+                           placeholder="e.g., https://facebook.com/yourpage">
+                    <p class="help-text">Link to your business Facebook page</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="instagramUrl">Instagram Profile URL</label>
+                    <input type="url" id="instagramUrl" class="form-control"
+                           placeholder="e.g., https://instagram.com/yourprofile">
+                    <p class="help-text">Link to your business Instagram profile</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="twitterUrl">Twitter/X Profile URL</label>
+                    <input type="url" id="twitterUrl" class="form-control"
+                           placeholder="e.g., https://twitter.com/yourprofile">
+                    <p class="help-text">Link to your business Twitter/X profile (optional)</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Facebook Auto-Posting</h2>
+                <p class="help-text">Automatically post new building listings to your Facebook page</p>
+
+                <div class="setting-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="enableAutoPost">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Enable Auto-Posting to Facebook</span>
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label for="facebookPageId">Facebook Page ID</label>
+                    <input type="text" id="facebookPageId" class="form-control"
+                           placeholder="e.g., 123456789012345">
+                    <p class="help-text">Your Facebook Page ID (found in page settings)</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="facebookAccessToken">Facebook Page Access Token</label>
+                    <input type="password" id="facebookAccessToken" class="form-control"
+                           placeholder="Enter your Facebook Page Access Token">
+                    <p class="help-text">Long-lived page access token from Facebook Developer Console</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Auto-Post Conditions</label>
+                    <div style="margin-top: 0.5rem;">
+                        <label class="toggle-label" style="margin-bottom: 0.75rem;">
+                            <input type="checkbox" id="autoPostNewOnly" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Only post new inventory (not repos)</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="toggle-label" style="margin-bottom: 0.75rem;">
+                            <input type="checkbox" id="autoPostWithImages" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Only post buildings with uploaded images</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="autoPostAvailableOnly" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Only post available buildings (not sold/pending)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="autoPostTemplate">Post Template</label>
+                    <textarea id="autoPostTemplate" class="form-control" rows="6"
+                              placeholder="Use {{name}}, {{size}}, {{price}}, {{type}} as placeholders">🏠 New Arrival! {{name}}
+
+📐 Size: {{size}}
+💰 Cash Price: {{price}}
+📍 Location: {{location}}
+
+Call us at {{phone}} or visit our website to learn more!
+
+#PortableBuildings #{{type}} #ForSale</textarea>
+                    <p class="help-text">Customize the post message. Available placeholders: {{name}}, {{size}}, {{price}}, {{type}}, {{location}}, {{phone}}</p>
+                </div>
             </div>
 
             <div class="card">
