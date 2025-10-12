@@ -69,7 +69,15 @@ class InventorySync {
             console.log('\nStep 4: Updating inventory.js...');
             await this.updateInventoryFile(formattedInventory, mergedOverrides);
 
-            // Step 7: Log success
+            // Step 7: Update lot metadata and save back to Vercel Blob
+            if (otherLotsData.length > 0) {
+                await this.updateLotMetadata(otherLotsData);
+            }
+
+            // Step 8: Commit and push to GitHub
+            await this.commitAndPush(scrapedData.length, otherLotsData.length);
+
+            // Step 9: Log success
             await this.logSync('success', formattedInventory.length, statusUpdates);
 
             const stats = this.statusTracker.getStats();
@@ -78,7 +86,8 @@ class InventorySync {
             console.log(`  Main lot: ${scrapedData.length} buildings`);
             console.log(`  Other lots: ${otherLotsData.length} buildings`);
             console.log(`Status: ${stats.available} available, ${stats.pending} pending, ${stats.sold} sold`);
-            console.log('Website will show new inventory on next page load');
+            console.log('Inventory committed and pushed to GitHub');
+            console.log('Website will update automatically via Vercel deployment');
 
             return {
                 success: true,
@@ -340,6 +349,74 @@ window.PROCESSED_INVENTORY = processInventory();
 
         await fs.writeFile(this.inventoryFile, content, 'utf-8');
         console.log('Inventory file updated successfully');
+    }
+
+    async updateLotMetadata(otherLotsData) {
+        try {
+            // Fetch current lot config
+            const siteUrl = process.env.SITE_URL || 'https://buytheshed.com';
+            const response = await fetch(`${siteUrl}/api/get-lot-config`);
+            const data = await response.json();
+
+            if (!data.success || !data.lots || data.lots.length === 0) {
+                return;
+            }
+
+            const lots = data.lots;
+
+            // Update each lot's metadata
+            for (const lot of lots) {
+                const lotBuildings = otherLotsData.filter(b => b.location === lot.name);
+                lot.lastSync = new Date().toISOString();
+                lot.buildingCount = lotBuildings.length;
+            }
+
+            // Save updated lots back to Vercel Blob
+            const saveResponse = await fetch(`${siteUrl}/api/save-lot-config`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ lots })
+            });
+
+            const saveResult = await saveResponse.json();
+
+            if (saveResult.success) {
+                console.log('Lot metadata updated successfully');
+            }
+        } catch (error) {
+            console.error('Could not update lot metadata:', error.message);
+        }
+    }
+
+    async commitAndPush(mainCount, otherCount) {
+        try {
+            const { exec } = require('child_process');
+            const util = require('util');
+            const execPromise = util.promisify(exec);
+
+            console.log('\nCommitting and pushing to GitHub...');
+
+            // Git add
+            await execPromise('git add inventory.js', { cwd: __dirname });
+
+            // Git commit
+            const commitMessage = `Auto-sync: ${mainCount + otherCount} buildings (${mainCount} main + ${otherCount} other lots)`;
+            await execPromise(`git commit -m "${commitMessage}"`, { cwd: __dirname });
+
+            // Git push
+            await execPromise('git push origin master', { cwd: __dirname });
+
+            console.log('✓ Changes pushed to GitHub');
+        } catch (error) {
+            // If there are no changes to commit, git will error - that's okay
+            if (error.message.includes('nothing to commit')) {
+                console.log('No inventory changes to commit');
+            } else {
+                console.error('Could not commit/push:', error.message);
+            }
+        }
     }
 
     async logSync(status, count, error = null) {
