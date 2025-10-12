@@ -219,10 +219,10 @@ main {
 .filters {
     background: var(--white);
     padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     margin-bottom: 2rem;
-    border: 1px solid var(--border);
+    border: 1px solid #000000;
 }
 
 .filters h2 {
