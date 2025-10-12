@@ -1,0 +1,19 @@
+{
+  "name": "portable-buildings-sync",
+  "version": "1.0.0",
+  "description": "Automated inventory sync for portable buildings dealer portal",
+  "main": "sync.js",
+  "scripts": {
+    "sync": "node sync.js",
+    "test": "node test-login.js",
+    "schedule": "node scheduler.js"
+  },
+  "keywords": ["inventory", "automation", "sync"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.40.0",
+    "dotenv": "^16.3.1",
+    "node-cron": "^3.0.3"
+  }
+}

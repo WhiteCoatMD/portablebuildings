@@ -1,0 +1,24 @@
+# Environment variables - NEVER COMMIT THIS!
+.env
+
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Screenshots from automation
+screenshots/
+
+# Database files (if we add SQLite later)
+*.db
+*.sqlite
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portable Buildings - Current Inventory</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Portable Buildings</h1>
+            <p class="tagline">Quality Storage Solutions</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="filters">
+            <h2>Find Your Building</h2>
+            <div class="filter-group">
+                <label for="type-filter">Building Type:</label>
+                <select id="type-filter">
+                    <option value="all">All Types</option>
+                    <option value="MS">Mini Shed</option>
+                    <option value="LB">Lofted Barn</option>
+                    <option value="UB">Utility Barn</option>
+                    <option value="CB">Cabin</option>
+                    <option value="GR">Garage</option>
+                </select>
+
+                <label for="size-filter">Size:</label>
+                <select id="size-filter">
+                    <option value="all">All Sizes</option>
+                </select>
+
+                <label for="status-filter">Status:</label>
+                <select id="status-filter">
+                    <option value="all">All</option>
+                    <option value="available">Available</option>
+                    <option value="repo">Repo</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="inventory">
+            <div class="inventory-count">
+                <span id="count">0</span> buildings available
+            </div>
+            <div id="buildings-grid" class="buildings-grid">
+                <!-- Buildings will be populated here by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Portable Buildings. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="decoder.js"></script>
+    <script src="inventory.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

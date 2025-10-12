@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(node gpb-scraper.js)",
+      "Bash(npx playwright install:*)",
+      "Bash(dir:*)",
+      "Bash(start index.html)",
+      "Bash(npm run sync:*)",
+      "Bash(node sync.js)",
+      "Bash(node test-decoder.js)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
