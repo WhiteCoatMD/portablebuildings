@@ -342,14 +342,42 @@ async function loadBuildingImages(serialNumber) {
             return;
         }
 
+        // Check if there's a custom order stored
+        const orderKey = `cpb_image_order_${serialNumber}`;
+        let orderedImages = JSON.parse(localStorage.getItem(orderKey) || 'null');
+
+        // If no custom order, use default (by upload time)
+        if (!orderedImages) {
+            orderedImages = data.images;
+        } else {
+            // Filter out any images that no longer exist
+            orderedImages = orderedImages.filter(url => data.images.includes(url));
+            // Add any new images that aren't in the order
+            data.images.forEach(url => {
+                if (!orderedImages.includes(url)) {
+                    orderedImages.push(url);
+                }
+            });
+            // Update stored order
+            localStorage.setItem(orderKey, JSON.stringify(orderedImages));
+        }
+
         container.classList.remove('empty');
-        container.innerHTML = data.images.map((imageUrl, index) => `
-            <div class="image-item">
+        container.innerHTML = orderedImages.map((imageUrl, index) => `
+            <div class="image-item" draggable="true" data-index="${index}" data-url="${imageUrl}">
                 <img src="${imageUrl}" alt="Building ${index + 1}">
                 <button class="image-item-remove" onclick="removeBuildingImage('${imageUrl}')">×</button>
+                <button class="image-item-main-btn ${index === 0 ? 'active' : ''}"
+                        onclick="setMainImage('${imageUrl}')"
+                        title="${index === 0 ? 'Main Image' : 'Set as Main'}">
+                    ★
+                </button>
                 ${index === 0 ? '<div class="image-item-primary">Main</div>' : ''}
             </div>
         `).join('');
+
+        // Add drag and drop functionality
+        addImageDragAndDrop();
     } catch (error) {
         console.error('Failed to load images:', error);
         container.innerHTML = '<p style="text-align: center; color: var(--text-light);">Failed to load images</p>';
@@ -360,7 +388,29 @@ async function getBuildingImages(serialNumber) {
     try {
         const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}`);
         const data = await response.json();
-        return data.success ? data.images : [];
+
+        if (!data.success || !data.images.length) {
+            return [];
+        }
+
+        // Check for custom order
+        const orderKey = `cpb_image_order_${serialNumber}`;
+        let orderedImages = JSON.parse(localStorage.getItem(orderKey) || 'null');
+
+        // If no custom order, use default
+        if (!orderedImages) {
+            return data.images;
+        }
+
+        // Filter and reorder
+        orderedImages = orderedImages.filter(url => data.images.includes(url));
+        data.images.forEach(url => {
+            if (!orderedImages.includes(url)) {
+                orderedImages.push(url);
+            }
+        });
+
+        return orderedImages;
     } catch (error) {
         console.error('Failed to get images:', error);
         return [];
@@ -531,6 +581,91 @@ async function removeBuildingImage(imageUrl) {
     }
 }
 
+async function setMainImage(imageUrl) {
+    try {
+        showToast('Setting as main image...');
+
+        // Get current images
+        const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(currentBuilding)}`);
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error('Failed to get current images');
+        }
+
+        // Reorder: move selected image to front
+        const images = data.images.filter(url => url !== imageUrl);
+        images.unshift(imageUrl);
+
+        // Save the new order by storing it in localStorage
+        // (Vercel Blob doesn't support reordering, so we store order separately)
+        const orderKey = `cpb_image_order_${currentBuilding}`;
+        localStorage.setItem(orderKey, JSON.stringify(images));
+
+        await loadBuildingImages(currentBuilding);
+        showToast('Main image updated!');
+    } catch (error) {
+        console.error('Set main error:', error);
+        showToast('Failed to set main image: ' + error.message, true);
+    }
+}
+
+function addImageDragAndDrop() {
+    const items = document.querySelectorAll('.image-item');
+    let draggedItem = null;
+
+    items.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+            draggedItem = item;
+            item.style.opacity = '0.5';
+        });
+
+        item.addEventListener('dragend', (e) => {
+            item.style.opacity = '1';
+        });
+
+        item.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        item.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            if (draggedItem !== item) {
+                const draggedUrl = draggedItem.dataset.url;
+                const targetIndex = parseInt(item.dataset.index);
+
+                try {
+                    // Get current images
+                    const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(currentBuilding)}`);
+                    const data = await response.json();
+
+                    if (!data.success) {
+                        throw new Error('Failed to get current images');
+                    }
+
+                    // Get current order or use default
+                    const orderKey = `cpb_image_order_${currentBuilding}`;
+                    let images = JSON.parse(localStorage.getItem(orderKey) || 'null') || data.images;
+
+                    // Remove dragged image and insert at target position
+                    const draggedIndex = images.indexOf(draggedUrl);
+                    images.splice(draggedIndex, 1);
+                    images.splice(targetIndex, 0, draggedUrl);
+
+                    // Save new order
+                    localStorage.setItem(orderKey, JSON.stringify(images));
+
+                    await loadBuildingImages(currentBuilding);
+                    showToast('Image order updated!');
+                } catch (error) {
+                    console.error('Reorder error:', error);
+                    showToast('Failed to reorder images', true);
+                }
+            }
+        });
+    });
+}
+
 // Close modal when clicking outside
 document.addEventListener('click', (e) => {
     const modal = document.getElementById('image-modal');
@@ -550,4 +685,5 @@ window.toggleBuildingVisibility = toggleBuildingVisibility;
 window.openImageModal = openImageModal;
 window.closeImageModal = closeImageModal;
 window.removeBuildingImage = removeBuildingImage;
+window.setMainImage = setMainImage;
 window.getBuildingImages = getBuildingImages;
