@@ -229,6 +229,8 @@ function loadBuildings() {
                     <p>SN: ${building.serialNumber} | $${building.price.toLocaleString()} ${building.isRepo ? '(Pre-Owned)' : ''}</p>
                 </div>
                 <div class="building-actions">
+                    <button class="btn btn-sm btn-primary"
+                            onclick="openImageModal('${building.serialNumber}')">📷 Images</button>
                     <button class="btn btn-sm ${status === 'available' ? 'btn-success' : 'btn-secondary'}"
                             onclick="setBuildingStatus('${building.serialNumber}', 'available')">Available</button>
                     <button class="btn btn-sm ${status === 'pending' ? 'btn-warning' : 'btn-secondary'}"
@@ -292,6 +294,144 @@ function showToast(message, isError = false) {
     }, 3000);
 }
 
+// Image Management
+const MAX_IMAGES = 5;
+let currentBuilding = null;
+
+function openImageModal(serialNumber) {
+    currentBuilding = serialNumber;
+    const inventory = window.PROCESSED_INVENTORY || [];
+    const building = inventory.find(b => b.serialNumber === serialNumber);
+
+    if (!building) return;
+
+    // Update modal header info
+    document.getElementById('modal-building-info').innerHTML = `
+        <h3>${building.title} - ${building.sizeDisplay}</h3>
+        <p>Serial: ${building.serialNumber}</p>
+    `;
+
+    // Load existing images
+    loadBuildingImages(serialNumber);
+
+    // Show modal
+    document.getElementById('image-modal').classList.add('show');
+
+    // Setup file upload handler
+    const uploadInput = document.getElementById('image-upload');
+    uploadInput.value = '';
+    uploadInput.onchange = handleImageUpload;
+}
+
+function closeImageModal() {
+    document.getElementById('image-modal').classList.remove('show');
+    currentBuilding = null;
+}
+
+function loadBuildingImages(serialNumber) {
+    const images = getBuildingImages(serialNumber);
+    const container = document.getElementById('building-images');
+
+    if (images.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-light);">No images uploaded yet</p>';
+        container.classList.add('empty');
+        return;
+    }
+
+    container.classList.remove('empty');
+    container.innerHTML = images.map((imageData, index) => `
+        <div class="image-item">
+            <img src="${imageData}" alt="Building ${index + 1}">
+            <button class="image-item-remove" onclick="removeBuildingImage(${index})">×</button>
+            ${index === 0 ? '<div class="image-item-primary">Main</div>' : ''}
+        </div>
+    `).join('');
+}
+
+function getBuildingImages(serialNumber) {
+    const key = `cpb_images_${serialNumber}`;
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : [];
+}
+
+function saveBuildingImages(serialNumber, images) {
+    const key = `cpb_images_${serialNumber}`;
+    localStorage.setItem(key, JSON.stringify(images));
+}
+
+async function handleImageUpload(event) {
+    const files = Array.from(event.target.files);
+    const currentImages = getBuildingImages(currentBuilding);
+
+    if (currentImages.length + files.length > MAX_IMAGES) {
+        showToast(`Maximum ${MAX_IMAGES} images allowed per building`, true);
+        return;
+    }
+
+    showToast('Processing images...');
+
+    try {
+        for (const file of files) {
+            let processedFile = file;
+
+            // Convert HEIC to JPEG
+            if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+                showToast('Converting HEIC image...');
+                try {
+                    const convertedBlob = await heic2any({
+                        blob: file,
+                        toType: 'image/jpeg',
+                        quality: 0.8
+                    });
+                    processedFile = new File([convertedBlob], file.name.replace(/\.heic$/i, '.jpg'), {
+                        type: 'image/jpeg'
+                    });
+                } catch (error) {
+                    console.error('HEIC conversion failed:', error);
+                    showToast('HEIC conversion failed, trying as regular image', true);
+                }
+            }
+
+            // Read image as base64
+            const reader = new FileReader();
+            await new Promise((resolve, reject) => {
+                reader.onload = () => {
+                    currentImages.push(reader.result);
+                    resolve();
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(processedFile);
+            });
+        }
+
+        saveBuildingImages(currentBuilding, currentImages);
+        loadBuildingImages(currentBuilding);
+        showToast(`${files.length} image(s) uploaded successfully!`);
+
+    } catch (error) {
+        console.error('Upload error:', error);
+        showToast('Failed to upload images', true);
+    }
+}
+
+function removeBuildingImage(index) {
+    if (!confirm('Remove this image?')) return;
+
+    const images = getBuildingImages(currentBuilding);
+    images.splice(index, 1);
+    saveBuildingImages(currentBuilding, images);
+    loadBuildingImages(currentBuilding);
+    showToast('Image removed!');
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('image-modal');
+    if (e.target === modal) {
+        closeImageModal();
+    }
+});
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveWelcomeMessage = saveWelcomeMessage;
@@ -300,3 +440,7 @@ window.removeCarouselImage = removeCarouselImage;
 window.saveCarousel = saveCarousel;
 window.setBuildingStatus = setBuildingStatus;
 window.toggleBuildingVisibility = toggleBuildingVisibility;
+window.openImageModal = openImageModal;
+window.closeImageModal = closeImageModal;
+window.removeBuildingImage = removeBuildingImage;
+window.getBuildingImages = getBuildingImages;

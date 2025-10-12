@@ -142,6 +142,35 @@ class InventoryApp {
 
         const repoBadge = building.isRepo ? '<div class="repo-badge">REPO</div>' : '';
 
+        // Get uploaded images
+        const buildingImages = this.getBuildingImages(building.serialNumber);
+        const hasImages = buildingImages && buildingImages.length > 0;
+
+        // Image display - either uploaded photos or emoji
+        let imageDisplay = '';
+        if (hasImages) {
+            imageDisplay = `
+                <div class="building-image-gallery">
+                    ${buildingImages.map((img, index) => `
+                        <img src="${img}" alt="${building.title} ${index + 1}"
+                             class="gallery-image ${index === 0 ? 'active' : ''}"
+                             data-index="${index}">
+                    `).join('')}
+                    ${buildingImages.length > 1 ? `
+                        <button class="gallery-nav prev" onclick="prevImage(event, '${building.serialNumber}')">❮</button>
+                        <button class="gallery-nav next" onclick="nextImage(event, '${building.serialNumber}')">❯</button>
+                        <div class="gallery-indicators">
+                            ${buildingImages.map((_, i) => `
+                                <span class="indicator ${i === 0 ? 'active' : ''}" data-index="${i}"></span>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        } else {
+            imageDisplay = '<span>🏠</span>';
+        }
+
         // Price display based on settings
         let priceSection = '';
         if (this.settings.showCashPrice) {
@@ -194,7 +223,7 @@ class InventoryApp {
                 ${statusBanner}
                 <div class="building-image">
                     ${repoBadge}
-                    <span>\u{1F3E0}</span>
+                    ${imageDisplay}
                 </div>
                 <div class="building-info">
                     <div class="building-type">${building.typeName}</div>
@@ -248,6 +277,12 @@ class InventoryApp {
 
     updateCount() {
         this.elements.countDisplay.textContent = this.filteredInventory.length;
+    }
+
+    getBuildingImages(serialNumber) {
+        const key = `cpb_images_${serialNumber}`;
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : [];
     }
 }
 
@@ -355,6 +390,45 @@ function shareBuilding(event, platform, serialNumber) {
             window.location.href = `sms:?&body=${smsBody}`;
             break;
     }
+}
+
+// Building Image Gallery Navigation
+function prevImage(event, serialNumber) {
+    event.stopPropagation();
+    navigateGallery(serialNumber, -1);
+}
+
+function nextImage(event, serialNumber) {
+    event.stopPropagation();
+    navigateGallery(serialNumber, 1);
+}
+
+function navigateGallery(serialNumber, direction) {
+    const card = document.querySelector(`[data-serial="${serialNumber}"]`);
+    if (!card) return;
+
+    const images = card.querySelectorAll('.gallery-image');
+    const indicators = card.querySelectorAll('.indicator');
+
+    let currentIndex = 0;
+    images.forEach((img, i) => {
+        if (img.classList.contains('active')) {
+            currentIndex = i;
+        }
+    });
+
+    // Calculate new index
+    let newIndex = currentIndex + direction;
+    if (newIndex < 0) newIndex = images.length - 1;
+    if (newIndex >= images.length) newIndex = 0;
+
+    // Update active states
+    images.forEach((img, i) => {
+        img.classList.toggle('active', i === newIndex);
+    });
+    indicators.forEach((ind, i) => {
+        ind.classList.toggle('active', i === newIndex);
+    });
 }
 
 // Initialize app when DOM is ready

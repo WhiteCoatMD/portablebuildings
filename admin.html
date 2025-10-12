@@ -108,6 +108,32 @@
         <span id="toast-message"></span>
     </div>
 
+    <!-- Image Upload Modal -->
+    <div class="modal" id="image-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Manage Building Images</h2>
+                <button class="modal-close" onclick="closeImageModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-building-info"></div>
+
+                <div class="image-gallery" id="building-images">
+                    <!-- Uploaded images will appear here -->
+                </div>
+
+                <div class="upload-section">
+                    <label class="upload-btn">
+                        <input type="file" id="image-upload" accept="image/*,.heic" multiple style="display: none;">
+                        <span>📷 Upload Photos (Max 5)</span>
+                    </label>
+                    <p class="help-text">Supports JPG, PNG, HEIC. HEIC will be auto-converted.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
     <script src="decoder.js"></script>
     <script src="inventory.js"></script>
     <script src="admin.js"></script>
