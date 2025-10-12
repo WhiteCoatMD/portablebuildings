@@ -21,6 +21,9 @@ class InventorySync {
         console.log(`Time: ${new Date().toISOString()}`);
 
         try {
+            // Step 0: Auto-update code from GitHub
+            await this.updateCodeFromGitHub();
+
             // Step 1: Backup current inventory
             await this.backupCurrentInventory();
 
@@ -113,6 +116,34 @@ class InventorySync {
                 error: error.message,
                 timestamp: new Date().toISOString()
             };
+        }
+    }
+
+    async updateCodeFromGitHub() {
+        try {
+            const { exec } = require('child_process');
+            const util = require('util');
+            const execPromise = util.promisify(exec);
+
+            console.log('\nStep 0: Checking for code updates from GitHub...');
+
+            // Fetch latest changes
+            await execPromise('git fetch origin master', { cwd: __dirname });
+
+            // Check if there are updates
+            const { stdout: statusOutput } = await execPromise('git status -uno', { cwd: __dirname });
+
+            if (statusOutput.includes('Your branch is behind')) {
+                console.log('  → Updates found, pulling latest code...');
+                await execPromise('git pull origin master', { cwd: __dirname });
+                console.log('  ✓ Code updated successfully');
+            } else {
+                console.log('  ✓ Code is already up to date');
+            }
+
+        } catch (error) {
+            console.warn('Could not auto-update code:', error.message);
+            console.warn('Continuing with current code version...');
         }
     }
 
