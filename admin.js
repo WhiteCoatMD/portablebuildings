@@ -775,7 +775,7 @@ function loadLots() {
                         <span class="lot-badge">${lot.buildingCount || 0} buildings</span>
                     </h3>
                     <p class="sync-status">${syncStatus}</p>
-                    <code style="font-size: 0.85rem; color: var(--text-light);">npm run sync:lot "${lot.name}"</code>
+                    <code style="font-size: 0.85rem; color: var(--text-light); display: block; margin-top: 0.5rem; padding: 0.5rem; background: #f5f5f5; border-radius: 4px;">npm run sync:lot ${lot.username || '[username]'} ${lot.password ? '••••••' : '[password]'} "${lot.name}"</code>
                 </div>
                 <div class="lot-actions">
                     <button class="btn btn-sm btn-danger" onclick="removeLot(${index})">Remove</button>
@@ -792,9 +792,11 @@ function getLots() {
 
 function addLot() {
     const name = document.getElementById('lot-name').value.trim();
+    const username = document.getElementById('lot-username').value.trim();
+    const password = document.getElementById('lot-password').value.trim();
 
-    if (!name) {
-        showToast('Please enter a lot name', true);
+    if (!name || !username || !password) {
+        showToast('Please fill in all fields', true);
         return;
     }
 
@@ -808,6 +810,8 @@ function addLot() {
 
     lots.push({
         name,
+        username,
+        password,
         lastSync: null,
         buildingCount: 0
     });
@@ -816,9 +820,11 @@ function addLot() {
 
     // Clear form
     document.getElementById('lot-name').value = '';
+    document.getElementById('lot-username').value = '';
+    document.getElementById('lot-password').value = '';
 
     loadLots();
-    showToast('Lot location added! Run sync command locally to import buildings.');
+    showToast('Lot location added! Run the sync command shown below.');
 }
 
 function removeLot(index) {
