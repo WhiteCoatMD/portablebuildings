@@ -27,25 +27,33 @@
         <!-- Site Customization Tab -->
         <div class="tab-content active" id="customization-tab">
             <div class="card">
+                <h2>Business Information</h2>
+
+                <div class="form-group">
+                    <label for="businessName">Business Name</label>
+                    <input type="text" id="businessName" class="form-control"
+                           placeholder="e.g., Community Portable Buildings">
+                    <p class="help-text">This appears in the header of your website</p>
+                </div>
+            </div>
+
+            <div class="card">
                 <h2>Color Scheme</h2>
-                <p class="help-text">Choose a professional color scheme for your website</p>
+                <p class="help-text">Choose a professional 2-color gradient scheme</p>
 
                 <div class="color-schemes">
                     <label class="color-scheme-option">
                         <input type="radio" name="colorScheme" value="rustic-earth" checked>
                         <div class="scheme-preview">
                             <div class="scheme-header">
-                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #2C5F2D 0%, #C75B39 100%);"></div>
+                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #2C5F2D 0%, #5D4E37 100%);"></div>
                             </div>
                             <div class="scheme-info">
-                                <h3>Rustic Earth & Forest</h3>
-                                <p>Warm, natural, professional - perfect for outdoor buildings</p>
+                                <h3>Rustic Earth</h3>
+                                <p>Forest green to earth brown - natural & professional</p>
                                 <div class="scheme-colors">
-                                    <span class="color-dot" style="background: #2C5F2D;" title="Deep Forest Green"></span>
-                                    <span class="color-dot" style="background: #C75B39;" title="Warm Clay"></span>
-                                    <span class="color-dot" style="background: #5D4E37;" title="Rich Earth Brown"></span>
-                                    <span class="color-dot" style="background: #D4B896;" title="Sandstone Beige"></span>
-                                    <span class="color-dot" style="background: #8A9A5B;" title="Sage Green"></span>
+                                    <span class="color-dot" style="background: #2C5F2D;" title="Forest Green"></span>
+                                    <span class="color-dot" style="background: #5D4E37;" title="Earth Brown"></span>
                                 </div>
                             </div>
                         </div>
@@ -59,13 +67,10 @@
                             </div>
                             <div class="scheme-info">
                                 <h3>Modern Ranch</h3>
-                                <p>Bold, confident, masculine - inspired by barn structures</p>
+                                <p>Barn red to charcoal - bold & confident</p>
                                 <div class="scheme-colors">
                                     <span class="color-dot" style="background: #7C2529;" title="Barn Red"></span>
-                                    <span class="color-dot" style="background: #3A3A3C;" title="Charcoal Gray"></span>
-                                    <span class="color-dot" style="background: #704214;" title="Warm Brown"></span>
-                                    <span class="color-dot" style="background: #D4A574;" title="Soft Gold"></span>
-                                    <span class="color-dot" style="background: #6B7280;" title="Slate Gray"></span>
+                                    <span class="color-dot" style="background: #3A3A3C;" title="Charcoal"></span>
                                 </div>
                             </div>
                         </div>
@@ -75,21 +80,28 @@
                         <input type="radio" name="colorScheme" value="desert-timber">
                         <div class="scheme-preview">
                             <div class="scheme-header">
-                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #C19A6B 0%, #6B6935 100%);"></div>
+                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #C19A6B 0%, #8B7355 100%);"></div>
                             </div>
                             <div class="scheme-info">
                                 <h3>Desert Timber</h3>
-                                <p>Warm, inviting, southwestern feel</p>
+                                <p>Warm sand to rich wood - inviting & warm</p>
                                 <div class="scheme-colors">
                                     <span class="color-dot" style="background: #C19A6B;" title="Desert Sand"></span>
-                                    <span class="color-dot" style="background: #6B6935;" title="Deep Olive"></span>
-                                    <span class="color-dot" style="background: #5C4033;" title="Rich Walnut"></span>
-                                    <span class="color-dot" style="background: #CC8B65;" title="Terracotta"></span>
-                                    <span class="color-dot" style="background: #9CA58F;" title="Sage Gray"></span>
+                                    <span class="color-dot" style="background: #8B7355;" title="Rich Wood"></span>
                                 </div>
                             </div>
                         </div>
                     </label>
+                </div>
+
+                <div class="form-group" style="margin-top: 2rem;">
+                    <label for="buttonColor">Custom Button Color (Optional)</label>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <input type="color" id="buttonColor" class="color-picker" value="#2C5F2D">
+                        <input type="text" id="buttonColorHex" class="form-control" placeholder="#2C5F2D" style="max-width: 150px;">
+                        <button class="btn btn-secondary btn-sm" onclick="resetButtonColor()">Reset</button>
+                    </div>
+                    <p class="help-text">Customize the button color on product cards (overrides scheme default)</p>
                 </div>
             </div>
 

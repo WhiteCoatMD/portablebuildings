@@ -7,11 +7,19 @@
     <link rel="stylesheet" href="color-schemes.css">
     <link rel="stylesheet" href="styles.css">
     <script>
-        // Apply color scheme before page loads
+        // Apply color scheme and customizations before page loads
         (function() {
+            // Apply color scheme
             const scheme = localStorage.getItem('cpb_color_scheme') || 'rustic-earth';
             if (scheme !== 'rustic-earth') {
                 document.documentElement.setAttribute('data-color-scheme', scheme);
+            }
+
+            // Apply custom button color if set
+            const buttonColor = localStorage.getItem('cpb_button_color');
+            if (buttonColor) {
+                document.documentElement.setAttribute('data-custom-button-color', '');
+                document.documentElement.style.setProperty('--custom-button-color', buttonColor);
             }
         })();
     </script>
@@ -20,7 +28,7 @@
     <header>
         <div class="container header-content">
             <div class="header-left">
-                <h1>Community Portable Buildings</h1>
+                <h1 id="business-name-header">Community Portable Buildings</h1>
                 <p class="phone-text">Call us at <a href="tel:318-594-5909" class="phone-link">318-594-5909</a></p>
             </div>
             <div class="header-right">

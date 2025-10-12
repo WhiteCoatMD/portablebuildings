@@ -44,11 +44,21 @@ class InventoryApp {
     }
 
     init() {
+        this.loadBusinessName();
         this.loadWelcomeMessage();
         this.populateSizeFilter();
         this.populateLocationFilter();
         this.attachEventListeners();
         this.renderBuildings();
+    }
+
+    loadBusinessName() {
+        const stored = localStorage.getItem('cpb_business_name');
+        const businessName = stored || 'Community Portable Buildings';
+        const headerEl = document.getElementById('business-name-header');
+        if (headerEl) {
+            headerEl.textContent = businessName;
+        }
     }
 
     loadWelcomeMessage() {

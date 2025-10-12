@@ -10,7 +10,9 @@ const STORAGE_KEYS = {
     CAROUSEL: 'cpb_carousel_images',
     BUILDINGS: 'cpb_building_overrides',
     LOTS: 'cpb_other_lots',
-    COLOR_SCHEME: 'cpb_color_scheme'
+    COLOR_SCHEME: 'cpb_color_scheme',
+    BUSINESS_NAME: 'cpb_business_name',
+    BUTTON_COLOR: 'cpb_button_color'
 };
 
 // Default settings
@@ -50,6 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadWelcomeMessage();
     loadCarousel();
     loadColorScheme();
+    loadBusinessName();
+    loadButtonColor();
+    initializeColorInputSync();
     loadLots();
     loadBuildings();
     initializeBuildingFilters();
@@ -1087,11 +1092,108 @@ function loadColorScheme() {
     }
 }
 
+// Business Name Management
+function loadBusinessName() {
+    const saved = localStorage.getItem(STORAGE_KEYS.BUSINESS_NAME);
+    const businessName = saved || 'Community Portable Buildings';
+
+    const input = document.getElementById('businessName');
+    if (input) {
+        input.value = businessName;
+    }
+}
+
+function getBusinessName() {
+    return localStorage.getItem(STORAGE_KEYS.BUSINESS_NAME) || 'Community Portable Buildings';
+}
+
+// Button Color Management
+function loadButtonColor() {
+    const saved = localStorage.getItem(STORAGE_KEYS.BUTTON_COLOR);
+
+    if (saved) {
+        const colorPicker = document.getElementById('buttonColor');
+        const hexInput = document.getElementById('buttonColorHex');
+
+        if (colorPicker) colorPicker.value = saved;
+        if (hexInput) hexInput.value = saved;
+    }
+}
+
+function getButtonColor() {
+    return localStorage.getItem(STORAGE_KEYS.BUTTON_COLOR);
+}
+
+function resetButtonColor() {
+    // Remove custom button color
+    localStorage.removeItem(STORAGE_KEYS.BUTTON_COLOR);
+
+    // Reset to scheme default
+    const selectedScheme = document.querySelector('input[name="colorScheme"]:checked');
+    const schemeDefaults = {
+        'rustic-earth': '#2C5F2D',
+        'modern-ranch': '#7C2529',
+        'desert-timber': '#C19A6B'
+    };
+
+    const defaultColor = schemeDefaults[selectedScheme?.value] || '#2C5F2D';
+
+    const colorPicker = document.getElementById('buttonColor');
+    const hexInput = document.getElementById('buttonColorHex');
+
+    if (colorPicker) colorPicker.value = defaultColor;
+    if (hexInput) hexInput.value = defaultColor;
+
+    showToast('Button color reset to scheme default');
+}
+
+function initializeColorInputSync() {
+    const colorPicker = document.getElementById('buttonColor');
+    const hexInput = document.getElementById('buttonColorHex');
+
+    if (colorPicker && hexInput) {
+        // Sync color picker -> hex input
+        colorPicker.addEventListener('input', (e) => {
+            hexInput.value = e.target.value;
+        });
+
+        // Sync hex input -> color picker
+        hexInput.addEventListener('input', (e) => {
+            let value = e.target.value.trim();
+
+            // Add # if missing
+            if (value && !value.startsWith('#')) {
+                value = '#' + value;
+            }
+
+            // Validate hex color
+            if (/^#[0-9A-F]{6}$/i.test(value)) {
+                colorPicker.value = value;
+                hexInput.style.borderColor = 'var(--border)';
+            } else if (value.length > 0) {
+                hexInput.style.borderColor = 'var(--danger-color)';
+            }
+        });
+    }
+}
+
 function saveCustomization() {
+    // Save business name
+    const businessName = document.getElementById('businessName');
+    if (businessName) {
+        localStorage.setItem(STORAGE_KEYS.BUSINESS_NAME, businessName.value.trim());
+    }
+
     // Save color scheme
     const selectedScheme = document.querySelector('input[name="colorScheme"]:checked');
     if (selectedScheme) {
         localStorage.setItem(STORAGE_KEYS.COLOR_SCHEME, selectedScheme.value);
+    }
+
+    // Save button color
+    const buttonColor = document.getElementById('buttonColor');
+    if (buttonColor) {
+        localStorage.setItem(STORAGE_KEYS.BUTTON_COLOR, buttonColor.value);
     }
 
     // Save welcome message
@@ -1121,3 +1223,4 @@ window.addLot = addLot;
 window.removeLot = removeLot;
 window.syncLot = syncLot;
 window.triggerManualSync = triggerManualSync;
+window.resetButtonColor = resetButtonColor;
