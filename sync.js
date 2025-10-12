@@ -34,6 +34,11 @@ class InventorySync {
 
             console.log(`Successfully scraped ${scrapedData.length} items from main lot`);
 
+            // Tag main lot buildings with West Monroe location
+            scrapedData.forEach(item => {
+                item.location = 'West Monroe, LA';
+            });
+
             // Step 2a: Scrape other lots
             console.log('\nStep 1a: Checking for other lot locations...');
             const otherLotsData = await this.scrapeOtherLots();
@@ -269,7 +274,7 @@ class InventorySync {
                 rto60: item.rto60 || null,
                 rto72: item.rto72 || null,
                 price: item.cashPrice || 0, // Use cash price as default display price
-                location: item.location || 'GPB Sales',
+                location: item.location || 'West Monroe, LA',
                 isRepo: item.isRepo || false
             };
         });
