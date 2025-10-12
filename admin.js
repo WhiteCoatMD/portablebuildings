@@ -857,17 +857,55 @@ async function syncLot(index) {
     showToast(`Syncing ${lot.name}...`);
 
     try {
-        // Fetch inventory from the lot using the decoder
-        const response = await fetch(`https://www.bscnow.com/GPWebAPI/Default.aspx?DealerNumber=${lot.dealerNumber}&Password=${encodeURIComponent(lot.password)}`);
+        // Fetch inventory via our API proxy to avoid CORS issues
+        const response = await fetch('/api/sync-lot', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                dealerNumber: lot.dealerNumber,
+                password: lot.password
+            })
+        });
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch inventory');
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to fetch inventory');
         }
 
-        const text = await response.text();
+        // Parse the API response - it should be an array of inventory items
+        let rawInventory;
+        try {
+            rawInventory = JSON.parse(result.data);
+        } catch (e) {
+            // If it's not JSON, it might be in a different format
+            throw new Error('Invalid data format received from API');
+        }
 
-        // Use the decoder to process the data
-        const decoded = await window.fetchAndDecodeInventory(lot.dealerNumber, lot.password);
+        // Process each building through the decoder
+        const decoded = rawInventory.map(item => {
+            const decoder = new SerialNumberDecoder(item.serialNumber);
+            const details = decoder.getFullDetails();
+
+            if (!details.valid) {
+                console.warn('Invalid serial number:', item.serialNumber);
+                return null;
+            }
+
+            return {
+                ...item,
+                ...details,
+                typeCode: details.type.code,
+                typeName: details.type.name,
+                sizeDisplay: details.size.display,
+                width: details.size.width,
+                length: details.size.length,
+                dateBuilt: details.dateBuilt.display,
+                isRepo: details.status === 'repo'
+            };
+        }).filter(item => item !== null);
 
         if (!decoded || decoded.length === 0) {
             throw new Error('No buildings found or invalid credentials');
