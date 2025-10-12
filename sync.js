@@ -4,12 +4,14 @@
  */
 
 const GPBScraper = require('./gpb-scraper');
+const BuildingStatusTracker = require('./status-tracker');
 const fs = require('fs').promises;
 const path = require('path');
 
 class InventorySync {
     constructor() {
         this.scraper = new GPBScraper();
+        this.statusTracker = new BuildingStatusTracker();
         this.inventoryFile = path.join(__dirname, 'inventory.js');
         this.backupDir = path.join(__dirname, 'backups');
     }
@@ -32,19 +34,33 @@ class InventorySync {
 
             console.log(`Successfully scraped ${scrapedData.length} items`);
 
-            // Step 3: Format data
-            console.log('\nStep 2: Formatting data...');
+            // Step 3: Process status changes
+            console.log('\nStep 2: Processing status changes...');
+            const statusUpdates = await this.statusTracker.processInventoryChange(scrapedData);
+
+            console.log(`  → ${statusUpdates.newPending.length} marked as PENDING`);
+            console.log(`  → ${statusUpdates.newSold.length} marked as SOLD`);
+            console.log(`  → ${statusUpdates.restored.length} RESTORED to available`);
+            console.log(`  → ${statusUpdates.toRemove.length} REMOVED (sold 72+ hours ago)`);
+
+            // Step 4: Format data
+            console.log('\nStep 3: Formatting data...');
             const formattedInventory = this.formatInventory(scrapedData);
 
-            // Step 4: Update inventory.js
-            console.log('\nStep 3: Updating inventory.js...');
-            await this.updateInventoryFile(formattedInventory);
+            // Step 5: Get status overrides
+            const statusOverrides = this.statusTracker.getStatusOverrides();
 
-            // Step 5: Log success
-            await this.logSync('success', formattedInventory.length);
+            // Step 6: Update inventory.js with status data
+            console.log('\nStep 4: Updating inventory.js...');
+            await this.updateInventoryFile(formattedInventory, statusOverrides);
 
+            // Step 7: Log success
+            await this.logSync('success', formattedInventory.length, statusUpdates);
+
+            const stats = this.statusTracker.getStats();
             console.log('\n=== Sync Complete ===');
             console.log(`Updated ${formattedInventory.length} items`);
+            console.log(`Status: ${stats.available} available, ${stats.pending} pending, ${stats.sold} sold`);
             console.log('Website will show new inventory on next page load');
 
             return {
@@ -145,7 +161,7 @@ class InventorySync {
         });
     }
 
-    async updateInventoryFile(inventory) {
+    async updateInventoryFile(inventory, statusOverrides = {}) {
         // Generate the inventory.js file content
         const content = `/**
  * Inventory Data
@@ -155,9 +171,11 @@ class InventorySync {
 
 const INVENTORY = ${JSON.stringify(inventory, null, 4)};
 
+const STATUS_OVERRIDES = ${JSON.stringify(statusOverrides, null, 4)};
+
 /**
  * Process raw inventory data through the decoder
- * Returns enhanced inventory with decoded information
+ * Returns enhanced inventory with decoded information and status overrides
  */
 function processInventory() {
     return INVENTORY.map(item => {
@@ -169,6 +187,9 @@ function processInventory() {
             return null;
         }
 
+        // Apply status overrides from automatic tracking
+        const override = STATUS_OVERRIDES[item.serialNumber] || {};
+
         return {
             ...item,
             ...details,
@@ -178,9 +199,34 @@ function processInventory() {
             width: details.size.width,
             length: details.size.length,
             dateBuilt: details.dateBuilt.display,
-            isRepo: details.status === 'repo'
+            isRepo: details.status === 'repo',
+            autoStatus: override.status || 'available',
+            statusMetadata: override.metadata || {}
         };
     }).filter(item => item !== null);
+}
+
+// Merge auto-tracked status with admin overrides
+function mergeWithAdminSettings() {
+    const processed = processInventory();
+    const adminOverrides = localStorage.getItem('cpb_building_overrides');
+
+    if (!adminOverrides) return processed;
+
+    const overrides = JSON.parse(adminOverrides);
+
+    return processed.map(building => {
+        const adminOverride = overrides[building.serialNumber];
+        if (adminOverride) {
+            // Admin overrides take precedence
+            return {
+                ...building,
+                adminStatus: adminOverride.status,
+                hidden: adminOverride.hidden
+            };
+        }
+        return building;
+    });
 }
 
 // Make available globally

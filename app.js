@@ -121,8 +121,16 @@ class InventoryApp {
     }
 
     createBuildingCard(building) {
-        const override = this.buildingOverrides[building.serialNumber] || {};
-        const status = override.status || 'available';
+        // Prioritize auto-tracked status from scraper, then admin override
+        const adminOverride = this.buildingOverrides[building.serialNumber] || {};
+        const autoStatus = building.autoStatus || 'available';
+
+        // Admin can override auto-status, but auto-status takes precedence for pending/sold
+        let status = autoStatus;
+        if (adminOverride.status && autoStatus === 'available') {
+            // Only allow admin override if auto-tracker says available
+            status = adminOverride.status;
+        }
 
         // Status banner
         let statusBanner = '';
