@@ -6,14 +6,14 @@
 }
 
 :root {
-    --primary-color: #2c5f2d;
-    --secondary-color: #97b58c;
-    --accent-color: #d4af37;
-    --text-dark: #2d2d2d;
-    --text-light: #666;
-    --background: #f8f9fa;
+    --primary-color: #1a5490;
+    --secondary-color: #2980b9;
+    --accent-color: #3498db;
+    --text-dark: #000000;
+    --text-light: #555;
+    --background: #ffffff;
     --white: #ffffff;
-    --border: #e0e0e0;
+    --border: #d0d0d0;
     --shadow: rgba(0, 0, 0, 0.1);
     --repo-badge: #e74c3c;
 }
@@ -36,18 +36,20 @@ header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: var(--white);
     padding: 2rem 0;
-    box-shadow: 0 2px 8px var(--shadow);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 header h1 {
     font-size: 2.5rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.5px;
 }
 
 header .tagline {
-    font-size: 1.1rem;
-    opacity: 0.95;
+    font-size: 1.25rem;
+    opacity: 0.9;
+    font-weight: 400;
 }
 
 /* Main Content */
@@ -60,8 +62,9 @@ main {
     background: var(--white);
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 2px 8px var(--shadow);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     margin-bottom: 2rem;
+    border: 1px solid var(--border);
 }
 
 .filters h2 {
@@ -128,14 +131,16 @@ main {
     background: var(--white);
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 8px var(--shadow);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
 }
 
 .building-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 16px var(--shadow);
+    box-shadow: 0 6px 20px rgba(26, 84, 144, 0.2);
+    border-color: var(--accent-color);
 }
 
 .building-image {
@@ -227,7 +232,7 @@ main {
     width: 100%;
     padding: 0.75rem 1rem;
     margin: 0.75rem 0;
-    background: var(--accent-color);
+    background: var(--primary-color);
     color: var(--white);
     border: none;
     border-radius: 6px;
@@ -238,15 +243,15 @@ main {
 }
 
 .rto-button:hover {
-    background: #c4a033;
+    background: var(--secondary-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 4px 12px rgba(26, 84, 144, 0.3);
 }
 
 .rto-tooltip {
     display: none;
-    background: var(--white);
-    border: 2px solid var(--accent-color);
+    background: #f8f9fa;
+    border: 2px solid var(--primary-color);
     border-radius: 8px;
     padding: 1rem;
     margin: 0.5rem 0 1rem 0;
