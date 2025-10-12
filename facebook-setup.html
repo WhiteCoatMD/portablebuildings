@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Auto-Posting Setup Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #3498db;
+            font-size: 1.75rem;
+        }
+
+        h3 {
+            color: #34495e;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .intro {
+            background: #e3f2fd;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #2196f3;
+        }
+
+        .step {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #28a745;
+        }
+
+        .step h3 {
+            margin-top: 0;
+            color: #28a745;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #c7254e;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .warning strong {
+            color: #856404;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        a {
+            color: #2196f3;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #2196f3;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 1rem;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #1976d2;
+            text-decoration: none;
+        }
+
+        .back-link {
+            margin-bottom: 2rem;
+        }
+
+        .placeholder-list {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .placeholder-list code {
+            display: block;
+            margin: 0.25rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back-link">
+            <a href="admin.html">← Back to Admin Panel</a>
+        </div>
+
+        <h1>Facebook Auto-Posting Setup Guide</h1>
+
+        <div class="intro">
+            <p><strong>Welcome!</strong> This guide will help you set up automatic Facebook posting for your portable building listings.</p>
+            <p>Follow each step carefully to configure the integration.</p>
+        </div>
+
+        <h2>Prerequisites</h2>
+        <ul>
+            <li>A Facebook Business Page (not a personal profile)</li>
+            <li>Admin access to the Facebook Page</li>
+            <li>A Facebook Developer account</li>
+        </ul>
+
+        <div class="step">
+            <h3>Step 1: Create a Facebook App</h3>
+            <ol>
+                <li>Go to <a href="https://developers.facebook.com/" target="_blank">Facebook Developers</a></li>
+                <li>Click "My Apps" → "Create App"</li>
+                <li>Select "Business" as the app type</li>
+                <li>Fill in your app details:
+                    <ul>
+                        <li><strong>App Name:</strong> "Portable Buildings Auto-Post" (or your choice)</li>
+                        <li><strong>App Contact Email:</strong> Your email</li>
+                    </ul>
+                </li>
+                <li>Click "Create App"</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Add Facebook Login Product</h3>
+            <ol>
+                <li>In your app dashboard, click "Add Product"</li>
+                <li>Find "Facebook Login" and click "Set Up"</li>
+                <li>Choose "Web" as the platform</li>
+                <li>Enter your website URL (e.g., <code>https://your-site.vercel.app</code>)</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Configure Facebook Login</h3>
+            <ol>
+                <li>In the left sidebar, go to "Facebook Login" → "Settings"</li>
+                <li>Add your website URL to "Valid OAuth Redirect URIs":
+                    <ul>
+                        <li><code>https://your-site.vercel.app</code></li>
+                    </ul>
+                </li>
+                <li>Save changes</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Get Your Page Access Token</h3>
+
+            <h4>Method 1: Using Graph API Explorer (Recommended)</h4>
+            <ol>
+                <li>Go to <a href="https://developers.facebook.com/tools/explorer/" target="_blank">Graph API Explorer</a></li>
+                <li>Select your app from the "Facebook App" dropdown</li>
+                <li>Click "Generate Access Token"</li>
+                <li>In the permissions dialog, select:
+                    <ul>
+                        <li><code>pages_show_list</code></li>
+                        <li><code>pages_read_engagement</code></li>
+                        <li><code>pages_manage_posts</code></li>
+                        <li><code>pages_manage_engagement</code></li>
+                    </ul>
+                </li>
+                <li>Click "Generate Access Token" and authorize</li>
+                <li>Copy the generated token (this is a short-lived token)</li>
+            </ol>
+
+            <div class="warning">
+                <strong>⚠️ Important:</strong> Short-lived tokens expire in 1-2 hours. You need a long-lived token for production use.
+            </div>
+
+            <h4>Method 2: Get Long-Lived Page Token</h4>
+            <ol>
+                <li>Get a long-lived user access token by visiting this URL in your browser (replace the values):
+                    <div class="code-block">https://graph.facebook.com/v18.0/oauth/access_token?grant_type=fb_exchange_token&client_id=YOUR_APP_ID&client_secret=YOUR_APP_SECRET&fb_exchange_token=SHORT_LIVED_TOKEN</div>
+                </li>
+                <li>Get your Page ID and Page Access Token by visiting this URL (replace the token):
+                    <div class="code-block">https://graph.facebook.com/v18.0/me/accounts?access_token=LONG_LIVED_USER_TOKEN</div>
+                </li>
+                <li>The response will include your Page ID and a never-expiring Page Access Token</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 5: Find Your Facebook Page ID</h3>
+
+            <h4>Option 1: Using Graph API Explorer</h4>
+            <ol>
+                <li>In Graph API Explorer, use the token from Step 4</li>
+                <li>In the query field, enter: <code>me/accounts</code></li>
+                <li>Click "Submit"</li>
+                <li>Find your page in the results and copy the <code>id</code> field</li>
+            </ol>
+
+            <h4>Option 2: From Your Page Settings</h4>
+            <ol>
+                <li>Go to your Facebook Page</li>
+                <li>Click "Settings" → "Page Info"</li>
+                <li>Scroll to find "Page ID"</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 6: Configure in Admin Panel</h3>
+            <ol>
+                <li>Go to your <a href="admin.html">admin panel</a></li>
+                <li>Navigate to the "Site Customization" tab</li>
+                <li>Scroll to the "Facebook Auto-Posting" section</li>
+                <li>Fill in the following:
+                    <ul>
+                        <li><strong>Enable Auto-Posting:</strong> Toggle ON</li>
+                        <li><strong>Facebook Page ID:</strong> Paste your Page ID from Step 5</li>
+                        <li><strong>Facebook Page Access Token:</strong> Paste your long-lived Page Access Token from Step 4</li>
+                    </ul>
+                </li>
+                <li><strong>Auto-Post Conditions:</strong> Configure when buildings should be posted
+                    <ul>
+                        <li>✅ Only post new inventory (not repos)</li>
+                        <li>✅ Only post buildings with uploaded images</li>
+                        <li>✅ Only post available buildings (not sold/pending)</li>
+                    </ul>
+                </li>
+                <li><strong>Post Template:</strong> Customize your post message
+                    <div class="placeholder-list">
+                        <strong>Available placeholders:</strong>
+                        <code>{{name}}</code> - Building name/title<br>
+                        <code>{{size}}</code> - Building size (e.g., 10x12)<br>
+                        <code>{{price}}</code> - Cash price<br>
+                        <code>{{type}}</code> - Building type (e.g., Lofted Barn)<br>
+                        <code>{{location}}</code> - Lot location<br>
+                        <code>{{phone}}</code> - Business phone number
+                    </div>
+                </li>
+                <li>Click "💾 Save All Customization"</li>
+            </ol>
+        </div>
+
+        <h2>How Auto-Posting Works</h2>
+        <div class="info">
+            <p>The system automatically posts buildings to Facebook when:</p>
+            <ol>
+                <li><strong>New Building Added:</strong> When inventory syncs and a new building appears that meets all configured conditions</li>
+                <li><strong>Images Uploaded:</strong> When you upload photos to a building (if "Only post with images" is enabled)</li>
+                <li><strong>Status Change:</strong> When a building's status changes to "Available" (if "Only post available buildings" is enabled)</li>
+            </ol>
+            <p><strong>Conditions Checked:</strong></p>
+            <ul>
+                <li>New inventory only (skips repos if enabled)</li>
+                <li>Has uploaded images (if enabled)</li>
+                <li>Status is "available" (if enabled)</li>
+                <li>Not previously posted</li>
+            </ul>
+        </div>
+
+        <h2>Troubleshooting</h2>
+
+        <h3>"Invalid OAuth access token"</h3>
+        <ul>
+            <li>Your token has expired</li>
+            <li>Generate a new long-lived Page Access Token (Step 4)</li>
+            <li>Update it in the admin panel</li>
+        </ul>
+
+        <h3>"Permissions error"</h3>
+        <ul>
+            <li>Make sure you granted all required permissions in Step 4</li>
+            <li>Regenerate the token with correct permissions</li>
+        </ul>
+
+        <h3>Posts not appearing</h3>
+        <ul>
+            <li>Check that auto-posting is enabled</li>
+            <li>Verify buildings meet all configured conditions</li>
+            <li>Check browser console for errors</li>
+            <li>Verify Page ID and Access Token are correct</li>
+        </ul>
+
+        <h3>"This feature is not available right now"</h3>
+        <ul>
+            <li>Your app may not be approved for posting</li>
+            <li>Go to App Review in Facebook Developer Console</li>
+            <li>Request permissions: <code>pages_manage_posts</code></li>
+        </ul>
+
+        <h2>Security Notes</h2>
+        <div class="warning">
+            <ul>
+                <li>Never share your Access Token publicly</li>
+                <li>The token is stored in localStorage (client-side only)</li>
+                <li>Rotate your token periodically</li>
+            </ul>
+        </div>
+
+        <h2>Rate Limits</h2>
+        <p>Facebook has rate limits:</p>
+        <ul>
+            <li>~200 posts per hour per user</li>
+            <li>~600 posts per day per app</li>
+            <li>The system prevents duplicate posts automatically</li>
+        </ul>
+
+        <h2>Need Help?</h2>
+        <ul>
+            <li><a href="https://developers.facebook.com/docs/graph-api" target="_blank">Facebook Developer Documentation</a></li>
+            <li><a href="https://developers.facebook.com/docs/marketing-apis" target="_blank">Facebook Marketing API</a></li>
+            <li><a href="https://developers.facebook.com/tools/explorer/" target="_blank">Graph API Explorer</a></li>
+        </ul>
+
+        <div class="success">
+            <p><strong>✅ Setup Complete!</strong> Once configured, your buildings will automatically post to Facebook when they meet your specified conditions.</p>
+        </div>
+
+        <a href="admin.html" class="btn">← Back to Admin Panel</a>
+    </div>
+</body>
+</html>
