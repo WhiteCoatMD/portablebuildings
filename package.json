@@ -6,6 +6,7 @@
   "scripts": {
     "sync": "node sync.js",
     "sync:lot": "node sync-other-lot.js",
+    "sync:server": "node sync-server.js",
     "test": "node test-login.js",
     "schedule": "node scheduler.js"
   },
@@ -18,7 +19,9 @@
   "license": "ISC",
   "dependencies": {
     "@vercel/blob": "^2.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "node-cron": "^3.0.3",
     "playwright": "^1.40.0"
   }

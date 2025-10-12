@@ -39,6 +39,9 @@ let buildingFilters = {
     type: 'all'
 };
 
+// Sync server configuration
+const SYNC_SERVER_URL = 'http://localhost:3001';
+
 // Initialize admin panel
 document.addEventListener('DOMContentLoaded', () => {
     initializeTabs();
@@ -765,7 +768,7 @@ function loadLots() {
     container.innerHTML = lots.map((lot, index) => {
         const syncStatus = lot.lastSync ?
             `Last synced: ${new Date(lot.lastSync).toLocaleString()}` :
-            'Run sync command locally';
+            'Will sync automatically during next scheduled sync';
 
         return `
             <div class="lot-item">
@@ -775,7 +778,6 @@ function loadLots() {
                         <span class="lot-badge">${lot.buildingCount || 0} buildings</span>
                     </h3>
                     <p class="sync-status">${syncStatus}</p>
-                    <code style="font-size: 0.85rem; color: var(--text-light); display: block; margin-top: 0.5rem; padding: 0.5rem; background: #f5f5f5; border-radius: 4px;">npm run sync:lot ${lot.username || '[username]'} ${lot.password ? '••••••' : '[password]'} "${lot.name}"</code>
                 </div>
                 <div class="lot-actions">
                     <button class="btn btn-sm btn-danger" onclick="removeLot(${index})">Remove</button>
@@ -790,7 +792,7 @@ function getLots() {
     return stored ? JSON.parse(stored) : [];
 }
 
-function addLot() {
+async function addLot() {
     const name = document.getElementById('lot-name').value.trim();
     const username = document.getElementById('lot-username').value.trim();
     const password = document.getElementById('lot-password').value.trim();
@@ -816,24 +818,65 @@ function addLot() {
         buildingCount: 0
     });
 
+    // Save to localStorage for UI
     localStorage.setItem(STORAGE_KEYS.LOTS, JSON.stringify(lots));
 
-    // Clear form
-    document.getElementById('lot-name').value = '';
-    document.getElementById('lot-username').value = '';
-    document.getElementById('lot-password').value = '';
+    // Save to server for automated sync
+    showToast('Saving lot configuration...');
+    try {
+        const response = await fetch('/api/save-lot-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ lots })
+        });
 
-    loadLots();
-    showToast('Lot location added! Run the sync command shown below.');
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to save');
+        }
+
+        // Clear form
+        document.getElementById('lot-name').value = '';
+        document.getElementById('lot-username').value = '';
+        document.getElementById('lot-password').value = '';
+
+        loadLots();
+        showToast('Lot added! It will be synced automatically during daily sync.');
+    } catch (error) {
+        console.error('Save error:', error);
+        showToast('Failed to save lot configuration: ' + error.message, true);
+    }
 }
 
-function removeLot(index) {
+async function removeLot(index) {
     if (!confirm('Remove this lot and all its synced buildings?')) return;
 
     const lots = getLots();
     const removed = lots.splice(index, 1)[0];
 
     localStorage.setItem(STORAGE_KEYS.LOTS, JSON.stringify(lots));
+
+    // Save to server for automated sync
+    try {
+        const response = await fetch('/api/save-lot-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ lots })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to save');
+        }
+    } catch (error) {
+        console.error('Failed to update server config:', error);
+    }
 
     // Remove buildings from this lot
     const overrides = getBuildingOverrides();
@@ -847,6 +890,118 @@ function removeLot(index) {
     loadLots();
     loadBuildings();
     showToast('Lot removed!');
+}
+
+// Check if sync server is running
+async function checkSyncServer() {
+    const statusEl = document.getElementById('sync-server-status');
+    if (!statusEl) return;
+
+    try {
+        const response = await fetch(`${SYNC_SERVER_URL}/health`, {
+            method: 'GET',
+            signal: AbortSignal.timeout(2000)
+        });
+
+        if (response.ok) {
+            statusEl.innerHTML = '✅ <strong>Sync server is running</strong> - You can sync lots from the admin panel';
+            statusEl.style.color = 'var(--success-color)';
+        } else {
+            throw new Error('Server not responding');
+        }
+    } catch (error) {
+        statusEl.innerHTML = '⚠️ <strong>Sync server not running</strong><br>Run <code>npm run sync:server</code> in your project folder to enable lot syncing';
+        statusEl.style.color = 'var(--warning-color)';
+    }
+}
+
+// Sync lot via local server
+async function syncLot(index) {
+    const lots = getLots();
+    const lot = lots[index];
+
+    if (!lot.username || !lot.password) {
+        showToast('Lot credentials missing', true);
+        return;
+    }
+
+    showToast(`Syncing ${lot.name}... This may take 1-2 minutes.`);
+
+    try {
+        const response = await fetch(`${SYNC_SERVER_URL}/sync-lot`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: lot.username,
+                password: lot.password,
+                lotName: lot.name
+            })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || 'Sync failed');
+        }
+
+        const rawInventory = result.inventory;
+
+        if (!rawInventory || rawInventory.length === 0) {
+            throw new Error('No buildings found');
+        }
+
+        // Process each building through the decoder
+        const decoded = rawInventory.map(item => {
+            const decoder = new SerialNumberDecoder(item.serialNumber);
+            const details = decoder.getFullDetails();
+
+            if (!details.valid) {
+                console.warn('Invalid serial number:', item.serialNumber);
+                return null;
+            }
+
+            return {
+                ...item,
+                ...details,
+                typeCode: details.type.code,
+                typeName: details.type.name,
+                sizeDisplay: details.size.display,
+                width: details.size.width,
+                length: details.size.length,
+                dateBuilt: details.dateBuilt.display,
+                isRepo: item.isRepo || details.status === 'repo'
+            };
+        }).filter(item => item !== null);
+
+        // Tag buildings with lot location
+        const overrides = getBuildingOverrides();
+        decoded.forEach(building => {
+            if (!overrides[building.serialNumber]) {
+                overrides[building.serialNumber] = {};
+            }
+            overrides[building.serialNumber].lotLocation = lot.name;
+        });
+        localStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(overrides));
+
+        // Update lot sync info
+        lot.lastSync = new Date().toISOString();
+        lot.buildingCount = decoded.length;
+        lots[index] = lot;
+        localStorage.setItem(STORAGE_KEYS.LOTS, JSON.stringify(lots));
+
+        loadLots();
+        loadBuildings();
+        showToast(`Successfully synced ${decoded.length} buildings from ${lot.name}!`);
+    } catch (error) {
+        console.error('Sync error:', error);
+        if (error.message.includes('fetch')) {
+            showToast('Sync server not running. Start it with: npm run sync:server', true);
+        } else {
+            showToast(`Failed to sync ${lot.name}: ${error.message}`, true);
+        }
+    }
 }
 
 // Export functions to global scope
@@ -864,3 +1019,4 @@ window.setMainImage = setMainImage;
 window.getBuildingImages = getBuildingImages;
 window.addLot = addLot;
 window.removeLot = removeLot;
+window.syncLot = syncLot;

@@ -24,19 +24,30 @@ class InventorySync {
             // Step 1: Backup current inventory
             await this.backupCurrentInventory();
 
-            // Step 2: Scrape portal
-            console.log('\nStep 1: Scraping dealer portal...');
+            // Step 2: Scrape main portal
+            console.log('\nStep 1: Scraping main dealer portal...');
             const scrapedData = await this.scraper.run();
 
             if (!scrapedData || scrapedData.length === 0) {
                 throw new Error('No inventory data scraped from portal');
             }
 
-            console.log(`Successfully scraped ${scrapedData.length} items`);
+            console.log(`Successfully scraped ${scrapedData.length} items from main lot`);
+
+            // Step 2a: Scrape other lots
+            console.log('\nStep 1a: Checking for other lot locations...');
+            const otherLotsData = await this.scrapeOtherLots();
+
+            if (otherLotsData.length > 0) {
+                console.log(`Successfully scraped ${otherLotsData.length} items from ${otherLotsData.filter((v, i, a) => a.findIndex(t => t.location === v.location) === i).length} other lot(s)`);
+            }
+
+            // Combine all inventory
+            const allScrapedData = [...scrapedData, ...otherLotsData];
 
             // Step 3: Process status changes
             console.log('\nStep 2: Processing status changes...');
-            const statusUpdates = await this.statusTracker.processInventoryChange(scrapedData);
+            const statusUpdates = await this.statusTracker.processInventoryChange(allScrapedData);
 
             console.log(`  → ${statusUpdates.newPending.length} marked as PENDING`);
             console.log(`  → ${statusUpdates.newSold.length} marked as SOLD`);
@@ -45,21 +56,27 @@ class InventorySync {
 
             // Step 4: Format data
             console.log('\nStep 3: Formatting data...');
-            const formattedInventory = this.formatInventory(scrapedData);
+            const formattedInventory = this.formatInventory(allScrapedData);
 
-            // Step 5: Get status overrides
+            // Step 5: Get status overrides and add lot location tags
             const statusOverrides = this.statusTracker.getStatusOverrides();
+            const lotLocationOverrides = await this.getLotLocationOverrides();
+
+            // Merge overrides
+            const mergedOverrides = { ...statusOverrides, ...lotLocationOverrides };
 
             // Step 6: Update inventory.js with status data
             console.log('\nStep 4: Updating inventory.js...');
-            await this.updateInventoryFile(formattedInventory, statusOverrides);
+            await this.updateInventoryFile(formattedInventory, mergedOverrides);
 
             // Step 7: Log success
             await this.logSync('success', formattedInventory.length, statusUpdates);
 
             const stats = this.statusTracker.getStats();
             console.log('\n=== Sync Complete ===');
-            console.log(`Updated ${formattedInventory.length} items`);
+            console.log(`Updated ${formattedInventory.length} total items`);
+            console.log(`  Main lot: ${scrapedData.length} buildings`);
+            console.log(`  Other lots: ${otherLotsData.length} buildings`);
             console.log(`Status: ${stats.available} available, ${stats.pending} pending, ${stats.sold} sold`);
             console.log('Website will show new inventory on next page load');
 
@@ -82,6 +99,94 @@ class InventorySync {
                 error: error.message,
                 timestamp: new Date().toISOString()
             };
+        }
+    }
+
+    async scrapeOtherLots() {
+        try {
+            let lotsConfig = [];
+
+            // Try to fetch from API endpoint (reads from Vercel Blob)
+            try {
+                const siteUrl = process.env.SITE_URL || 'https://buytheshed.com';
+                const response = await fetch(`${siteUrl}/api/get-lot-config`);
+                const data = await response.json();
+
+                if (data.success && data.lots && data.lots.length > 0) {
+                    lotsConfig = data.lots;
+                    console.log(`Loaded ${lotsConfig.length} lot configuration(s) from server`);
+                }
+            } catch (e) {
+                console.log('Could not fetch lot config from server:', e.message);
+
+                // Fallback: try local file
+                try {
+                    const lotsConfigPath = path.join(__dirname, 'lots-config.json');
+                    const configContent = await fs.readFile(lotsConfigPath, 'utf-8');
+                    lotsConfig = JSON.parse(configContent);
+                    console.log(`Loaded ${lotsConfig.length} lot configuration(s) from local file`);
+                } catch (localError) {
+                    console.log('No local lot config file found');
+                }
+            }
+
+            if (!lotsConfig || lotsConfig.length === 0) {
+                console.log('No other lots configured');
+                return [];
+            }
+
+            const allOtherInventory = [];
+
+            for (const lot of lotsConfig) {
+                console.log(`\n  → Scraping ${lot.name}...`);
+
+                try {
+                    const lotScraper = new GPBScraper();
+                    lotScraper.config.username = lot.username;
+                    lotScraper.config.password = lot.password;
+
+                    const lotData = await lotScraper.run();
+
+                    // Tag each building with lot location
+                    const taggedData = lotData.map(item => ({
+                        ...item,
+                        location: lot.name
+                    }));
+
+                    allOtherInventory.push(...taggedData);
+                    console.log(`  ✓ ${lot.name}: ${lotData.length} buildings`);
+
+                } catch (error) {
+                    console.error(`  ✗ ${lot.name}: Failed - ${error.message}`);
+                }
+            }
+
+            return allOtherInventory;
+
+        } catch (error) {
+            console.error('Error scraping other lots:', error.message);
+            return [];
+        }
+    }
+
+    async getLotLocationOverrides() {
+        // Create overrides that tag buildings with their lot location
+        const lotsConfigPath = path.join(__dirname, 'lots-config.json');
+
+        try {
+            const configContent = await fs.readFile(lotsConfigPath, 'utf-8');
+            const lotsConfig = JSON.parse(configContent);
+
+            const overrides = {};
+            for (const lot of lotsConfig) {
+                overrides[`_lot_${lot.name}`] = {
+                    lotLocation: lot.name
+                };
+            }
+
+            return overrides;
+        } catch (e) {
+            return {};
         }
     }
 
