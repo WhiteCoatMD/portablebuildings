@@ -774,7 +774,6 @@ function loadLots() {
                         ${lot.name}
                         <span class="lot-badge">${lot.buildingCount || 0} buildings</span>
                     </h3>
-                    <p>Dealer #: ${lot.dealerNumber}</p>
                     <p class="sync-status">${syncStatus}</p>
                 </div>
                 <div class="lot-actions">
@@ -791,12 +790,12 @@ function getLots() {
     return stored ? JSON.parse(stored) : [];
 }
 
-function addLot() {
+async function addLot() {
     const name = document.getElementById('lot-name').value.trim();
-    const dealerNumber = document.getElementById('lot-dealer-number').value.trim();
+    const username = document.getElementById('lot-username').value.trim();
     const password = document.getElementById('lot-password').value.trim();
 
-    if (!name || !dealerNumber || !password) {
+    if (!name || !username || !password) {
         showToast('Please fill in all fields', true);
         return;
     }
@@ -804,14 +803,15 @@ function addLot() {
     const lots = getLots();
 
     // Check for duplicate
-    if (lots.some(lot => lot.dealerNumber === dealerNumber)) {
-        showToast('This dealer number is already added', true);
+    if (lots.some(lot => lot.name === name)) {
+        showToast('This lot name is already added', true);
         return;
     }
 
+    // Add lot and immediately sync
     lots.push({
         name,
-        dealerNumber,
+        username,
         password,
         lastSync: null,
         buildingCount: 0
@@ -821,11 +821,14 @@ function addLot() {
 
     // Clear form
     document.getElementById('lot-name').value = '';
-    document.getElementById('lot-dealer-number').value = '';
+    document.getElementById('lot-username').value = '';
     document.getElementById('lot-password').value = '';
 
     loadLots();
-    showToast('Lot added! Click "Sync Now" to fetch buildings.');
+    showToast('Lot added! Starting sync...');
+
+    // Auto-sync the newly added lot
+    await syncLot(lots.length - 1);
 }
 
 function removeLot(index) {
@@ -854,34 +857,32 @@ async function syncLot(index) {
     const lots = getLots();
     const lot = lots[index];
 
-    showToast(`Syncing ${lot.name}...`);
+    showToast(`Syncing ${lot.name}... This may take 1-2 minutes.`);
 
     try {
-        // Fetch inventory via our API proxy to avoid CORS issues
-        const response = await fetch('/api/sync-lot', {
+        // Call the scraper API to get inventory from this lot
+        const response = await fetch('/api/sync-other-lot', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                dealerNumber: lot.dealerNumber,
-                password: lot.password
+                username: lot.username,
+                password: lot.password,
+                lotName: lot.name
             })
         });
 
         const result = await response.json();
 
         if (!result.success) {
-            throw new Error(result.error || 'Failed to fetch inventory');
+            throw new Error(result.error || 'Failed to scrape lot inventory');
         }
 
-        // Parse the API response - it should be an array of inventory items
-        let rawInventory;
-        try {
-            rawInventory = JSON.parse(result.data);
-        } catch (e) {
-            // If it's not JSON, it might be in a different format
-            throw new Error('Invalid data format received from API');
+        const rawInventory = result.inventory;
+
+        if (!rawInventory || rawInventory.length === 0) {
+            throw new Error('No buildings found - check credentials or lot may be empty');
         }
 
         // Process each building through the decoder
@@ -903,13 +904,9 @@ async function syncLot(index) {
                 width: details.size.width,
                 length: details.size.length,
                 dateBuilt: details.dateBuilt.display,
-                isRepo: details.status === 'repo'
+                isRepo: item.isRepo || details.status === 'repo'
             };
         }).filter(item => item !== null);
-
-        if (!decoded || decoded.length === 0) {
-            throw new Error('No buildings found or invalid credentials');
-        }
 
         // Tag buildings with lot location
         const overrides = getBuildingOverrides();
@@ -918,7 +915,7 @@ async function syncLot(index) {
                 overrides[building.serialNumber] = {};
             }
             overrides[building.serialNumber].lotLocation = lot.name;
-            overrides[building.serialNumber].lotDealerNumber = lot.dealerNumber;
+            overrides[building.serialNumber].lotUsername = lot.username;
         });
         localStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(overrides));
 
