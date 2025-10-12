@@ -18,8 +18,16 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // Get the sync server URL from environment or default
-        const syncServerUrl = process.env.SYNC_SERVER_URL || 'http://YOUR_DIGITALOCEAN_IP:3002';
+        // Get the sync server URL from environment
+        const syncServerUrl = process.env.SYNC_SERVER_URL;
+
+        if (!syncServerUrl) {
+            return res.status(200).json({
+                success: false,
+                message: 'Manual sync not configured. Set SYNC_SERVER_URL environment variable in Vercel.',
+                help: 'The sync still runs automatically at 2 AM daily.'
+            });
+        }
 
         // Try to trigger the sync on the DigitalOcean server
         const response = await fetch(`${syncServerUrl}/trigger-sync`, {
@@ -50,7 +58,7 @@ module.exports = async (req, res) => {
             success: false,
             message: 'Could not connect to sync server. The sync will run automatically at 2 AM.',
             error: error.message,
-            help: 'To enable manual sync, make sure the sync server is running on your DigitalOcean droplet with: pm2 start sync-api-server.js'
+            help: 'Make sure the sync API server is running on your DigitalOcean droplet'
         });
     }
 };
