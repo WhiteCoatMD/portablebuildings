@@ -23,9 +23,9 @@ module.exports = async (req, res) => {
         // List all blobs and find the most recent lots-config.json
         const { blobs } = await list();
 
-        // Find all blobs that start with 'lots-config.json'
+        // Find all blobs that start with 'lots-config' (includes files with random suffixes)
         const configBlobs = blobs
-            .filter(b => b.pathname.startsWith('lots-config.json'))
+            .filter(b => b.pathname.startsWith('lots-config'))
             .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
 
         if (configBlobs.length === 0) {
