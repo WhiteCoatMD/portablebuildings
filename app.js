@@ -44,7 +44,7 @@ class InventoryApp {
     }
 
     init() {
-        this.loadBusinessName();
+        this.loadBusinessInfo();
         this.loadWelcomeMessage();
         this.populateSizeFilter();
         this.populateLocationFilter();
@@ -52,12 +52,58 @@ class InventoryApp {
         this.renderBuildings();
     }
 
-    loadBusinessName() {
-        const stored = localStorage.getItem('cpb_business_name');
-        const businessName = stored || 'Community Portable Buildings';
+    loadBusinessInfo() {
+        // Load business name
+        const businessName = localStorage.getItem('cpb_business_name') || 'Community Portable Buildings';
         const headerEl = document.getElementById('business-name-header');
         if (headerEl) {
             headerEl.textContent = businessName;
+        }
+
+        const footerNameEl = document.getElementById('footer-business-name');
+        if (footerNameEl) {
+            footerNameEl.textContent = businessName;
+        }
+
+        const copyrightNameEl = document.getElementById('footer-copyright-name');
+        if (copyrightNameEl) {
+            copyrightNameEl.textContent = businessName;
+        }
+
+        // Load phone
+        const businessPhone = localStorage.getItem('cpb_business_phone') || '318-594-5909';
+        const headerPhoneLink = document.getElementById('header-phone-link');
+        if (headerPhoneLink) {
+            headerPhoneLink.href = `tel:${businessPhone}`;
+            headerPhoneLink.textContent = businessPhone;
+        }
+
+        const footerPhoneLink = document.getElementById('footer-phone-link');
+        if (footerPhoneLink) {
+            footerPhoneLink.href = `tel:${businessPhone}`;
+            footerPhoneLink.textContent = businessPhone;
+        }
+
+        // Load email
+        const businessEmail = localStorage.getItem('cpb_business_email') || '';
+        if (businessEmail) {
+            const footerEmailContainer = document.getElementById('footer-email-container');
+            const footerEmailLink = document.getElementById('footer-email-link');
+
+            if (footerEmailContainer && footerEmailLink) {
+                footerEmailContainer.style.display = 'block';
+                footerEmailLink.href = `mailto:${businessEmail}`;
+                footerEmailLink.textContent = businessEmail;
+            }
+        }
+
+        // Load address
+        const businessAddress = localStorage.getItem('cpb_business_address') || '';
+        if (businessAddress) {
+            const footerAddressEl = document.getElementById('footer-address');
+            if (footerAddressEl) {
+                footerAddressEl.textContent = businessAddress;
+            }
         }
     }
 

@@ -12,6 +12,9 @@ const STORAGE_KEYS = {
     LOTS: 'cpb_other_lots',
     COLOR_SCHEME: 'cpb_color_scheme',
     BUSINESS_NAME: 'cpb_business_name',
+    BUSINESS_PHONE: 'cpb_business_phone',
+    BUSINESS_EMAIL: 'cpb_business_email',
+    BUSINESS_ADDRESS: 'cpb_business_address',
     BUTTON_COLOR: 'cpb_button_color'
 };
 
@@ -52,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadWelcomeMessage();
     loadCarousel();
     loadColorScheme();
-    loadBusinessName();
+    loadBusinessInfo();
     loadButtonColor();
     initializeColorInputSync();
     loadLots();
@@ -1092,19 +1095,55 @@ function loadColorScheme() {
     }
 }
 
-// Business Name Management
-function loadBusinessName() {
-    const saved = localStorage.getItem(STORAGE_KEYS.BUSINESS_NAME);
-    const businessName = saved || 'Community Portable Buildings';
+// Business Information Management
+function loadBusinessInfo() {
+    // Load business name
+    const savedName = localStorage.getItem(STORAGE_KEYS.BUSINESS_NAME);
+    const businessName = savedName || 'Community Portable Buildings';
+    const nameInput = document.getElementById('businessName');
+    if (nameInput) {
+        nameInput.value = businessName;
+    }
 
-    const input = document.getElementById('businessName');
-    if (input) {
-        input.value = businessName;
+    // Load phone
+    const savedPhone = localStorage.getItem(STORAGE_KEYS.BUSINESS_PHONE);
+    const businessPhone = savedPhone || '318-594-5909';
+    const phoneInput = document.getElementById('businessPhone');
+    if (phoneInput) {
+        phoneInput.value = businessPhone;
+    }
+
+    // Load email
+    const savedEmail = localStorage.getItem(STORAGE_KEYS.BUSINESS_EMAIL);
+    const businessEmail = savedEmail || '';
+    const emailInput = document.getElementById('businessEmail');
+    if (emailInput) {
+        emailInput.value = businessEmail;
+    }
+
+    // Load address
+    const savedAddress = localStorage.getItem(STORAGE_KEYS.BUSINESS_ADDRESS);
+    const businessAddress = savedAddress || '';
+    const addressInput = document.getElementById('businessAddress');
+    if (addressInput) {
+        addressInput.value = businessAddress;
     }
 }
 
 function getBusinessName() {
     return localStorage.getItem(STORAGE_KEYS.BUSINESS_NAME) || 'Community Portable Buildings';
+}
+
+function getBusinessPhone() {
+    return localStorage.getItem(STORAGE_KEYS.BUSINESS_PHONE) || '318-594-5909';
+}
+
+function getBusinessEmail() {
+    return localStorage.getItem(STORAGE_KEYS.BUSINESS_EMAIL) || '';
+}
+
+function getBusinessAddress() {
+    return localStorage.getItem(STORAGE_KEYS.BUSINESS_ADDRESS) || '';
 }
 
 // Button Color Management
@@ -1182,6 +1221,24 @@ function saveCustomization() {
     const businessName = document.getElementById('businessName');
     if (businessName) {
         localStorage.setItem(STORAGE_KEYS.BUSINESS_NAME, businessName.value.trim());
+    }
+
+    // Save business phone
+    const businessPhone = document.getElementById('businessPhone');
+    if (businessPhone) {
+        localStorage.setItem(STORAGE_KEYS.BUSINESS_PHONE, businessPhone.value.trim());
+    }
+
+    // Save business email
+    const businessEmail = document.getElementById('businessEmail');
+    if (businessEmail) {
+        localStorage.setItem(STORAGE_KEYS.BUSINESS_EMAIL, businessEmail.value.trim());
+    }
+
+    // Save business address
+    const businessAddress = document.getElementById('businessAddress');
+    if (businessAddress) {
+        localStorage.setItem(STORAGE_KEYS.BUSINESS_ADDRESS, businessAddress.value.trim());
     }
 
     // Save color scheme
