@@ -21,13 +21,39 @@ class InventoryApp {
             countDisplay: document.getElementById('count')
         };
 
+        // Load admin settings
+        this.settings = this.loadSettings();
+        this.buildingOverrides = this.loadBuildingOverrides();
+
         this.init();
     }
 
+    loadSettings() {
+        const stored = localStorage.getItem('cpb_admin_settings');
+        return stored ? JSON.parse(stored) : { showCashPrice: true, showRtoOptions: true };
+    }
+
+    loadBuildingOverrides() {
+        const stored = localStorage.getItem('cpb_building_overrides');
+        return stored ? JSON.parse(stored) : {};
+    }
+
     init() {
+        this.loadWelcomeMessage();
         this.populateSizeFilter();
         this.attachEventListeners();
         this.renderBuildings();
+    }
+
+    loadWelcomeMessage() {
+        const stored = localStorage.getItem('cpb_welcome_message');
+        if (stored) {
+            const welcome = JSON.parse(stored);
+            const titleEl = document.querySelector('.welcome-message h2');
+            const messageEl = document.querySelector('.welcome-message p');
+            if (titleEl) titleEl.textContent = welcome.title;
+            if (messageEl) messageEl.textContent = welcome.message;
+        }
     }
 
     populateSizeFilter() {
@@ -66,6 +92,10 @@ class InventoryApp {
 
     applyFilters() {
         this.filteredInventory = this.inventory.filter(item => {
+            // Check if building is hidden
+            const override = this.buildingOverrides[item.serialNumber];
+            if (override && override.hidden) return false;
+
             const typeMatch = this.filters.type === 'all' || item.typeCode === this.filters.type;
             const sizeMatch = this.filters.size === 'all' || item.sizeDisplay === this.filters.size;
             const statusMatch = this.filters.status === 'all' ||
@@ -91,14 +121,69 @@ class InventoryApp {
     }
 
     createBuildingCard(building) {
+        const override = this.buildingOverrides[building.serialNumber] || {};
+        const status = override.status || 'available';
+
+        // Status banner
+        let statusBanner = '';
+        if (status === 'pending') {
+            statusBanner = '<div class="status-banner pending">Pending Sale</div>';
+        } else if (status === 'sold') {
+            statusBanner = '<div class="status-banner sold">Sold</div>';
+        }
+
         const repoBadge = building.isRepo ? '<div class="repo-badge">REPO</div>' : '';
-        const priceDisplay = building.isRepo ?
-            `<span class="value strikethrough">$${building.price.toLocaleString()}</span>
-             <div class="repo-price-note">Call for Pre-Owned Price</div>` :
-            `<span class="value">$${building.price.toLocaleString()}</span>`;
+
+        // Price display based on settings
+        let priceSection = '';
+        if (this.settings.showCashPrice) {
+            const priceDisplay = building.isRepo ?
+                `<span class="value strikethrough">$${building.price.toLocaleString()}</span>
+                 <div class="repo-price-note">Call for Pre-Owned Price</div>` :
+                `<span class="value">$${building.price.toLocaleString()}</span>`;
+
+            priceSection = `
+                <div class="building-detail-item">
+                    <span class="label">Cash Price:</span>
+                    ${priceDisplay}
+                </div>
+            `;
+        }
+
+        // RTO section based on settings
+        let rtoSection = '';
+        if (this.settings.showRtoOptions && !building.isRepo) {
+            rtoSection = `
+                <button class="rto-button" onclick="toggleRTO(event, '${building.serialNumber}')">
+                    Rent to Own Options
+                </button>
+                <div class="rto-tooltip" id="rto-${building.serialNumber.replace(/[^a-zA-Z0-9]/g, '')}">
+                    ${building.rto36 ? `
+                    <div class="rto-option">
+                        <span class="rto-term">36 months:</span>
+                        <span class="rto-price">$${building.rto36.toFixed(2)}/mo</span>
+                    </div>
+                    <div class="rto-option">
+                        <span class="rto-term">48 months:</span>
+                        <span class="rto-price">$${building.rto48.toFixed(2)}/mo</span>
+                    </div>
+                    <div class="rto-option">
+                        <span class="rto-term">60 months:</span>
+                        <span class="rto-price">$${building.rto60.toFixed(2)}/mo</span>
+                    </div>
+                    <div class="rto-option">
+                        <span class="rto-term">72 months:</span>
+                        <span class="rto-price">$${building.rto72.toFixed(2)}/mo</span>
+                    </div>
+                    <div class="rto-note">*Plus your local sales tax</div>
+                    ` : `<div class="rto-note">RTO pricing not available</div>`}
+                </div>
+            `;
+        }
 
         return `
             <div class="building-card" data-serial="${building.serialNumber}">
+                ${statusBanner}
                 <div class="building-image">
                     ${repoBadge}
                     <span>\u{1F3E0}</span>
@@ -109,43 +194,11 @@ class InventoryApp {
                     <div class="building-size">${building.sizeDisplay}</div>
 
                     <div class="building-details">
-                        <div class="building-detail-item">
-                            <span class="label">Cash Price:</span>
-                            ${priceDisplay}
-                        </div>
-                        ${!building.isRepo ? `
-                        <button class="rto-button" onclick="toggleRTO(event, '${building.serialNumber}')">
-                            Rent to Own Options
-                        </button>
-                        <div class="rto-tooltip" id="rto-${building.serialNumber.replace(/[^a-zA-Z0-9]/g, '')}">
-                            ${building.rto36 ? `
-                            <div class="rto-option">
-                                <span class="rto-term">36 months:</span>
-                                <span class="rto-price">$${building.rto36.toFixed(2)}/mo</span>
-                            </div>
-                            <div class="rto-option">
-                                <span class="rto-term">48 months:</span>
-                                <span class="rto-price">$${building.rto48.toFixed(2)}/mo</span>
-                            </div>
-                            <div class="rto-option">
-                                <span class="rto-term">60 months:</span>
-                                <span class="rto-price">$${building.rto60.toFixed(2)}/mo</span>
-                            </div>
-                            <div class="rto-option">
-                                <span class="rto-term">72 months:</span>
-                                <span class="rto-price">$${building.rto72.toFixed(2)}/mo</span>
-                            </div>
-                            <div class="rto-note">*Plus your local sales tax</div>
-                            ` : `<div class="rto-note">RTO pricing not available</div>`}
-                        </div>
-                        ` : ''}
-                        <div class="building-detail-item">
-                            <span class="label">Location:</span>
-                            <span class="value">${building.location}</span>
-                        </div>
+                        ${priceSection}
+                        ${rtoSection}
                         <div class="building-detail-item">
                             <span class="label">Status:</span>
-                            <span class="value">${building.isRepo ? 'Pre-Owned' : 'Available'}</span>
+                            <span class="value">${building.isRepo ? 'Pre-Owned' : status.charAt(0).toUpperCase() + status.slice(1)}</span>
                         </div>
                     </div>
 

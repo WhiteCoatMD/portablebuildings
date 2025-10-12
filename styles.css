@@ -293,12 +293,40 @@ main {
     border: 1px solid var(--border);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
+    position: relative;
 }
 
 .building-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 6px 20px rgba(26, 84, 144, 0.2);
     border-color: var(--accent-color);
+}
+
+/* Status Banner */
+.status-banner {
+    position: absolute;
+    top: 30px;
+    right: -35px;
+    width: 150px;
+    text-align: center;
+    padding: 0.5rem 0;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transform: rotate(45deg);
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.status-banner.pending {
+    background: #f39c12;
+    color: var(--white);
+}
+
+.status-banner.sold {
+    background: #e74c3c;
+    color: var(--white);
 }
 
 .building-image {

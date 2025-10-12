@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Community Portable Buildings</title>
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <header class="admin-header">
+        <div class="container">
+            <h1>Admin Panel</h1>
+            <div class="header-actions">
+                <a href="index.html" target="_blank" class="btn btn-secondary">View Site</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="settings">Settings</button>
+            <button class="tab-btn" data-tab="welcome">Welcome Message</button>
+            <button class="tab-btn" data-tab="carousel">Hero Carousel</button>
+            <button class="tab-btn" data-tab="buildings">Manage Buildings</button>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content active" id="settings-tab">
+            <div class="card">
+                <h2>Display Settings</h2>
+
+                <div class="setting-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="showCashPrice" checked>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Show Cash Prices</span>
+                    </label>
+                </div>
+
+                <div class="setting-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="showRtoOptions" checked>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Show Rent-to-Own Options</span>
+                    </label>
+                </div>
+
+                <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+            </div>
+        </div>
+
+        <!-- Welcome Message Tab -->
+        <div class="tab-content" id="welcome-tab">
+            <div class="card">
+                <h2>Welcome Message</h2>
+
+                <div class="form-group">
+                    <label for="welcomeTitle">Title</label>
+                    <input type="text" id="welcomeTitle" class="form-control"
+                           value="Welcome to Community Portable Buildings of West Monroe, LA and Columbia, LA">
+                </div>
+
+                <div class="form-group">
+                    <label for="welcomeMessage">Message</label>
+                    <textarea id="welcomeMessage" class="form-control" rows="3">Take a look at what we have in stock, and let us know if we can design you a custom Graceland Building or help in any way!</textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="saveWelcomeMessage()">Save Welcome Message</button>
+            </div>
+        </div>
+
+        <!-- Carousel Tab -->
+        <div class="tab-content" id="carousel-tab">
+            <div class="card">
+                <h2>Hero Carousel Images</h2>
+                <p class="help-text">Current images in the carousel. Drag to reorder, click X to remove.</p>
+
+                <div id="carousel-images" class="carousel-manager">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <div class="form-group">
+                    <label for="newCarouselImage">Add New Image (filename from root directory)</label>
+                    <div class="input-group">
+                        <input type="text" id="newCarouselImage" class="form-control"
+                               placeholder="e.g., Cabin-12x24-Angle.jpg">
+                        <button class="btn btn-secondary" onclick="addCarouselImage()">Add Image</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="saveCarousel()">Save Carousel</button>
+            </div>
+        </div>
+
+        <!-- Buildings Tab -->
+        <div class="tab-content" id="buildings-tab">
+            <div class="card">
+                <h2>Manage Buildings</h2>
+
+                <div class="buildings-list" id="buildings-list">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast" id="toast">
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="decoder.js"></script>
+    <script src="inventory.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
