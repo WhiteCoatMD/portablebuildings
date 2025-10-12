@@ -1004,6 +1004,50 @@ async function syncLot(index) {
     }
 }
 
+// Manual Sync Function
+async function triggerManualSync() {
+    const btn = document.getElementById('manual-sync-btn');
+    const status = document.getElementById('sync-status');
+
+    // Disable button
+    btn.disabled = true;
+    btn.textContent = '⏳ Syncing...';
+    status.textContent = 'Triggering sync on your server...';
+    status.style.color = 'var(--text-light)';
+
+    try {
+        const response = await fetch('/api/trigger-sync', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            status.textContent = '✅ Sync started! Check back in 2-3 minutes to see updated inventory.';
+            status.style.color = 'var(--success-color)';
+            showToast('Manual sync triggered successfully!');
+        } else {
+            status.textContent = result.message || 'Sync will run automatically at 2 AM daily.';
+            status.style.color = 'var(--warning-color)';
+            showToast(result.message || 'Could not trigger manual sync', true);
+        }
+    } catch (error) {
+        console.error('Sync trigger error:', error);
+        status.textContent = 'Could not connect to sync server. Automatic sync runs daily at 2 AM.';
+        status.style.color = 'var(--warning-color)';
+        showToast('Could not trigger manual sync. Automatic sync runs daily at 2 AM.', true);
+    } finally {
+        // Re-enable button after 10 seconds
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = '🔄 Run Manual Sync Now';
+        }, 10000);
+    }
+}
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveWelcomeMessage = saveWelcomeMessage;
@@ -1020,3 +1064,4 @@ window.getBuildingImages = getBuildingImages;
 window.addLot = addLot;
 window.removeLot = removeLot;
 window.syncLot = syncLot;
+window.triggerManualSync = triggerManualSync;

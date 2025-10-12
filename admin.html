@@ -104,8 +104,12 @@
                 </div>
 
                 <div class="card" style="background: var(--background); margin-top: 1.5rem;">
-                    <h3>Automatic Sync</h3>
-                    <p class="help-text">✅ Lots are synced automatically once daily along with your main inventory. No manual action required!</p>
+                    <h3>Sync Inventory</h3>
+                    <p class="help-text">✅ Automatic sync runs daily at 2 AM. Or trigger a manual sync now:</p>
+                    <button class="btn btn-primary" onclick="triggerManualSync()" id="manual-sync-btn">
+                        🔄 Run Manual Sync Now
+                    </button>
+                    <p id="sync-status" class="help-text" style="margin-top: 1rem; color: var(--text-light);"></p>
                 </div>
 
                 <div class="card" style="background: var(--background); margin-top: 1.5rem;">
