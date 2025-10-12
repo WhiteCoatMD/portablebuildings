@@ -1,6 +1,6 @@
-import { list, del } from '@vercel/blob';
+const { list, del } = require('@vercel/blob');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, DELETE, OPTIONS');
@@ -15,6 +15,8 @@ export default async function handler(req, res) {
       // Get images for a specific building
       const { serialNumber } = req.query;
 
+      console.log('GET images for:', serialNumber);
+
       if (!serialNumber) {
         return res.status(400).json({ error: 'Missing serialNumber parameter' });
       }
@@ -23,6 +25,8 @@ export default async function handler(req, res) {
       const { blobs } = await list({
         prefix: `buildings/${serialNumber}/`,
       });
+
+      console.log('Found blobs:', blobs.length);
 
       // Return URLs sorted by upload time (newest first)
       const urls = blobs
@@ -36,13 +40,22 @@ export default async function handler(req, res) {
 
     } else if (req.method === 'DELETE') {
       // Delete a specific image
-      const { url } = req.body;
+      let body = req.body;
+      if (typeof body === 'string') {
+        body = JSON.parse(body);
+      }
+
+      const { url } = body;
+
+      console.log('DELETE image:', url);
 
       if (!url) {
         return res.status(400).json({ error: 'Missing url in request body' });
       }
 
       await del(url);
+
+      console.log('Delete successful');
 
       return res.status(200).json({
         success: true,
@@ -55,9 +68,11 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('API error:', error);
+    console.error('Error stack:', error.stack);
     return res.status(500).json({
       error: 'Failed to process request',
-      details: error.message
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }
