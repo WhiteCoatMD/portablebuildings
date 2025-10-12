@@ -765,7 +765,7 @@ function loadLots() {
     container.innerHTML = lots.map((lot, index) => {
         const syncStatus = lot.lastSync ?
             `Last synced: ${new Date(lot.lastSync).toLocaleString()}` :
-            'Never synced';
+            'Run sync command locally';
 
         return `
             <div class="lot-item">
@@ -775,9 +775,9 @@ function loadLots() {
                         <span class="lot-badge">${lot.buildingCount || 0} buildings</span>
                     </h3>
                     <p class="sync-status">${syncStatus}</p>
+                    <code style="font-size: 0.85rem; color: var(--text-light);">npm run sync:lot "${lot.name}"</code>
                 </div>
                 <div class="lot-actions">
-                    <button class="btn btn-sm btn-primary" onclick="syncLot(${index})">🔄 Sync Now</button>
                     <button class="btn btn-sm btn-danger" onclick="removeLot(${index})">Remove</button>
                 </div>
             </div>
@@ -790,13 +790,11 @@ function getLots() {
     return stored ? JSON.parse(stored) : [];
 }
 
-async function addLot() {
+function addLot() {
     const name = document.getElementById('lot-name').value.trim();
-    const username = document.getElementById('lot-username').value.trim();
-    const password = document.getElementById('lot-password').value.trim();
 
-    if (!name || !username || !password) {
-        showToast('Please fill in all fields', true);
+    if (!name) {
+        showToast('Please enter a lot name', true);
         return;
     }
 
@@ -808,11 +806,8 @@ async function addLot() {
         return;
     }
 
-    // Add lot and immediately sync
     lots.push({
         name,
-        username,
-        password,
         lastSync: null,
         buildingCount: 0
     });
@@ -821,14 +816,9 @@ async function addLot() {
 
     // Clear form
     document.getElementById('lot-name').value = '';
-    document.getElementById('lot-username').value = '';
-    document.getElementById('lot-password').value = '';
 
     loadLots();
-    showToast('Lot added! Starting sync...');
-
-    // Auto-sync the newly added lot
-    await syncLot(lots.length - 1);
+    showToast('Lot location added! Run sync command locally to import buildings.');
 }
 
 function removeLot(index) {
@@ -853,87 +843,6 @@ function removeLot(index) {
     showToast('Lot removed!');
 }
 
-async function syncLot(index) {
-    const lots = getLots();
-    const lot = lots[index];
-
-    showToast(`Syncing ${lot.name}... This may take 1-2 minutes.`);
-
-    try {
-        // Call the scraper API to get inventory from this lot
-        const response = await fetch('/api/sync-other-lot', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: lot.username,
-                password: lot.password,
-                lotName: lot.name
-            })
-        });
-
-        const result = await response.json();
-
-        if (!result.success) {
-            throw new Error(result.error || 'Failed to scrape lot inventory');
-        }
-
-        const rawInventory = result.inventory;
-
-        if (!rawInventory || rawInventory.length === 0) {
-            throw new Error('No buildings found - check credentials or lot may be empty');
-        }
-
-        // Process each building through the decoder
-        const decoded = rawInventory.map(item => {
-            const decoder = new SerialNumberDecoder(item.serialNumber);
-            const details = decoder.getFullDetails();
-
-            if (!details.valid) {
-                console.warn('Invalid serial number:', item.serialNumber);
-                return null;
-            }
-
-            return {
-                ...item,
-                ...details,
-                typeCode: details.type.code,
-                typeName: details.type.name,
-                sizeDisplay: details.size.display,
-                width: details.size.width,
-                length: details.size.length,
-                dateBuilt: details.dateBuilt.display,
-                isRepo: item.isRepo || details.status === 'repo'
-            };
-        }).filter(item => item !== null);
-
-        // Tag buildings with lot location
-        const overrides = getBuildingOverrides();
-        decoded.forEach(building => {
-            if (!overrides[building.serialNumber]) {
-                overrides[building.serialNumber] = {};
-            }
-            overrides[building.serialNumber].lotLocation = lot.name;
-            overrides[building.serialNumber].lotUsername = lot.username;
-        });
-        localStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(overrides));
-
-        // Update lot sync info
-        lot.lastSync = new Date().toISOString();
-        lot.buildingCount = decoded.length;
-        lots[index] = lot;
-        localStorage.setItem(STORAGE_KEYS.LOTS, JSON.stringify(lots));
-
-        loadLots();
-        loadBuildings();
-        showToast(`Successfully synced ${decoded.length} buildings from ${lot.name}!`);
-    } catch (error) {
-        console.error('Sync error:', error);
-        showToast(`Failed to sync ${lot.name}: ${error.message}`, true);
-    }
-}
-
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveWelcomeMessage = saveWelcomeMessage;
@@ -949,4 +858,3 @@ window.setMainImage = setMainImage;
 window.getBuildingImages = getBuildingImages;
 window.addLot = addLot;
 window.removeLot = removeLot;
-window.syncLot = syncLot;

@@ -5,6 +5,7 @@
   "main": "sync.js",
   "scripts": {
     "sync": "node sync.js",
+    "sync:lot": "node sync-other-lot.js",
     "test": "node test-login.js",
     "schedule": "node scheduler.js"
   },

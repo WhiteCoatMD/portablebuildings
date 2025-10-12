@@ -104,21 +104,13 @@
                 </div>
 
                 <div class="card" style="background: var(--background); margin-top: 1.5rem;">
-                    <h3>Add Lot Location</h3>
-                    <p class="help-text">Add GPB Sales login credentials for another lot. We'll scrape their inventory and tag it with the lot location.</p>
+                    <h3>Add/Update Lot Location</h3>
+                    <p class="help-text">To sync another lot's inventory: <br>1. Run <code>npm run sync:lot &lt;username&gt; &lt;password&gt; &lt;lot-name&gt;</code> locally<br>2. It will automatically tag and upload buildings to this site</p>
                     <div class="form-group">
                         <label for="lot-name">Lot Name/Location</label>
                         <input type="text" id="lot-name" class="form-control" placeholder="e.g., Columbia, LA">
                     </div>
-                    <div class="form-group">
-                        <label for="lot-username">GPB Sales Username/Email</label>
-                        <input type="email" id="lot-username" class="form-control" placeholder="Enter GPB Sales email">
-                    </div>
-                    <div class="form-group">
-                        <label for="lot-password">GPB Sales Password</label>
-                        <input type="password" id="lot-password" class="form-control" placeholder="Enter GPB Sales password">
-                    </div>
-                    <button class="btn btn-primary" onclick="addLot()">Add Lot & Sync</button>
+                    <button class="btn btn-primary" onclick="addLot()">Add Lot Location</button>
                 </div>
             </div>
         </div>
