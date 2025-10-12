@@ -8,11 +8,51 @@
 </head>
 <body>
     <header>
-        <div class="container">
-            <h1>Community Portable Buildings</h1>
-            <p class="tagline">A Graceland Portable Buildings Dealer</p>
+        <div class="container header-content">
+            <div class="header-left">
+                <h1>Community Portable Buildings</h1>
+                <p class="phone-text">Call us at <a href="tel:318-594-5909" class="phone-link">318-594-5909</a></p>
+            </div>
+            <div class="header-right">
+                <img src="public/graceland_logo.png" alt="Graceland Portable Buildings" class="header-logo">
+                <p class="dealer-text">Authorized Dealer</p>
+            </div>
         </div>
     </header>
+
+    <!-- Hero Section with Photo Gallery -->
+    <section class="hero">
+        <div class="hero-gallery">
+            <div class="gallery-slide active">
+                <img src="public/buildings/Cabin/Cabin-12x24-Angle.jpg" alt="Cabin">
+            </div>
+            <div class="gallery-slide">
+                <img src="public/buildings/Lofted Barn/LB10X16_BlueSlate-Fossil-Midnight-FRONT.png" alt="Lofted Barn">
+            </div>
+            <div class="gallery-slide">
+                <img src="public/buildings/Corner Porch Lofted Barn Cabin/CPLBC-12X24-Front-PorchLeft.jpg" alt="Corner Porch Lofted Barn Cabin">
+            </div>
+            <div class="gallery-slide">
+                <img src="public/buildings/Garden Shed/IMG_7356-Edit.jpg" alt="Garden Shed">
+            </div>
+            <div class="gallery-slide">
+                <img src="public/buildings/Garage/Garage-12X32-Open-Angle.jpg" alt="Garage">
+            </div>
+            <div class="gallery-slide">
+                <img src="public/buildings/Barn/Barn-Front-View-8x12.jpg" alt="Barn">
+            </div>
+        </div>
+        <button class="gallery-prev" onclick="changeSlide(-1)">❮</button>
+        <button class="gallery-next" onclick="changeSlide(1)">❯</button>
+        <div class="gallery-dots">
+            <span class="dot active" onclick="currentSlide(0)"></span>
+            <span class="dot" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+            <span class="dot" onclick="currentSlide(4)"></span>
+            <span class="dot" onclick="currentSlide(5)"></span>
+        </div>
+    </section>
 
     <main class="container">
         <section class="filters">

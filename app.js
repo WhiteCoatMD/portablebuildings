@@ -192,6 +192,54 @@ document.addEventListener('click', (event) => {
     }
 });
 
+// Hero Gallery Functionality
+let currentSlideIndex = 0;
+let slideInterval;
+
+function showSlide(index) {
+    const slides = document.querySelectorAll('.gallery-slide');
+    const dots = document.querySelectorAll('.dot');
+
+    if (!slides.length) return;
+
+    // Wrap around
+    if (index >= slides.length) currentSlideIndex = 0;
+    else if (index < 0) currentSlideIndex = slides.length - 1;
+    else currentSlideIndex = index;
+
+    // Hide all slides
+    slides.forEach(slide => slide.classList.remove('active'));
+    dots.forEach(dot => dot.classList.remove('active'));
+
+    // Show current slide
+    slides[currentSlideIndex].classList.add('active');
+    dots[currentSlideIndex].classList.add('active');
+}
+
+function changeSlide(direction) {
+    showSlide(currentSlideIndex + direction);
+    resetSlideInterval();
+}
+
+function currentSlide(index) {
+    showSlide(index);
+    resetSlideInterval();
+}
+
+function autoSlide() {
+    showSlide(currentSlideIndex + 1);
+}
+
+function resetSlideInterval() {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(autoSlide, 5000);
+}
+
+// Start auto-sliding when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    slideInterval = setInterval(autoSlide, 5000);
+});
+
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
