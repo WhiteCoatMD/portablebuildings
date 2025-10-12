@@ -361,6 +361,14 @@ function saveBuildingImages(serialNumber, images) {
 
 async function handleImageUpload(event) {
     const files = Array.from(event.target.files);
+
+    if (!files || files.length === 0) {
+        showToast('No files selected', true);
+        return;
+    }
+
+    console.log('Files selected:', files.length);
+
     const currentImages = getBuildingImages(currentBuilding);
 
     if (currentImages.length + files.length > MAX_IMAGES) {
@@ -372,6 +380,7 @@ async function handleImageUpload(event) {
 
     try {
         for (const file of files) {
+            console.log('Processing file:', file.name, file.type, file.size);
             let processedFile = file;
 
             // Convert HEIC to JPEG
@@ -381,37 +390,89 @@ async function handleImageUpload(event) {
                     const convertedBlob = await heic2any({
                         blob: file,
                         toType: 'image/jpeg',
-                        quality: 0.8
+                        quality: 0.6
                     });
                     processedFile = new File([convertedBlob], file.name.replace(/\.heic$/i, '.jpg'), {
                         type: 'image/jpeg'
                     });
+                    console.log('HEIC converted successfully');
                 } catch (error) {
                     console.error('HEIC conversion failed:', error);
-                    showToast('HEIC conversion failed, trying as regular image', true);
+                    showToast('HEIC conversion failed: ' + error.message, true);
+                    continue;
                 }
             }
 
-            // Read image as base64
-            const reader = new FileReader();
-            await new Promise((resolve, reject) => {
-                reader.onload = () => {
-                    currentImages.push(reader.result);
-                    resolve();
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(processedFile);
-            });
+            // Compress and resize image
+            const compressedImage = await compressImage(processedFile);
+            console.log('Image compressed, original:', file.size, 'compressed:', compressedImage.length);
+
+            currentImages.push(compressedImage);
         }
 
-        saveBuildingImages(currentBuilding, currentImages);
-        loadBuildingImages(currentBuilding);
-        showToast(`${files.length} image(s) uploaded successfully!`);
+        if (currentImages.length === 0) {
+            showToast('No images were processed', true);
+            return;
+        }
+
+        try {
+            saveBuildingImages(currentBuilding, currentImages);
+            loadBuildingImages(currentBuilding);
+            showToast(`${files.length} image(s) uploaded successfully!`);
+        } catch (error) {
+            console.error('Save error:', error);
+            showToast('Failed to save images - may be too large', true);
+        }
 
     } catch (error) {
         console.error('Upload error:', error);
-        showToast('Failed to upload images', true);
+        showToast('Failed to upload images: ' + error.message, true);
     }
+}
+
+// Compress image to reduce storage size
+function compressImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const img = new Image();
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Resize to max 800px on longest side
+                const maxSize = 800;
+                if (width > maxSize || height > maxSize) {
+                    if (width > height) {
+                        height = (height / width) * maxSize;
+                        width = maxSize;
+                    } else {
+                        width = (width / height) * maxSize;
+                        height = maxSize;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convert to JPEG with 0.7 quality
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                resolve(compressedDataUrl);
+            };
+
+            img.onerror = () => reject(new Error('Failed to load image'));
+            img.src = e.target.result;
+        };
+
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+    });
 }
 
 function removeBuildingImage(index) {
