@@ -8,7 +8,8 @@ const STORAGE_KEYS = {
     SETTINGS: 'cpb_admin_settings',
     WELCOME: 'cpb_welcome_message',
     CAROUSEL: 'cpb_carousel_images',
-    BUILDINGS: 'cpb_building_overrides'
+    BUILDINGS: 'cpb_building_overrides',
+    LOTS: 'cpb_other_lots'
 };
 
 // Default settings
@@ -44,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     loadWelcomeMessage();
     loadCarousel();
+    loadLots();
     loadBuildings();
     initializeBuildingFilters();
 });
@@ -291,6 +293,7 @@ function loadBuildings() {
         const override = overrides[building.serialNumber] || {};
         const status = override.status || 'available';
         const isHidden = override.hidden || false;
+        const lotLocation = override.lotLocation || null;
 
         return `
             <div class="building-item">
@@ -299,6 +302,7 @@ function loadBuildings() {
                         ${building.title} - ${building.sizeDisplay}
                         <span class="status-badge ${status}">${status.toUpperCase()}</span>
                         ${isHidden ? '<span class="status-badge hidden">HIDDEN</span>' : ''}
+                        ${lotLocation ? `<span class="lot-badge" style="margin-left: 0.5rem;">📍 ${lotLocation}</span>` : ''}
                     </h3>
                     <p>SN: ${building.serialNumber} | $${building.price.toLocaleString()} ${building.isRepo ? '(Pre-Owned)' : ''}</p>
                 </div>
@@ -748,6 +752,153 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Lot Management Functions
+function loadLots() {
+    const lots = getLots();
+    const container = document.getElementById('lots-list');
+
+    if (!lots || lots.length === 0) {
+        container.innerHTML = '<p style="text-align: center; padding: 1rem; color: var(--text-light);">No other lots added yet. Add one below to start syncing inventory.</p>';
+        return;
+    }
+
+    container.innerHTML = lots.map((lot, index) => {
+        const syncStatus = lot.lastSync ?
+            `Last synced: ${new Date(lot.lastSync).toLocaleString()}` :
+            'Never synced';
+
+        return `
+            <div class="lot-item">
+                <div class="lot-info">
+                    <h3>
+                        ${lot.name}
+                        <span class="lot-badge">${lot.buildingCount || 0} buildings</span>
+                    </h3>
+                    <p>Dealer #: ${lot.dealerNumber}</p>
+                    <p class="sync-status">${syncStatus}</p>
+                </div>
+                <div class="lot-actions">
+                    <button class="btn btn-sm btn-primary" onclick="syncLot(${index})">🔄 Sync Now</button>
+                    <button class="btn btn-sm btn-danger" onclick="removeLot(${index})">Remove</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function getLots() {
+    const stored = localStorage.getItem(STORAGE_KEYS.LOTS);
+    return stored ? JSON.parse(stored) : [];
+}
+
+function addLot() {
+    const name = document.getElementById('lot-name').value.trim();
+    const dealerNumber = document.getElementById('lot-dealer-number').value.trim();
+    const password = document.getElementById('lot-password').value.trim();
+
+    if (!name || !dealerNumber || !password) {
+        showToast('Please fill in all fields', true);
+        return;
+    }
+
+    const lots = getLots();
+
+    // Check for duplicate
+    if (lots.some(lot => lot.dealerNumber === dealerNumber)) {
+        showToast('This dealer number is already added', true);
+        return;
+    }
+
+    lots.push({
+        name,
+        dealerNumber,
+        password,
+        lastSync: null,
+        buildingCount: 0
+    });
+
+    localStorage.setItem(STORAGE_KEYS.LOTS, JSON.stringify(lots));
+
+    // Clear form
+    document.getElementById('lot-name').value = '';
+    document.getElementById('lot-dealer-number').value = '';
+    document.getElementById('lot-password').value = '';
+
+    loadLots();
+    showToast('Lot added! Click "Sync Now" to fetch buildings.');
+}
+
+function removeLot(index) {
+    if (!confirm('Remove this lot and all its synced buildings?')) return;
+
+    const lots = getLots();
+    const removed = lots.splice(index, 1)[0];
+
+    localStorage.setItem(STORAGE_KEYS.LOTS, JSON.stringify(lots));
+
+    // Remove buildings from this lot
+    const overrides = getBuildingOverrides();
+    for (const serialNumber in overrides) {
+        if (overrides[serialNumber].lotLocation === removed.name) {
+            delete overrides[serialNumber];
+        }
+    }
+    localStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(overrides));
+
+    loadLots();
+    loadBuildings();
+    showToast('Lot removed!');
+}
+
+async function syncLot(index) {
+    const lots = getLots();
+    const lot = lots[index];
+
+    showToast(`Syncing ${lot.name}...`);
+
+    try {
+        // Fetch inventory from the lot using the decoder
+        const response = await fetch(`https://www.bscnow.com/GPWebAPI/Default.aspx?DealerNumber=${lot.dealerNumber}&Password=${encodeURIComponent(lot.password)}`);
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch inventory');
+        }
+
+        const text = await response.text();
+
+        // Use the decoder to process the data
+        const decoded = await window.fetchAndDecodeInventory(lot.dealerNumber, lot.password);
+
+        if (!decoded || decoded.length === 0) {
+            throw new Error('No buildings found or invalid credentials');
+        }
+
+        // Tag buildings with lot location
+        const overrides = getBuildingOverrides();
+        decoded.forEach(building => {
+            if (!overrides[building.serialNumber]) {
+                overrides[building.serialNumber] = {};
+            }
+            overrides[building.serialNumber].lotLocation = lot.name;
+            overrides[building.serialNumber].lotDealerNumber = lot.dealerNumber;
+        });
+        localStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(overrides));
+
+        // Update lot sync info
+        lot.lastSync = new Date().toISOString();
+        lot.buildingCount = decoded.length;
+        lots[index] = lot;
+        localStorage.setItem(STORAGE_KEYS.LOTS, JSON.stringify(lots));
+
+        loadLots();
+        loadBuildings();
+        showToast(`Successfully synced ${decoded.length} buildings from ${lot.name}!`);
+    } catch (error) {
+        console.error('Sync error:', error);
+        showToast(`Failed to sync ${lot.name}: ${error.message}`, true);
+    }
+}
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveWelcomeMessage = saveWelcomeMessage;
@@ -761,3 +912,6 @@ window.closeImageModal = closeImageModal;
 window.removeBuildingImage = removeBuildingImage;
 window.setMainImage = setMainImage;
 window.getBuildingImages = getBuildingImages;
+window.addLot = addLot;
+window.removeLot = removeLot;
+window.syncLot = syncLot;

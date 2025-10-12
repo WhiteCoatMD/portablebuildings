@@ -690,3 +690,72 @@ textarea.form-control {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 }
+
+/* Lots List */
+.lots-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.lot-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    gap: 1rem;
+}
+
+.lot-info {
+    flex: 1;
+}
+
+.lot-info h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+    font-size: 1.1rem;
+}
+
+.lot-info p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.lot-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.lot-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--secondary-color);
+    color: var(--white);
+}
+
+.sync-status {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+}
+
+.sync-status.syncing {
+    color: var(--warning-color);
+}
+
+.sync-status.success {
+    color: var(--success-color);
+}
+
+.sync-status.error {
+    color: var(--danger-color);
+}
