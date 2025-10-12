@@ -92,6 +92,10 @@ class InventoryApp {
 
     createBuildingCard(building) {
         const repoBadge = building.isRepo ? '<div class="repo-badge">REPO</div>' : '';
+        const priceDisplay = building.isRepo ?
+            `<span class="value strikethrough">$${building.price.toLocaleString()}</span>
+             <div class="repo-price-note">Call for Pre-Owned Price</div>` :
+            `<span class="value">$${building.price.toLocaleString()}</span>`;
 
         return `
             <div class="building-card" data-serial="${building.serialNumber}">
@@ -107,8 +111,9 @@ class InventoryApp {
                     <div class="building-details">
                         <div class="building-detail-item">
                             <span class="label">Cash Price:</span>
-                            <span class="value">$${building.price.toLocaleString()}</span>
+                            ${priceDisplay}
                         </div>
+                        ${!building.isRepo ? `
                         <button class="rto-button" onclick="toggleRTO(event, '${building.serialNumber}')">
                             Rent to Own Options
                         </button>
@@ -133,14 +138,33 @@ class InventoryApp {
                             <div class="rto-note">*Plus your local sales tax</div>
                             ` : `<div class="rto-note">RTO pricing not available</div>`}
                         </div>
+                        ` : ''}
                         <div class="building-detail-item">
                             <span class="label">Location:</span>
                             <span class="value">${building.location}</span>
                         </div>
                         <div class="building-detail-item">
                             <span class="label">Status:</span>
-                            <span class="value">${building.isRepo ? 'Repo' : 'Available'}</span>
+                            <span class="value">${building.isRepo ? 'Pre-Owned' : 'Available'}</span>
                         </div>
+                    </div>
+
+                    <div class="share-buttons">
+                        <button class="share-btn" onclick="shareBuilding(event, 'facebook', '${building.serialNumber}')" title="Share on Facebook">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </button>
+                        <button class="share-btn" onclick="shareBuilding(event, 'email', '${building.serialNumber}')" title="Share via Email">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                        </button>
+                        <button class="share-btn" onclick="shareBuilding(event, 'sms', '${building.serialNumber}')" title="Share via Text">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/>
+                            </svg>
+                        </button>
                     </div>
 
                     <div class="building-serial">
@@ -239,6 +263,38 @@ function resetSlideInterval() {
 document.addEventListener('DOMContentLoaded', () => {
     slideInterval = setInterval(autoSlide, 5000);
 });
+
+// Share building functionality
+function shareBuilding(event, platform, serialNumber) {
+    event.stopPropagation();
+
+    // Find the building data
+    const building = window.PROCESSED_INVENTORY.find(b => b.serialNumber === serialNumber);
+    if (!building) return;
+
+    const url = window.location.href;
+    const price = building.isRepo ? 'Call for Pre-Owned Price' : `$${building.price.toLocaleString()}`;
+    const title = `${building.typeName} - ${building.sizeDisplay}`;
+    const message = `Check out this ${building.typeName} (${building.sizeDisplay}) at Community Portable Buildings!\n${price}\nLocation: ${building.location}\nSN: ${building.serialNumber}`;
+
+    switch (platform) {
+        case 'facebook':
+            const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(message)}`;
+            window.open(fbUrl, '_blank', 'width=600,height=400');
+            break;
+
+        case 'email':
+            const emailSubject = encodeURIComponent(`${title} - Community Portable Buildings`);
+            const emailBody = encodeURIComponent(`${message}\n\nView online: ${url}\n\nCall us at 318-594-5909 for more information!`);
+            window.location.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+            break;
+
+        case 'sms':
+            const smsBody = encodeURIComponent(`${message}\n\n${url}\n\nCommunity Portable Buildings - 318-594-5909`);
+            window.location.href = `sms:?&body=${smsBody}`;
+            break;
+    }
+}
 
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {
