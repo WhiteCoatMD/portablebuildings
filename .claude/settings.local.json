@@ -14,7 +14,10 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(vercel:*)"
+      "Bash(vercel:*)",
+      "Bash(git pull:*)",
+      "Bash(powershell:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

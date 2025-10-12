@@ -18,15 +18,119 @@
 
     <main class="container">
         <div class="admin-tabs">
-            <button class="tab-btn active" data-tab="settings">Settings</button>
-            <button class="tab-btn" data-tab="welcome">Welcome Message</button>
-            <button class="tab-btn" data-tab="carousel">Hero Carousel</button>
+            <button class="tab-btn active" data-tab="customization">Site Customization</button>
+            <button class="tab-btn" data-tab="settings">Display Settings</button>
             <button class="tab-btn" data-tab="lots">Other Lots</button>
             <button class="tab-btn" data-tab="buildings">Manage Buildings</button>
         </div>
 
-        <!-- Settings Tab -->
-        <div class="tab-content active" id="settings-tab">
+        <!-- Site Customization Tab -->
+        <div class="tab-content active" id="customization-tab">
+            <div class="card">
+                <h2>Color Scheme</h2>
+                <p class="help-text">Choose a professional color scheme for your website</p>
+
+                <div class="color-schemes">
+                    <label class="color-scheme-option">
+                        <input type="radio" name="colorScheme" value="rustic-earth" checked>
+                        <div class="scheme-preview">
+                            <div class="scheme-header">
+                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #2C5F2D 0%, #C75B39 100%);"></div>
+                            </div>
+                            <div class="scheme-info">
+                                <h3>Rustic Earth & Forest</h3>
+                                <p>Warm, natural, professional - perfect for outdoor buildings</p>
+                                <div class="scheme-colors">
+                                    <span class="color-dot" style="background: #2C5F2D;" title="Deep Forest Green"></span>
+                                    <span class="color-dot" style="background: #C75B39;" title="Warm Clay"></span>
+                                    <span class="color-dot" style="background: #5D4E37;" title="Rich Earth Brown"></span>
+                                    <span class="color-dot" style="background: #D4B896;" title="Sandstone Beige"></span>
+                                    <span class="color-dot" style="background: #8A9A5B;" title="Sage Green"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="color-scheme-option">
+                        <input type="radio" name="colorScheme" value="modern-ranch">
+                        <div class="scheme-preview">
+                            <div class="scheme-header">
+                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #7C2529 0%, #3A3A3C 100%);"></div>
+                            </div>
+                            <div class="scheme-info">
+                                <h3>Modern Ranch</h3>
+                                <p>Bold, confident, masculine - inspired by barn structures</p>
+                                <div class="scheme-colors">
+                                    <span class="color-dot" style="background: #7C2529;" title="Barn Red"></span>
+                                    <span class="color-dot" style="background: #3A3A3C;" title="Charcoal Gray"></span>
+                                    <span class="color-dot" style="background: #704214;" title="Warm Brown"></span>
+                                    <span class="color-dot" style="background: #D4A574;" title="Soft Gold"></span>
+                                    <span class="color-dot" style="background: #6B7280;" title="Slate Gray"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="color-scheme-option">
+                        <input type="radio" name="colorScheme" value="desert-timber">
+                        <div class="scheme-preview">
+                            <div class="scheme-header">
+                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #C19A6B 0%, #6B6935 100%);"></div>
+                            </div>
+                            <div class="scheme-info">
+                                <h3>Desert Timber</h3>
+                                <p>Warm, inviting, southwestern feel</p>
+                                <div class="scheme-colors">
+                                    <span class="color-dot" style="background: #C19A6B;" title="Desert Sand"></span>
+                                    <span class="color-dot" style="background: #6B6935;" title="Deep Olive"></span>
+                                    <span class="color-dot" style="background: #5C4033;" title="Rich Walnut"></span>
+                                    <span class="color-dot" style="background: #CC8B65;" title="Terracotta"></span>
+                                    <span class="color-dot" style="background: #9CA58F;" title="Sage Gray"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Welcome Message</h2>
+
+                <div class="form-group">
+                    <label for="welcomeTitle">Title</label>
+                    <input type="text" id="welcomeTitle" class="form-control"
+                           value="Welcome to Community Portable Buildings of West Monroe, LA and Columbia, LA">
+                </div>
+
+                <div class="form-group">
+                    <label for="welcomeMessage">Message</label>
+                    <textarea id="welcomeMessage" class="form-control" rows="3">Take a look at what we have in stock, and let us know if we can design you a custom Graceland Building or help in any way!</textarea>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Hero Carousel Images</h2>
+                <p class="help-text">Current images in the carousel. Drag to reorder, click X to remove.</p>
+
+                <div id="carousel-images" class="carousel-manager">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <div class="form-group">
+                    <label for="newCarouselImage">Add New Image (filename from root directory)</label>
+                    <div class="input-group">
+                        <input type="text" id="newCarouselImage" class="form-control"
+                               placeholder="e.g., Cabin-12x24-Angle.jpg">
+                        <button class="btn btn-secondary" onclick="addCarouselImage()">Add Image</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg" onclick="saveCustomization()">💾 Save All Customization</button>
+        </div>
+
+        <!-- Display Settings Tab -->
+        <div class="tab-content" id="settings-tab">
             <div class="card">
                 <h2>Display Settings</h2>
 
@@ -47,49 +151,6 @@
                 </div>
 
                 <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
-            </div>
-        </div>
-
-        <!-- Welcome Message Tab -->
-        <div class="tab-content" id="welcome-tab">
-            <div class="card">
-                <h2>Welcome Message</h2>
-
-                <div class="form-group">
-                    <label for="welcomeTitle">Title</label>
-                    <input type="text" id="welcomeTitle" class="form-control"
-                           value="Welcome to Community Portable Buildings of West Monroe, LA and Columbia, LA">
-                </div>
-
-                <div class="form-group">
-                    <label for="welcomeMessage">Message</label>
-                    <textarea id="welcomeMessage" class="form-control" rows="3">Take a look at what we have in stock, and let us know if we can design you a custom Graceland Building or help in any way!</textarea>
-                </div>
-
-                <button class="btn btn-primary" onclick="saveWelcomeMessage()">Save Welcome Message</button>
-            </div>
-        </div>
-
-        <!-- Carousel Tab -->
-        <div class="tab-content" id="carousel-tab">
-            <div class="card">
-                <h2>Hero Carousel Images</h2>
-                <p class="help-text">Current images in the carousel. Drag to reorder, click X to remove.</p>
-
-                <div id="carousel-images" class="carousel-manager">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-
-                <div class="form-group">
-                    <label for="newCarouselImage">Add New Image (filename from root directory)</label>
-                    <div class="input-group">
-                        <input type="text" id="newCarouselImage" class="form-control"
-                               placeholder="e.g., Cabin-12x24-Angle.jpg">
-                        <button class="btn btn-secondary" onclick="addCarouselImage()">Add Image</button>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" onclick="saveCarousel()">Save Carousel</button>
             </div>
         </div>
 

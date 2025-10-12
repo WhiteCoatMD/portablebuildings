@@ -759,3 +759,86 @@ textarea.form-control {
 .sync-status.error {
     color: var(--danger-color);
 }
+
+/* Color Scheme Selector */
+.color-schemes {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.color-scheme-option {
+    position: relative;
+    cursor: pointer;
+}
+
+.color-scheme-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.scheme-preview {
+    border: 3px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.color-scheme-option input[type="radio"]:checked + .scheme-preview {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 16px rgba(26, 84, 144, 0.2);
+    transform: translateY(-2px);
+}
+
+.scheme-header {
+    height: 80px;
+    position: relative;
+}
+
+.scheme-gradient {
+    width: 100%;
+    height: 100%;
+}
+
+.scheme-info {
+    padding: 1.5rem;
+    background: var(--white);
+}
+
+.scheme-info h3 {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.scheme-info p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.scheme-colors {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.color-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: help;
+}
+
+.color-scheme-option:hover .scheme-preview {
+    border-color: var(--secondary-color);
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    width: 100%;
+    margin-top: 1rem;
+}

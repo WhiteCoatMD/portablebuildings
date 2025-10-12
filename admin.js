@@ -9,7 +9,8 @@ const STORAGE_KEYS = {
     WELCOME: 'cpb_welcome_message',
     CAROUSEL: 'cpb_carousel_images',
     BUILDINGS: 'cpb_building_overrides',
-    LOTS: 'cpb_other_lots'
+    LOTS: 'cpb_other_lots',
+    COLOR_SCHEME: 'cpb_color_scheme'
 };
 
 // Default settings
@@ -48,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     loadWelcomeMessage();
     loadCarousel();
+    loadColorScheme();
     loadLots();
     loadBuildings();
     initializeBuildingFilters();
@@ -1074,8 +1076,36 @@ async function triggerManualSync() {
     }
 }
 
+// Color Scheme Management
+function loadColorScheme() {
+    const saved = localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME);
+    const scheme = saved || 'rustic-earth';
+
+    const radio = document.querySelector(`input[name="colorScheme"][value="${scheme}"]`);
+    if (radio) {
+        radio.checked = true;
+    }
+}
+
+function saveCustomization() {
+    // Save color scheme
+    const selectedScheme = document.querySelector('input[name="colorScheme"]:checked');
+    if (selectedScheme) {
+        localStorage.setItem(STORAGE_KEYS.COLOR_SCHEME, selectedScheme.value);
+    }
+
+    // Save welcome message
+    saveWelcomeMessage();
+
+    // Save carousel
+    saveCarousel();
+
+    showToast('Site customization saved successfully!');
+}
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
+window.saveCustomization = saveCustomization;
 window.saveWelcomeMessage = saveWelcomeMessage;
 window.addCarouselImage = addCarouselImage;
 window.removeCarouselImage = removeCarouselImage;

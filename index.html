@@ -4,7 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community Portable Buildings - Current Inventory</title>
+    <link rel="stylesheet" href="color-schemes.css">
     <link rel="stylesheet" href="styles.css">
+    <script>
+        // Apply color scheme before page loads
+        (function() {
+            const scheme = localStorage.getItem('cpb_color_scheme') || 'rustic-earth';
+            if (scheme !== 'rustic-earth') {
+                document.documentElement.setAttribute('data-color-scheme', scheme);
+            }
+        })();
+    </script>
 </head>
 <body>
     <header>

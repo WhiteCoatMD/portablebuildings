@@ -1,0 +1,40 @@
+/**
+ * Color Scheme Definitions
+ * Dynamically applied based on admin selection
+ */
+
+/* Default: Rustic Earth & Forest */
+:root {
+    --primary-gradient-start: #2C5F2D;
+    --primary-gradient-end: #C75B39;
+    --primary-color: #2C5F2D;
+    --secondary-color: #C75B39;
+    --accent-color: #5D4E37;
+    --light-accent: #D4B896;
+    --sage-accent: #8A9A5B;
+    --background: #F5F1E8;
+}
+
+/* Modern Ranch */
+[data-color-scheme="modern-ranch"] {
+    --primary-gradient-start: #7C2529;
+    --primary-gradient-end: #3A3A3C;
+    --primary-color: #7C2529;
+    --secondary-color: #3A3A3C;
+    --accent-color: #704214;
+    --light-accent: #D4A574;
+    --sage-accent: #6B7280;
+    --background: #FAF7F2;
+}
+
+/* Desert Timber */
+[data-color-scheme="desert-timber"] {
+    --primary-gradient-start: #C19A6B;
+    --primary-gradient-end: #6B6935;
+    --primary-color: #C19A6B;
+    --secondary-color: #6B6935;
+    --accent-color: #5C4033;
+    --light-accent: #CC8B65;
+    --sage-accent: #9CA58F;
+    --background: #FEFDF8;
+}
