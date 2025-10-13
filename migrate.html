@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Your Data - Portable Buildings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #1a5490;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196f3;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .info-box p {
+            margin-bottom: 1rem;
+            color: #004085;
+            line-height: 1.6;
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-box {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .status-box.show {
+            display: block;
+        }
+
+        .status-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-item.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-item.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-item.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 25px rgba(108, 117, 125, 0.4);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .data-summary {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .data-summary h3 {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+
+        .data-summary ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .data-summary li {
+            padding: 0.5rem 0;
+            color: #856404;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .skip-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .skip-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .skip-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Import Your Existing Data</h1>
+
+        <div class="info-box">
+            <p><strong>Welcome!</strong> We've detected that you have existing site data saved locally.</p>
+            <p>Click the button below to import your data into your new account. This includes:</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Business information and customization</li>
+                <li>Color schemes and carousel images</li>
+                <li>Building status and visibility settings</li>
+                <li>Image uploads and ordering</li>
+                <li>Facebook configuration</li>
+                <li>Other lot locations</li>
+            </ul>
+        </div>
+
+        <div id="data-summary" class="data-summary" style="display: none;">
+            <h3>Found Data to Import:</h3>
+            <ul id="data-list"></ul>
+        </div>
+
+        <div id="status-box" class="status-box"></div>
+
+        <button id="migrate-btn" class="btn" onclick="migrateData()">
+            🚀 Import My Data
+        </button>
+
+        <button id="skip-btn" class="btn btn-secondary" onclick="skipMigration()" style="display: none; margin-top: 0.5rem;">
+            Skip for Now
+        </button>
+
+        <div class="skip-link">
+            <a href="admin.html">Go to Admin Panel →</a>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // Storage keys to migrate
+        const STORAGE_KEYS = {
+            SETTINGS: 'cpb_admin_settings',
+            WELCOME: 'cpb_welcome_message',
+            CAROUSEL: 'cpb_carousel_images',
+            BUILDINGS: 'cpb_building_overrides',
+            LOTS: 'cpb_other_lots',
+            COLOR_SCHEME: 'cpb_color_scheme',
+            BUSINESS_NAME: 'cpb_business_name',
+            BUSINESS_PHONE: 'cpb_business_phone',
+            BUSINESS_EMAIL: 'cpb_business_email',
+            BUSINESS_ADDRESS: 'cpb_business_address',
+            BUTTON_COLOR: 'cpb_button_color',
+            SOCIAL_MEDIA: 'cpb_social_media',
+            FACEBOOK_CONFIG: 'cpb_facebook_config',
+            BACKGROUND_SETTINGS: 'cpb_background_settings',
+            IMAGE_ORDER: 'cpb_image_order'
+        };
+
+        // Check what data exists
+        function checkExistingData() {
+            const summary = document.getElementById('data-summary');
+            const list = document.getElementById('data-list');
+            const found = [];
+
+            if (localStorage.getItem(STORAGE_KEYS.BUSINESS_NAME)) found.push('Business Information');
+            if (localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME)) found.push('Color Scheme');
+            if (localStorage.getItem(STORAGE_KEYS.CAROUSEL)) found.push('Carousel Images');
+            if (localStorage.getItem(STORAGE_KEYS.BUILDINGS)) found.push('Building Overrides');
+            if (localStorage.getItem(STORAGE_KEYS.IMAGE_ORDER)) found.push('Image Orders');
+            if (localStorage.getItem(STORAGE_KEYS.FACEBOOK_CONFIG)) found.push('Facebook Configuration');
+            if (localStorage.getItem(STORAGE_KEYS.LOTS)) found.push('Other Lots');
+
+            if (found.length > 0) {
+                summary.style.display = 'block';
+                list.innerHTML = found.map(item => `<li><span>${item}</span><span>✓</span></li>`).join('');
+            }
+        }
+
+        checkExistingData();
+
+        async function migrateData() {
+            const btn = document.getElementById('migrate-btn');
+            const skipBtn = document.getElementById('skip-btn');
+            const statusBox = document.getElementById('status-box');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>Importing...';
+            skipBtn.style.display = 'block';
+            statusBox.classList.add('show');
+            statusBox.innerHTML = '';
+
+            try {
+                // 1. Migrate user settings
+                await migrateSettings(statusBox);
+
+                // 2. Migrate building overrides
+                await migrateBuildingOverrides(statusBox);
+
+                // 3. Migrate image orders
+                await migrateImageOrders(statusBox);
+
+                // Success!
+                statusBox.innerHTML += '<div class="status-item success">✅ All data imported successfully!</div>';
+                btn.innerHTML = '✅ Import Complete';
+                skipBtn.textContent = 'Continue to Admin Panel';
+                skipBtn.onclick = () => window.location.href = 'admin.html';
+
+            } catch (error) {
+                console.error('Migration error:', error);
+                statusBox.innerHTML += `<div class="status-item error">❌ Migration failed: ${error.message}</div>`;
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Try Again';
+            }
+        }
+
+        async function migrateSettings(statusBox) {
+            statusBox.innerHTML += '<div class="status-item info">📋 Importing settings...</div>';
+
+            const settings = {};
+
+            // Collect all settings from localStorage
+            Object.entries(STORAGE_KEYS).forEach(([key, storageKey]) => {
+                const value = localStorage.getItem(storageKey);
+                if (value) {
+                    try {
+                        settings[storageKey] = JSON.parse(value);
+                    } catch (e) {
+                        settings[storageKey] = value;
+                    }
+                }
+            });
+
+            if (Object.keys(settings).length === 0) {
+                statusBox.innerHTML += '<div class="status-item info">ℹ️  No settings to import</div>';
+                return;
+            }
+
+            const response = await fetch('/api/user/settings', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ settings })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to save settings');
+            }
+
+            statusBox.innerHTML += '<div class="status-item success">✅ Settings imported</div>';
+        }
+
+        async function migrateBuildingOverrides(statusBox) {
+            const overridesStr = localStorage.getItem(STORAGE_KEYS.BUILDINGS);
+            if (!overridesStr) {
+                statusBox.innerHTML += '<div class="status-item info">ℹ️  No building overrides to import</div>';
+                return;
+            }
+
+            statusBox.innerHTML += '<div class="status-item info">📋 Importing building overrides...</div>';
+
+            const overrides = JSON.parse(overridesStr);
+
+            const response = await fetch('/api/user/building-overrides', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ overrides })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to save building overrides');
+            }
+
+            statusBox.innerHTML += `<div class="status-item success">✅ Building overrides imported (${Object.keys(overrides).length} buildings)</div>`;
+        }
+
+        async function migrateImageOrders(statusBox) {
+            const ordersStr = localStorage.getItem(STORAGE_KEYS.IMAGE_ORDER);
+            if (!ordersStr) {
+                statusBox.innerHTML += '<div class="status-item info">ℹ️  No image orders to import</div>';
+                return;
+            }
+
+            statusBox.innerHTML += '<div class="status-item info">📋 Importing image orders...</div>';
+
+            const orders = JSON.parse(ordersStr);
+
+            const response = await fetch('/api/user/image-orders', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orders })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to save image orders');
+            }
+
+            statusBox.innerHTML += `<div class="status-item success">✅ Image orders imported (${Object.keys(orders).length} buildings)</div>`;
+        }
+
+        function skipMigration() {
+            if (confirm('Are you sure you want to skip importing your data? You can always import it later.')) {
+                window.location.href = 'admin.html';
+            }
+        }
+    </script>
+</body>
+</html>
