@@ -18,7 +18,8 @@ const STORAGE_KEYS = {
     BUTTON_COLOR: 'cpb_button_color',
     SOCIAL_MEDIA: 'cpb_social_media',
     FACEBOOK_CONFIG: 'cpb_facebook_config',
-    POSTED_BUILDINGS: 'cpb_posted_buildings'
+    POSTED_BUILDINGS: 'cpb_posted_buildings',
+    CUSTOM_COLORS: 'cpb_custom_colors'
 };
 
 // Default settings
@@ -223,6 +224,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadButtonColor();
     initializeColorInputSync();
     initializeBackgroundColorPicker();
+    initializeCustomColorPickers();
+    loadCustomColors();
     loadLots();
     loadBuildings();
     initializeBuildingFilters();
@@ -1933,6 +1936,191 @@ function applyBackgroundToSite(settings) {
     console.log('Background to apply:', bodyStyle);
 }
 
+// Custom Primary Colors Management
+function initializeCustomColorPickers() {
+    // Setup sync for all 6 color pickers
+    const colorPairs = [
+        { picker: 'primaryColor', hex: 'primaryColorHex' },
+        { picker: 'secondaryColor', hex: 'secondaryColorHex' },
+        { picker: 'accentColor', hex: 'accentColorHex' },
+        { picker: 'headerColor', hex: 'headerColorHex' },
+        { picker: 'footerColor', hex: 'footerColorHex' },
+        { picker: 'textColor', hex: 'textColorHex' }
+    ];
+
+    colorPairs.forEach(pair => {
+        const colorPicker = document.getElementById(pair.picker);
+        const hexInput = document.getElementById(pair.hex);
+
+        if (colorPicker && hexInput) {
+            // Sync color picker -> hex input
+            colorPicker.addEventListener('input', (e) => {
+                hexInput.value = e.target.value;
+                updateCustomColorPreview();
+            });
+
+            // Sync hex input -> color picker
+            hexInput.addEventListener('input', (e) => {
+                let value = e.target.value.trim();
+
+                // Add # if missing
+                if (value && !value.startsWith('#')) {
+                    value = '#' + value;
+                }
+
+                // Validate hex color
+                if (/^#[0-9A-F]{6}$/i.test(value)) {
+                    colorPicker.value = value;
+                    hexInput.style.borderColor = 'var(--border)';
+                    updateCustomColorPreview();
+                } else if (value.length > 0) {
+                    hexInput.style.borderColor = 'var(--danger-color)';
+                }
+            });
+        }
+    });
+}
+
+function loadCustomColors() {
+    const colors = getSetting(STORAGE_KEYS.CUSTOM_COLORS, null);
+
+    if (colors) {
+        // Load each color into its inputs
+        const colorMap = {
+            primary: { picker: 'primaryColor', hex: 'primaryColorHex' },
+            secondary: { picker: 'secondaryColor', hex: 'secondaryColorHex' },
+            accent: { picker: 'accentColor', hex: 'accentColorHex' },
+            header: { picker: 'headerColor', hex: 'headerColorHex' },
+            footer: { picker: 'footerColor', hex: 'footerColorHex' },
+            text: { picker: 'textColor', hex: 'textColorHex' }
+        };
+
+        Object.keys(colorMap).forEach(key => {
+            if (colors[key]) {
+                const picker = document.getElementById(colorMap[key].picker);
+                const hex = document.getElementById(colorMap[key].hex);
+                if (picker) picker.value = colors[key];
+                if (hex) hex.value = colors[key];
+            }
+        });
+
+        updateCustomColorPreview();
+    }
+}
+
+function updateCustomColorPreview() {
+    const preview = document.getElementById('custom-colors-preview');
+    if (!preview) return;
+
+    const colors = {
+        primary: document.getElementById('primaryColor')?.value,
+        secondary: document.getElementById('secondaryColor')?.value,
+        accent: document.getElementById('accentColor')?.value,
+        header: document.getElementById('headerColor')?.value,
+        footer: document.getElementById('footerColor')?.value,
+        text: document.getElementById('textColor')?.value
+    };
+
+    // Show preview if any color is set
+    const hasColors = Object.values(colors).some(c => c && c !== '#000000');
+
+    if (hasColors) {
+        preview.style.display = 'block';
+
+        // Update preview boxes
+        if (colors.primary) {
+            const primaryBox = document.getElementById('preview-primary');
+            if (primaryBox) {
+                primaryBox.style.background = colors.primary;
+                primaryBox.style.color = '#fff';
+            }
+        }
+
+        if (colors.secondary) {
+            const secondaryBox = document.getElementById('preview-secondary');
+            if (secondaryBox) {
+                secondaryBox.style.background = colors.secondary;
+                secondaryBox.style.color = '#fff';
+            }
+        }
+
+        if (colors.accent) {
+            const accentBox = document.getElementById('preview-accent');
+            if (accentBox) {
+                accentBox.style.background = colors.accent;
+                accentBox.style.color = '#fff';
+            }
+        }
+
+        if (colors.header) {
+            const headerBox = document.getElementById('preview-header');
+            if (headerBox) {
+                headerBox.style.background = colors.header;
+                headerBox.style.color = '#fff';
+            }
+        }
+
+        if (colors.footer) {
+            const footerBox = document.getElementById('preview-footer');
+            if (footerBox) {
+                footerBox.style.background = colors.footer;
+                footerBox.style.color = '#fff';
+            }
+        }
+    }
+}
+
+async function applyCustomColors() {
+    const colors = {
+        primary: document.getElementById('primaryColor')?.value || '',
+        secondary: document.getElementById('secondaryColor')?.value || '',
+        accent: document.getElementById('accentColor')?.value || '',
+        header: document.getElementById('headerColor')?.value || '',
+        footer: document.getElementById('footerColor')?.value || '',
+        text: document.getElementById('textColor')?.value || ''
+    };
+
+    // Save to database
+    await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, colors);
+
+    updateCustomColorPreview();
+    showToast('Custom colors saved! These will override your color scheme.');
+}
+
+function resetCustomColors() {
+    if (!confirm('Reset all custom colors to color scheme defaults?')) return;
+
+    // Clear all inputs
+    const colorInputs = [
+        'primaryColor', 'primaryColorHex',
+        'secondaryColor', 'secondaryColorHex',
+        'accentColor', 'accentColorHex',
+        'headerColor', 'headerColorHex',
+        'footerColor', 'footerColorHex',
+        'textColor', 'textColorHex'
+    ];
+
+    colorInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.value = input.type === 'color' ? '#000000' : '';
+        }
+    });
+
+    // Remove from database
+    localStorage.removeItem(STORAGE_KEYS.CUSTOM_COLORS);
+    if (dbCache.settings) {
+        delete dbCache.settings[STORAGE_KEYS.CUSTOM_COLORS];
+    }
+    saveToDatabase('settings', { [STORAGE_KEYS.CUSTOM_COLORS]: null });
+
+    // Hide preview
+    const preview = document.getElementById('custom-colors-preview');
+    if (preview) preview.style.display = 'none';
+
+    showToast('Custom colors reset to scheme defaults!');
+}
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveCustomization = saveCustomization;
@@ -1954,3 +2142,5 @@ window.triggerManualSync = triggerManualSync;
 window.resetButtonColor = resetButtonColor;
 window.checkAndPostToFacebook = checkAndPostToFacebook;
 window.testFacebookPost = testFacebookPost;
+window.applyCustomColors = applyCustomColors;
+window.resetCustomColors = resetCustomColors;
