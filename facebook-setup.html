@@ -241,17 +241,20 @@
                 <li>Go to <a href="https://developers.facebook.com/tools/explorer/" target="_blank">Graph API Explorer</a></li>
                 <li>Select your app from the "Facebook App" dropdown</li>
                 <li>Click "Generate Access Token"</li>
-                <li>In the permissions dialog, select:
+                <li>In the permissions dialog, select these <strong>required</strong> permissions:
                     <ul>
-                        <li><code>pages_show_list</code></li>
-                        <li><code>pages_read_engagement</code></li>
-                        <li><code>pages_manage_posts</code></li>
-                        <li><code>pages_manage_engagement</code></li>
+                        <li><code>pages_show_list</code> - Required to list your pages</li>
+                        <li><code>pages_read_engagement</code> - Required to read page info</li>
+                        <li><code>pages_manage_posts</code> - <strong>REQUIRED</strong> for posting content</li>
                     </ul>
                 </li>
                 <li>Click "Generate Access Token" and authorize</li>
                 <li>Copy the generated token (this is a short-lived token)</li>
             </ol>
+
+            <div class="warning">
+                <strong>⚠️ Important Permission Note:</strong> Make sure you have <code>pages_manage_posts</code> permission. The old <code>publish_actions</code> permission is deprecated and will NOT work.
+            </div>
 
             <div class="warning">
                 <strong>⚠️ Important:</strong> Short-lived tokens expire in 1-2 hours. You need a long-lived token for production use.

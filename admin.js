@@ -1365,25 +1365,39 @@ async function checkAndPostToFacebook(building) {
         return; // Already posted
     }
 
-    // Check conditions
+    // REQUIRED: Check for images (always required for auto-posting)
+    const images = await getBuildingImages(building.serialNumber);
+    if (!images || images.length === 0) {
+        console.log('Skipping Facebook post: No images uploaded');
+        return; // ALWAYS skip if no images
+    }
+    building.images = images; // Add images to building object
+
+    // REQUIRED: Check for valid pricing
+    if (!building.price || building.price <= 0) {
+        console.log('Skipping Facebook post: No valid pricing');
+        return; // ALWAYS skip if no price
+    }
+
+    // REQUIRED: Check for complete description (from decoder)
+    if (!building.typeName || !building.sizeDisplay || !building.serialNumber) {
+        console.log('Skipping Facebook post: Incomplete building description');
+        return; // ALWAYS skip if description is incomplete
+    }
+
+    // Check optional conditions
     const override = getBuildingOverrides()[building.serialNumber] || {};
     const status = override.status || 'available';
 
-    // Check if building meets criteria
+    // Optional: Check if building meets user-configured criteria
     if (config.newOnly && building.isRepo) {
+        console.log('Skipping Facebook post: Repo building (newOnly enabled)');
         return; // Skip repos if newOnly is enabled
     }
 
     if (config.availableOnly && status !== 'available') {
+        console.log('Skipping Facebook post: Not available status');
         return; // Skip if not available
-    }
-
-    if (config.withImages) {
-        const images = await getBuildingImages(building.serialNumber);
-        if (!images || images.length === 0) {
-            return; // Skip if no images
-        }
-        building.images = images; // Add images to building object
     }
 
     // Get business phone for template
