@@ -1310,7 +1310,7 @@ async function triggerManualSync() {
 
 // Color Scheme Management
 function loadColorScheme() {
-    const saved = localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME);
+    const saved = getSetting(STORAGE_KEYS.COLOR_SCHEME, 'rustic-earth');
     const scheme = saved || 'rustic-earth';
 
     const radio = document.querySelector(`input[name="colorScheme"][value="${scheme}"]`);
