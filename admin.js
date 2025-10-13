@@ -51,8 +51,56 @@ let buildingFilters = {
 // Sync server configuration
 const SYNC_SERVER_URL = 'http://localhost:3001';
 
+// Authentication helpers
+async function checkAuth() {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+        return null;
+    }
+
+    try {
+        const response = await fetch('/api/auth/me', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            return data.user;
+        }
+        return null;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        return null;
+    }
+}
+
+function logout() {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+}
+
 // Initialize admin panel
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check authentication and show user info
+    const user = await checkAuth();
+    if (user) {
+        const userEmailEl = document.getElementById('user-email');
+        if (userEmailEl) {
+            userEmailEl.textContent = user.email;
+        }
+
+        // Show super admin link if user is admin
+        if (user.is_admin) {
+            const superAdminLink = document.getElementById('super-admin-link');
+            if (superAdminLink) {
+                superAdminLink.style.display = 'inline-block';
+            }
+        }
+    }
+
     initializeTabs();
     loadSettings();
     loadWelcomeMessage();

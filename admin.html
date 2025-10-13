@@ -7,11 +7,22 @@
     <link rel="stylesheet" href="admin-styles.css">
 </head>
 <body>
+    <script>
+        // Check authentication before loading page
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
     <header class="admin-header">
         <div class="container">
             <h1>Admin Panel</h1>
             <div class="header-actions">
+                <span id="user-email" style="margin-right: 1rem; color: #666;"></span>
+                <a href="super-admin.html" class="btn btn-secondary" id="super-admin-link" style="display: none; margin-right: 0.5rem;">Super Admin</a>
                 <a href="index.html" target="_blank" class="btn btn-secondary">View Site</a>
+                <button class="btn btn-secondary" onclick="logout()" style="margin-left: 0.5rem;">Logout</button>
             </div>
         </div>
     </header>
