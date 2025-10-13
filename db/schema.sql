@@ -7,6 +7,13 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     business_name VARCHAR(255),
+    is_admin BOOLEAN DEFAULT FALSE,
+    subscription_status VARCHAR(50) DEFAULT 'trial', -- trial, active, cancelled, expired
+    subscription_plan VARCHAR(50) DEFAULT 'free', -- free, basic, premium
+    subscription_start_date TIMESTAMP,
+    subscription_end_date TIMESTAMP,
+    features JSONB DEFAULT '{"multiLot": false}'::jsonb, -- Feature toggles
+    last_login_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
