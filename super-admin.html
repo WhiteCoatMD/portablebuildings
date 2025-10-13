@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .users-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table-header h2 {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-trial { background: #fff3cd; color: #856404; }
+        .status-active { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        .status-expired { background: #e2e3e5; color: #383d41; }
+
+        .plan-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .plan-free { background: #e7f3ff; color: #004085; }
+        .plan-basic { background: #d1ecf1; color: #0c5460; }
+        .plan-premium { background: #d4edda; color: #155724; }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .loading::after {
+            content: "Loading...";
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "Loading"; }
+            40% { content: "Loading."; }
+            60% { content: "Loading.."; }
+            80%, 100% { content: "Loading..."; }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .admin-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: #764ba2;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔐 Super Admin Dashboard</h1>
+        <p>Manage all user accounts and system settings</p>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+        <div id="error-message" class="error" style="display: none;"></div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Users</h3>
+                <div class="value" id="stat-total-users">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Users (30d)</h3>
+                <div class="value" id="stat-active-users">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Recent Signups (7d)</h3>
+                <div class="value" id="stat-recent-signups">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Buildings</h3>
+                <div class="value" id="stat-total-buildings">-</div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="users-table-container">
+            <div class="table-header">
+                <h2>All Users</h2>
+            </div>
+            <div id="users-table-content">
+                <div class="loading"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit User</h2>
+            <form id="edit-form">
+                <input type="hidden" id="edit-user-id">
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" id="edit-email" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Subscription Status</label>
+                    <select id="edit-subscription-status">
+                        <option value="trial">Trial</option>
+                        <option value="active">Active</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="expired">Expired</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Subscription Plan</label>
+                    <select id="edit-subscription-plan">
+                        <option value="free">Free</option>
+                        <option value="basic">Basic</option>
+                        <option value="premium">Premium</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="edit-multi-lot">
+                        Enable Multi-Lot Feature
+                    </label>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let allUsers = [];
+
+        // Check authentication
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // Load data on page load
+        loadStats();
+        loadUsers();
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/admin/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('stat-total-users').textContent = data.stats.totalUsers;
+                    document.getElementById('stat-active-users').textContent = data.stats.activeUsers;
+                    document.getElementById('stat-recent-signups').textContent = data.stats.recentSignups;
+                    document.getElementById('stat-total-buildings').textContent = data.stats.totalBuildings;
+                } else {
+                    showError(data.error || 'Failed to load statistics');
+                }
+            } catch (error) {
+                console.error('Load stats error:', error);
+                showError('Failed to load statistics');
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    allUsers = data.users;
+                    renderUsersTable(allUsers);
+                } else {
+                    if (response.status === 403) {
+                        showError('Access denied. Admin privileges required.');
+                        setTimeout(() => window.location.href = 'admin.html', 2000);
+                    } else {
+                        showError(data.error || 'Failed to load users');
+                    }
+                }
+            } catch (error) {
+                console.error('Load users error:', error);
+                showError('Failed to load users');
+            }
+        }
+
+        function renderUsersTable(users) {
+            const content = document.getElementById('users-table-content');
+
+            if (users.length === 0) {
+                content.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">No users found</div>';
+                return;
+            }
+
+            const tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Business</th>
+                            <th>Status</th>
+                            <th>Plan</th>
+                            <th>Buildings</th>
+                            <th>Multi-Lot</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(user => `
+                            <tr>
+                                <td>
+                                    ${user.email}
+                                    ${user.is_admin ? '<span class="admin-badge">ADMIN</span>' : ''}
+                                </td>
+                                <td>${user.business_name || '<em>Not set</em>'}</td>
+                                <td>
+                                    <span class="status-badge status-${user.subscription_status}">
+                                        ${user.subscription_status}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="plan-badge plan-${user.subscription_plan}">
+                                        ${user.subscription_plan}
+                                    </span>
+                                </td>
+                                <td>
+                                    ${user.building_count} buildings<br>
+                                    <small style="color: #666;">${user.images_count} images, ${user.posts_count} posts</small>
+                                </td>
+                                <td>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" ${user.features?.multiLot ? 'checked' : ''}
+                                               onchange="toggleMultiLot(${user.id}, this.checked)">
+                                        <span class="slider"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    ${new Date(user.created_at).toLocaleDateString()}<br>
+                                    <small style="color: #666;">
+                                        ${user.last_login_at
+                                            ? 'Last: ' + new Date(user.last_login_at).toLocaleDateString()
+                                            : 'Never logged in'
+                                        }
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="btn btn-primary" onclick="editUser(${user.id})">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            content.innerHTML = tableHTML;
+        }
+
+        async function toggleMultiLot(userId, enabled) {
+            try {
+                const response = await fetch('/api/admin/update-user', {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId,
+                        updates: {
+                            features: { multiLot: enabled }
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    showError(data.error || 'Failed to update feature');
+                    loadUsers(); // Reload to reset toggle
+                }
+            } catch (error) {
+                console.error('Toggle multi-lot error:', error);
+                showError('Failed to update feature');
+                loadUsers();
+            }
+        }
+
+        function editUser(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('edit-user-id').value = user.id;
+            document.getElementById('edit-email').value = user.email;
+            document.getElementById('edit-subscription-status').value = user.subscription_status;
+            document.getElementById('edit-subscription-plan').value = user.subscription_plan;
+            document.getElementById('edit-multi-lot').checked = user.features?.multiLot || false;
+
+            document.getElementById('edit-modal').classList.add('show');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('show');
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userId = document.getElementById('edit-user-id').value;
+            const updates = {
+                subscription_status: document.getElementById('edit-subscription-status').value,
+                subscription_plan: document.getElementById('edit-subscription-plan').value,
+                features: {
+                    multiLot: document.getElementById('edit-multi-lot').checked
+                }
+            };
+
+            try {
+                const response = await fetch('/api/admin/update-user', {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId, updates })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    closeEditModal();
+                    loadUsers();
+                    loadStats();
+                } else {
+                    showError(data.error || 'Failed to update user');
+                }
+            } catch (error) {
+                console.error('Update user error:', error);
+                showError('Failed to update user');
+            }
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function logout() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('edit-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'edit-modal') {
+                closeEditModal();
+            }
+        });
+    </script>
+</body>
+</html>

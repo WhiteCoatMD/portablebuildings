@@ -3,7 +3,8 @@
  * Usage: node make-admin.js your-email@example.com
  */
 
-const { sql } = require('@vercel/postgres');
+require('dotenv').config({ path: '.env.local' });
+const { Client } = require('pg');
 
 async function makeAdmin(email) {
     if (!email) {
@@ -12,16 +13,26 @@ async function makeAdmin(email) {
         process.exit(1);
     }
 
+    const client = new Client({
+        connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
+        ssl: {
+            rejectUnauthorized: false
+        }
+    });
+
+    await client.connect();
+
     try {
         console.log(`🔧 Making ${email} an admin...\n`);
 
-        const result = await sql`
-            UPDATE users
-            SET is_admin = TRUE,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE email = ${email}
-            RETURNING id, email, is_admin, business_name
-        `;
+        const result = await client.query(
+            `UPDATE users
+             SET is_admin = TRUE,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE email = $1
+             RETURNING id, email, is_admin, business_name`,
+            [email]
+        );
 
         if (result.rowCount === 0) {
             console.error(`❌ User not found with email: ${email}`);
@@ -41,6 +52,8 @@ async function makeAdmin(email) {
     } catch (error) {
         console.error('❌ Failed to make user admin:', error);
         throw error;
+    } finally {
+        await client.end();
     }
 }
 
