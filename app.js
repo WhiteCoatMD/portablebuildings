@@ -429,7 +429,11 @@ class InventoryApp {
 
     async loadBuildingImagesAsync(serialNumber) {
         try {
-            const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}`);
+            // Get image order from localStorage
+            const imageOrder = localStorage.getItem('cpb_image_order');
+            const orderParam = imageOrder ? `&order=${encodeURIComponent(imageOrder)}` : '';
+
+            const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}${orderParam}`);
             const data = await response.json();
 
             if (data.success && data.images.length > 0) {

@@ -38,6 +38,23 @@ Call us at {{phone}} or visit our website to learn more!
 
 #PortableBuildings #{{type}} #ForSale`;
 
+        // Format RTO options
+        const rto36 = building.rto36 ? `$${building.rto36.toFixed(2)}/mo` : 'N/A';
+        const rto48 = building.rto48 ? `$${building.rto48.toFixed(2)}/mo` : 'N/A';
+        const rto60 = building.rto60 ? `$${building.rto60.toFixed(2)}/mo` : 'N/A';
+        const rto72 = building.rto72 ? `$${building.rto72.toFixed(2)}/mo` : 'N/A';
+
+        // Format all RTO options together
+        let rtoAll = '';
+        if (building.rto36) {
+            rtoAll = `Rent-to-Own Options:
+36 months: $${building.rto36.toFixed(2)}/mo
+48 months: $${building.rto48.toFixed(2)}/mo
+60 months: $${building.rto60.toFixed(2)}/mo
+72 months: $${building.rto72.toFixed(2)}/mo
+*Plus your local sales tax`;
+        }
+
         // Replace placeholders
         message = message
             .replace(/\{\{name\}\}/g, building.title || building.typeName)
@@ -45,7 +62,12 @@ Call us at {{phone}} or visit our website to learn more!
             .replace(/\{\{price\}\}/g, building.price ? `$${building.price.toLocaleString()}` : 'Call for price')
             .replace(/\{\{type\}\}/g, building.typeName || '')
             .replace(/\{\{location\}\}/g, building.location || 'GPB Sales')
-            .replace(/\{\{phone\}\}/g, businessPhone || '318-594-5909');
+            .replace(/\{\{phone\}\}/g, businessPhone || '318-594-5909')
+            .replace(/\{\{rto36\}\}/g, rto36)
+            .replace(/\{\{rto48\}\}/g, rto48)
+            .replace(/\{\{rto60\}\}/g, rto60)
+            .replace(/\{\{rto72\}\}/g, rto72)
+            .replace(/\{\{rtoAll\}\}/g, rtoAll);
 
         // Prepare Facebook API request
         const fbApiUrl = `https://graph.facebook.com/v18.0/${config.pageId}/photos`;

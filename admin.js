@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFacebookConfig();
     loadButtonColor();
     initializeColorInputSync();
+    initializeBackgroundColorPicker();
     loadLots();
     loadBuildings();
     initializeBuildingFilters();
@@ -313,11 +314,31 @@ function loadBuildings() {
         const isHidden = override.hidden || false;
         const lotLocation = override.lotLocation || null;
 
+        // Check if building has images (check localStorage cache)
+        let imageCount = 0;
+        let hasImages = false;
+        try {
+            const imageOrderKey = `cpb_image_order_${building.serialNumber}`;
+            const storedOrder = localStorage.getItem(imageOrderKey);
+            if (storedOrder) {
+                const images = JSON.parse(storedOrder);
+                imageCount = images.length;
+                hasImages = imageCount > 0;
+            }
+        } catch (e) {
+            // Ignore errors
+        }
+
+        const imageIndicator = hasImages
+            ? `<span style="color: #27ae60; font-weight: 600; margin-left: 0.5rem;" title="${imageCount} image(s)">📷 ${imageCount}</span>`
+            : `<span style="color: #e74c3c; font-weight: 600; margin-left: 0.5rem;" title="No images">📷 0</span>`;
+
         return `
             <div class="building-item">
                 <div class="building-info-admin">
                     <h3>
                         ${building.title} - ${building.sizeDisplay}
+                        ${imageIndicator}
                         <span class="status-badge ${status}">${status.toUpperCase()}</span>
                         ${isHidden ? '<span class="status-badge hidden">HIDDEN</span>' : ''}
                         ${lotLocation ? `<span class="lot-badge" style="margin-left: 0.5rem;">📍 ${lotLocation}</span>` : ''}
@@ -693,8 +714,12 @@ async function setMainImage(imageUrl) {
         const images = data.images.filter(url => url !== imageUrl);
         images.unshift(imageUrl);
 
-        // Save the new order by storing it in localStorage
-        // (Vercel Blob doesn't support reordering, so we store order separately)
+        // Save to centralized image order storage
+        let allOrders = JSON.parse(localStorage.getItem('cpb_image_order') || '{}');
+        allOrders[currentBuilding] = images;
+        localStorage.setItem('cpb_image_order', JSON.stringify(allOrders));
+
+        // Also save to individual building key for backwards compatibility
         const orderKey = `cpb_image_order_${currentBuilding}`;
         localStorage.setItem(orderKey, JSON.stringify(images));
 
@@ -740,15 +765,20 @@ function addImageDragAndDrop() {
                     }
 
                     // Get current order or use default
-                    const orderKey = `cpb_image_order_${currentBuilding}`;
-                    let images = JSON.parse(localStorage.getItem(orderKey) || 'null') || data.images;
+                    let allOrders = JSON.parse(localStorage.getItem('cpb_image_order') || '{}');
+                    let images = allOrders[currentBuilding] || data.images;
 
                     // Remove dragged image and insert at target position
                     const draggedIndex = images.indexOf(draggedUrl);
                     images.splice(draggedIndex, 1);
                     images.splice(targetIndex, 0, draggedUrl);
 
-                    // Save new order
+                    // Save to centralized storage
+                    allOrders[currentBuilding] = images;
+                    localStorage.setItem('cpb_image_order', JSON.stringify(allOrders));
+
+                    // Also save to individual key for backwards compatibility
+                    const orderKey = `cpb_image_order_${currentBuilding}`;
                     localStorage.setItem(orderKey, JSON.stringify(images));
 
                     await loadBuildingImages(currentBuilding);
@@ -1346,6 +1376,9 @@ function saveCustomization() {
     // Save carousel
     saveCarousel();
 
+    // Save background settings
+    saveBackgroundSettings();
+
     showToast('Site customization saved successfully!');
 }
 
@@ -1530,6 +1563,197 @@ async function handleImageUploadWithAutoPost(event) {
             await checkAndPostToFacebook(building);
         }
     }
+}
+
+// Background Color Picker Management
+function initializeBackgroundColorPicker() {
+    const typeRadios = document.querySelectorAll('input[name="backgroundType"]');
+    const solidOptions = document.getElementById('solid-background-options');
+    const gradientOptions = document.getElementById('gradient-background-options');
+    const preview = document.getElementById('background-preview');
+
+    // Toggle between solid/gradient options
+    typeRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'solid') {
+                solidOptions.style.display = 'block';
+                gradientOptions.style.display = 'none';
+            } else {
+                solidOptions.style.display = 'none';
+                gradientOptions.style.display = 'block';
+            }
+            updateBackgroundPreview();
+        });
+    });
+
+    // Color swatches
+    document.querySelectorAll('.color-swatch').forEach(swatch => {
+        swatch.addEventListener('click', () => {
+            const color = swatch.dataset.color;
+            document.getElementById('customBgColor').value = color;
+            document.getElementById('customBgColorHex').value = color;
+
+            // Mark as active
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            swatch.classList.add('active');
+
+            updateBackgroundPreview();
+        });
+    });
+
+    // Gradient swatches
+    document.querySelectorAll('.gradient-swatch').forEach(swatch => {
+        swatch.addEventListener('click', () => {
+            const gradient = swatch.dataset.gradient;
+
+            // Extract colors from gradient string
+            const match = gradient.match(/#[0-9A-Fa-f]{6}/g);
+            if (match && match.length >= 2) {
+                document.getElementById('gradientColor1').value = match[0];
+                document.getElementById('gradientColor1Hex').value = match[0];
+                document.getElementById('gradientColor2').value = match[1];
+                document.getElementById('gradientColor2Hex').value = match[1];
+            }
+
+            // Mark as active
+            document.querySelectorAll('.gradient-swatch').forEach(s => s.classList.remove('active'));
+            swatch.classList.add('active');
+
+            updateBackgroundPreview();
+        });
+    });
+
+    // Custom color inputs
+    const bgColorPicker = document.getElementById('customBgColor');
+    const bgColorHex = document.getElementById('customBgColorHex');
+    const grad1Picker = document.getElementById('gradientColor1');
+    const grad1Hex = document.getElementById('gradientColor1Hex');
+    const grad2Picker = document.getElementById('gradientColor2');
+    const grad2Hex = document.getElementById('gradientColor2Hex');
+
+    if (bgColorPicker && bgColorHex) {
+        bgColorPicker.addEventListener('input', (e) => {
+            bgColorHex.value = e.target.value;
+            updateBackgroundPreview();
+        });
+        bgColorHex.addEventListener('input', (e) => {
+            let value = e.target.value.trim();
+            if (value && !value.startsWith('#')) value = '#' + value;
+            if (/^#[0-9A-F]{6}$/i.test(value)) {
+                bgColorPicker.value = value;
+                updateBackgroundPreview();
+            }
+        });
+    }
+
+    if (grad1Picker && grad1Hex) {
+        grad1Picker.addEventListener('input', (e) => {
+            grad1Hex.value = e.target.value;
+            updateBackgroundPreview();
+        });
+        grad1Hex.addEventListener('input', (e) => {
+            let value = e.target.value.trim();
+            if (value && !value.startsWith('#')) value = '#' + value;
+            if (/^#[0-9A-F]{6}$/i.test(value)) {
+                grad1Picker.value = value;
+                updateBackgroundPreview();
+            }
+        });
+    }
+
+    if (grad2Picker && grad2Hex) {
+        grad2Picker.addEventListener('input', (e) => {
+            grad2Hex.value = e.target.value;
+            updateBackgroundPreview();
+        });
+        grad2Hex.addEventListener('input', (e) => {
+            let value = e.target.value.trim();
+            if (value && !value.startsWith('#')) value = '#' + value;
+            if (/^#[0-9A-F]{6}$/i.test(value)) {
+                grad2Picker.value = value;
+                updateBackgroundPreview();
+            }
+        });
+    }
+
+    // Load saved background settings
+    loadBackgroundSettings();
+}
+
+function updateBackgroundPreview() {
+    const preview = document.getElementById('background-preview');
+    const selectedType = document.querySelector('input[name="backgroundType"]:checked')?.value || 'solid';
+
+    if (selectedType === 'solid') {
+        const color = document.getElementById('customBgColor')?.value || '#ffffff';
+        preview.style.background = color;
+    } else {
+        const color1 = document.getElementById('gradientColor1')?.value || '#667eea';
+        const color2 = document.getElementById('gradientColor2')?.value || '#764ba2';
+        preview.style.background = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+    }
+}
+
+function loadBackgroundSettings() {
+    const saved = localStorage.getItem('cpb_background_settings');
+    if (saved) {
+        try {
+            const settings = JSON.parse(saved);
+
+            // Set type radio
+            const typeRadio = document.querySelector(`input[name="backgroundType"][value="${settings.type}"]`);
+            if (typeRadio) {
+                typeRadio.checked = true;
+                typeRadio.dispatchEvent(new Event('change'));
+            }
+
+            if (settings.type === 'solid') {
+                document.getElementById('customBgColor').value = settings.color;
+                document.getElementById('customBgColorHex').value = settings.color;
+            } else {
+                document.getElementById('gradientColor1').value = settings.color1;
+                document.getElementById('gradientColor1Hex').value = settings.color1;
+                document.getElementById('gradientColor2').value = settings.color2;
+                document.getElementById('gradientColor2Hex').value = settings.color2;
+            }
+
+            updateBackgroundPreview();
+        } catch (e) {
+            console.error('Failed to load background settings:', e);
+        }
+    }
+}
+
+function saveBackgroundSettings() {
+    const selectedType = document.querySelector('input[name="backgroundType"]:checked')?.value || 'solid';
+
+    const settings = {
+        type: selectedType
+    };
+
+    if (selectedType === 'solid') {
+        settings.color = document.getElementById('customBgColor')?.value || '#ffffff';
+    } else {
+        settings.color1 = document.getElementById('gradientColor1')?.value || '#667eea';
+        settings.color2 = document.getElementById('gradientColor2')?.value || '#764ba2';
+    }
+
+    localStorage.setItem('cpb_background_settings', JSON.stringify(settings));
+
+    // Apply to the website
+    applyBackgroundToSite(settings);
+}
+
+function applyBackgroundToSite(settings) {
+    // This would need to update the styles.css :root variable
+    // For now, we'll store it and it can be applied on page load
+    const bodyStyle = settings.type === 'solid'
+        ? settings.color
+        : `linear-gradient(135deg, ${settings.color1} 0%, ${settings.color2} 100%)`;
+
+    // We can apply it directly to show the change
+    // In production, this would be in the main site's load logic
+    console.log('Background to apply:', bodyStyle);
 }
 
 // Export functions to global scope

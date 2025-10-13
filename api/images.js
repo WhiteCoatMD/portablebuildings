@@ -28,9 +28,39 @@ module.exports = async function handler(req, res) {
 
       console.log('Found blobs:', blobs.length);
 
-      // Return URLs sorted by upload time (newest first)
+      // Get image order from query param (set from localStorage on client side)
+      const orderParam = req.query.order;
+      let imageOrder = {};
+      if (orderParam) {
+        try {
+          imageOrder = JSON.parse(decodeURIComponent(orderParam));
+        } catch (e) {
+          console.log('Failed to parse order param:', e);
+        }
+      }
+
+      // Sort by custom order if available, otherwise by upload time
       const urls = blobs
-        .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
+        .sort((a, b) => {
+          // If we have custom order for this serial number, use it
+          const orderArray = imageOrder[serialNumber];
+          if (orderArray && Array.isArray(orderArray)) {
+            const indexA = orderArray.indexOf(a.url);
+            const indexB = orderArray.indexOf(b.url);
+
+            // If both images are in the order array, sort by their position
+            if (indexA !== -1 && indexB !== -1) {
+              return indexA - indexB;
+            }
+            // If only A is in order array, it comes first
+            if (indexA !== -1) return -1;
+            // If only B is in order array, it comes first
+            if (indexB !== -1) return 1;
+          }
+
+          // Default: sort by upload time (newest first)
+          return new Date(b.uploadedAt) - new Date(a.uploadedAt);
+        })
         .map(blob => blob.url);
 
       return res.status(200).json({

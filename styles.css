@@ -37,7 +37,7 @@ body {
 
 /* Header */
 header {
-    background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-end) 100%);
+    background: #001f3f;
     color: var(--white);
     padding: 2rem 0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -497,6 +497,7 @@ main {
 
 .building-info {
     padding: 1.5rem;
+    background: #ffffff;
 }
 
 .building-type {
