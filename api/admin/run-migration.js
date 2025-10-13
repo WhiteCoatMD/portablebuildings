@@ -3,13 +3,10 @@
  * Runs the user contact fields migration
  */
 
-const { Pool } = require('pg');
+const { getPool } = require('../../lib/db');
 const { requireAuth } = require('../../lib/auth');
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
-    ssl: { rejectUnauthorized: false }
-});
+const pool = getPool();
 
 async function handler(req, res) {
     // Check if user is admin

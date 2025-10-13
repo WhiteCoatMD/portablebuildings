@@ -17,7 +17,9 @@
       "Bash(vercel:*)",
       "Bash(git pull:*)",
       "Bash(powershell:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npm install pg)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []
