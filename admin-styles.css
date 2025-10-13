@@ -132,6 +132,8 @@ body {
 textarea.form-control {
     resize: vertical;
     min-height: 100px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .input-group {
@@ -155,14 +157,19 @@ textarea.form-control {
 }
 
 .toggle-label {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 1rem;
     cursor: pointer;
+    position: relative;
 }
 
 .toggle-label input[type="checkbox"] {
-    display: none;
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
 }
 
 .toggle-slider {
@@ -173,7 +180,7 @@ textarea.form-control {
     border-radius: 13px;
     transition: background 0.3s ease;
     flex-shrink: 0;
-    overflow: hidden;
+    order: 0;
 }
 
 .toggle-slider::before {
@@ -200,6 +207,8 @@ textarea.form-control {
 .toggle-text {
     font-weight: 600;
     color: var(--text-dark);
+    order: 1;
+    flex: 1;
 }
 
 /* Buttons */
