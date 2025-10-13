@@ -414,6 +414,19 @@
         </div>
     </div>
 
+    <!-- Contact Info Modal -->
+    <div id="contact-modal" class="modal">
+        <div class="modal-content">
+            <h2>📋 User Contact Information</h2>
+            <div id="contact-info-content" style="line-height: 1.8;">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-primary" onclick="closeContactModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let allUsers = [];
 
@@ -556,6 +569,7 @@
                                 </td>
                                 <td>
                                     <div class="actions">
+                                        <button class="btn btn-secondary" onclick="viewContact(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">📋 Contact</button>
                                         <button class="btn btn-primary" onclick="editUser(${user.id})">Edit</button>
                                     </div>
                                 </td>
@@ -614,6 +628,52 @@
             document.getElementById('edit-modal').classList.remove('show');
         }
 
+        function viewContact(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            // Format location hours
+            let hoursHTML = '';
+            if (user.location_hours && typeof user.location_hours === 'object' && Object.keys(user.location_hours).length > 0) {
+                const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                const dayNames = {
+                    monday: 'Monday',
+                    tuesday: 'Tuesday',
+                    wednesday: 'Wednesday',
+                    thursday: 'Thursday',
+                    friday: 'Friday',
+                    saturday: 'Saturday',
+                    sunday: 'Sunday'
+                };
+
+                hoursHTML = '<div style="margin-top: 1rem;"><strong>Location Hours:</strong><ul style="margin: 0.5rem 0; padding-left: 1.5rem;">';
+                days.forEach(day => {
+                    if (user.location_hours[day]) {
+                        const hours = user.location_hours[day];
+                        hoursHTML += `<li>${dayNames[day]}: ${hours.open} - ${hours.close}</li>`;
+                    }
+                });
+                hoursHTML += '</ul></div>';
+            }
+
+            const content = document.getElementById('contact-info-content');
+            content.innerHTML = `
+                <p><strong>Business Name:</strong> ${user.business_name || '<em>Not set</em>'}</p>
+                <p><strong>Full Name:</strong> ${user.full_name || '<em>Not set</em>'}</p>
+                <p><strong>Email (Login):</strong> ${user.email}</p>
+                <p><strong>Best Contact Email:</strong> ${user.best_contact_email || '<em>Not set</em>'}</p>
+                <p><strong>Phone:</strong> ${user.phone || '<em>Not set</em>'}</p>
+                <p><strong>Address:</strong> ${user.address || '<em>Not set</em>'}</p>
+                ${hoursHTML}
+            `;
+
+            document.getElementById('contact-modal').classList.add('show');
+        }
+
+        function closeContactModal() {
+            document.getElementById('contact-modal').classList.remove('show');
+        }
+
         document.getElementById('edit-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -666,10 +726,16 @@
             window.location.href = 'login.html';
         }
 
-        // Close modal when clicking outside
+        // Close modals when clicking outside
         document.getElementById('edit-modal').addEventListener('click', (e) => {
             if (e.target.id === 'edit-modal') {
                 closeEditModal();
+            }
+        });
+
+        document.getElementById('contact-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'contact-modal') {
+                closeContactModal();
             }
         });
     </script>
