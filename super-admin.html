@@ -478,19 +478,29 @@
                     allUsers = data.users;
 
                     // Fetch actual inventory count
-                    const invResponse = await fetch('/api/admin/user-inventory-count', {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
+                    try {
+                        const invResponse = await fetch('/api/admin/user-inventory-count', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
 
-                    const invData = await invResponse.json();
-                    const inventoryCount = invData.success ? invData.count : 0;
+                        const invData = await invResponse.json();
+                        console.log('Inventory count API response:', invData);
+                        const inventoryCount = invData.success ? invData.count : 0;
+                        console.log('Setting inventory count to:', inventoryCount);
 
-                    // Add inventory count to each user
-                    allUsers.forEach(user => {
-                        user.inventory_count = inventoryCount;
-                    });
+                        // Add inventory count to each user
+                        allUsers.forEach(user => {
+                            user.inventory_count = inventoryCount;
+                        });
+                    } catch (error) {
+                        console.error('Failed to fetch inventory count:', error);
+                        // Set to 0 on error
+                        allUsers.forEach(user => {
+                            user.inventory_count = 0;
+                        });
+                    }
 
                     renderUsersTable(allUsers);
                 } else {
