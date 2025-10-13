@@ -226,6 +226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeBackgroundColorPicker();
     initializeCustomColorPickers();
     loadCustomColors();
+    loadLocationHours();
     loadLots();
     loadBuildings();
     initializeBuildingFilters();
@@ -1559,6 +1560,9 @@ async function saveCustomization() {
     // Save background settings (no async needed)
     saveBackgroundSettings();
 
+    // Save location hours
+    await saveLocationHours();
+
     showToast('Site customization saved successfully!');
 }
 
@@ -1936,6 +1940,93 @@ function applyBackgroundToSite(settings) {
     console.log('Background to apply:', bodyStyle);
 }
 
+// Location Hours Management
+const DAYS_OF_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+function toggleDayHours(day) {
+    const checkbox = document.getElementById(`hours-${day}-enabled`);
+    const inputs = document.getElementById(`hours-${day}-inputs`);
+
+    if (checkbox.checked) {
+        inputs.style.display = 'flex';
+    } else {
+        inputs.style.display = 'none';
+    }
+}
+
+async function loadLocationHours() {
+    // Try to get location hours from database
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    try {
+        const response = await fetch('/api/auth/me', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        if (data.success && data.user.location_hours) {
+            const hours = data.user.location_hours;
+
+            DAYS_OF_WEEK.forEach(day => {
+                if (hours[day]) {
+                    const checkbox = document.getElementById(`hours-${day}-enabled`);
+                    const openInput = document.getElementById(`hours-${day}-open`);
+                    const closeInput = document.getElementById(`hours-${day}-close`);
+                    const inputs = document.getElementById(`hours-${day}-inputs`);
+
+                    if (checkbox) checkbox.checked = true;
+                    if (openInput) openInput.value = hours[day].open || '';
+                    if (closeInput) closeInput.value = hours[day].close || '';
+                    if (inputs) inputs.style.display = 'flex';
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Failed to load location hours:', error);
+    }
+}
+
+async function saveLocationHours() {
+    const hours = {};
+
+    DAYS_OF_WEEK.forEach(day => {
+        const checkbox = document.getElementById(`hours-${day}-enabled`);
+        if (checkbox && checkbox.checked) {
+            const openInput = document.getElementById(`hours-${day}-open`);
+            const closeInput = document.getElementById(`hours-${day}-close`);
+
+            if (openInput && closeInput && openInput.value && closeInput.value) {
+                hours[day] = {
+                    open: openInput.value,
+                    close: closeInput.value
+                };
+            }
+        }
+    });
+
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    try {
+        const response = await fetch('/api/user/update-hours', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ location_hours: hours })
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            console.error('Failed to save location hours:', result.error);
+        }
+    } catch (error) {
+        console.error('Failed to save location hours:', error);
+    }
+}
+
 // Custom Primary Colors Management
 function initializeCustomColorPickers() {
     // Setup sync for all 6 color pickers
@@ -2144,3 +2235,4 @@ window.checkAndPostToFacebook = checkAndPostToFacebook;
 window.testFacebookPost = testFacebookPost;
 window.applyCustomColors = applyCustomColors;
 window.resetCustomColors = resetCustomColors;
+window.toggleDayHours = toggleDayHours;
