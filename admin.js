@@ -82,6 +82,114 @@ function logout() {
     window.location.href = 'login.html';
 }
 
+// Database API helpers
+let dbCache = {
+    settings: null,
+    overrides: null,
+    imageOrders: null
+};
+
+async function loadFromDatabase() {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    try {
+        // Load all data in parallel
+        const [settingsRes, overridesRes, imageOrdersRes] = await Promise.all([
+            fetch('/api/user/settings', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch('/api/user/building-overrides', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch('/api/user/image-orders', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+        ]);
+
+        const [settingsData, overridesData, imageOrdersData] = await Promise.all([
+            settingsRes.json(),
+            overridesRes.json(),
+            imageOrdersRes.json()
+        ]);
+
+        if (settingsData.success) dbCache.settings = settingsData.settings;
+        if (overridesData.success) dbCache.overrides = overridesData.overrides;
+        if (imageOrdersData.success) dbCache.imageOrders = imageOrdersData.orders;
+
+        console.log('Loaded from database:', dbCache);
+    } catch (error) {
+        console.error('Failed to load from database:', error);
+    }
+}
+
+async function saveToDatabase(type, data) {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    const endpoints = {
+        settings: '/api/user/settings',
+        overrides: '/api/user/building-overrides',
+        imageOrders: '/api/user/image-orders'
+    };
+
+    const bodyKeys = {
+        settings: 'settings',
+        overrides: 'overrides',
+        imageOrders: 'orders'
+    };
+
+    try {
+        const response = await fetch(endpoints[type], {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ [bodyKeys[type]]: data })
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            console.error('Failed to save to database:', result.error);
+        }
+    } catch (error) {
+        console.error('Failed to save to database:', error);
+    }
+}
+
+// Helper to get settings with fallback to localStorage
+function getSetting(key, defaultValue = null) {
+    // Try database cache first
+    if (dbCache.settings && dbCache.settings[key] !== undefined) {
+        return dbCache.settings[key];
+    }
+    // Fallback to localStorage
+    const stored = localStorage.getItem(key);
+    if (stored) {
+        try {
+            return JSON.parse(stored);
+        } catch (e) {
+            return stored;
+        }
+    }
+    return defaultValue;
+}
+
+// Helper to save setting to both database and localStorage (for backwards compat)
+async function saveSetting(key, value) {
+    // Save to localStorage for backwards compatibility
+    const valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
+    localStorage.setItem(key, valueStr);
+
+    // Update cache
+    if (!dbCache.settings) dbCache.settings = {};
+    dbCache.settings[key] = value;
+
+    // Save to database
+    await saveToDatabase('settings', { [key]: value });
+}
+
 // Initialize admin panel
 document.addEventListener('DOMContentLoaded', async () => {
     // Check authentication and show user info
@@ -100,6 +208,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     }
+
+    // Load data from database first
+    await loadFromDatabase();
 
     initializeTabs();
     loadSettings();
@@ -152,17 +263,16 @@ function loadSettings() {
 }
 
 function getSettings() {
-    const stored = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-    return stored ? JSON.parse(stored) : DEFAULT_SETTINGS;
+    return getSetting(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
 }
 
-function saveSettings() {
+async function saveSettings() {
     const settings = {
         showCashPrice: document.getElementById('showCashPrice').checked,
         showRtoOptions: document.getElementById('showRtoOptions').checked
     };
 
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+    await saveSetting(STORAGE_KEYS.SETTINGS, settings);
     showToast('Settings saved successfully!');
 }
 
@@ -174,17 +284,16 @@ function loadWelcomeMessage() {
 }
 
 function getWelcomeMessage() {
-    const stored = localStorage.getItem(STORAGE_KEYS.WELCOME);
-    return stored ? JSON.parse(stored) : DEFAULT_WELCOME;
+    return getSetting(STORAGE_KEYS.WELCOME, DEFAULT_WELCOME);
 }
 
-function saveWelcomeMessage() {
+async function saveWelcomeMessage() {
     const welcome = {
         title: document.getElementById('welcomeTitle').value,
         message: document.getElementById('welcomeMessage').value
     };
 
-    localStorage.setItem(STORAGE_KEYS.WELCOME, JSON.stringify(welcome));
+    await saveSetting(STORAGE_KEYS.WELCOME, welcome);
     showToast('Welcome message saved successfully!');
 }
 
@@ -206,11 +315,10 @@ function loadCarousel() {
 }
 
 function getCarouselImages() {
-    const stored = localStorage.getItem(STORAGE_KEYS.CAROUSEL);
-    return stored ? JSON.parse(stored) : DEFAULT_CAROUSEL;
+    return getSetting(STORAGE_KEYS.CAROUSEL, DEFAULT_CAROUSEL);
 }
 
-function addCarouselImage() {
+async function addCarouselImage() {
     const input = document.getElementById('newCarouselImage');
     const imageName = input.value.trim();
 
@@ -221,19 +329,19 @@ function addCarouselImage() {
 
     const images = getCarouselImages();
     images.push(imageName);
-    localStorage.setItem(STORAGE_KEYS.CAROUSEL, JSON.stringify(images));
+    await saveSetting(STORAGE_KEYS.CAROUSEL, images);
 
     input.value = '';
     loadCarousel();
     showToast('Image added to carousel!');
 }
 
-function removeCarouselImage(index) {
+async function removeCarouselImage(index) {
     if (!confirm('Remove this image from the carousel?')) return;
 
     const images = getCarouselImages();
     images.splice(index, 1);
-    localStorage.setItem(STORAGE_KEYS.CAROUSEL, JSON.stringify(images));
+    await saveSetting(STORAGE_KEYS.CAROUSEL, images);
 
     loadCarousel();
     showToast('Image removed from carousel!');
@@ -262,7 +370,7 @@ function addDragAndDrop() {
             e.preventDefault();
         });
 
-        item.addEventListener('drop', (e) => {
+        item.addEventListener('drop', async (e) => {
             e.preventDefault();
             if (draggedItem !== item) {
                 const images = getCarouselImages();
@@ -272,7 +380,7 @@ function addDragAndDrop() {
                 // Swap images
                 [images[draggedIndex], images[targetIndex]] = [images[targetIndex], images[draggedIndex]];
 
-                localStorage.setItem(STORAGE_KEYS.CAROUSEL, JSON.stringify(images));
+                await saveSetting(STORAGE_KEYS.CAROUSEL, images);
                 loadCarousel();
             }
         });
@@ -413,11 +521,16 @@ function loadBuildings() {
 }
 
 function getBuildingOverrides() {
+    // Try database cache first
+    if (dbCache.overrides) {
+        return dbCache.overrides;
+    }
+    // Fallback to localStorage
     const stored = localStorage.getItem(STORAGE_KEYS.BUILDINGS);
     return stored ? JSON.parse(stored) : {};
 }
 
-function setBuildingStatus(serialNumber, status) {
+async function setBuildingStatus(serialNumber, status) {
     const overrides = getBuildingOverrides();
 
     if (!overrides[serialNumber]) {
@@ -426,12 +539,18 @@ function setBuildingStatus(serialNumber, status) {
 
     overrides[serialNumber].status = status;
 
+    // Save to localStorage for backwards compatibility
     localStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(overrides));
+
+    // Update cache and save to database
+    dbCache.overrides = overrides;
+    await saveToDatabase('overrides', overrides);
+
     loadBuildings();
     showToast(`Building status updated to ${status}!`);
 }
 
-function toggleBuildingVisibility(serialNumber) {
+async function toggleBuildingVisibility(serialNumber) {
     const overrides = getBuildingOverrides();
 
     if (!overrides[serialNumber]) {
@@ -440,7 +559,13 @@ function toggleBuildingVisibility(serialNumber) {
 
     overrides[serialNumber].hidden = !overrides[serialNumber].hidden;
 
+    // Save to localStorage for backwards compatibility
     localStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(overrides));
+
+    // Update cache and save to database
+    dbCache.overrides = overrides;
+    await saveToDatabase('overrides', overrides);
+
     loadBuildings();
     showToast(overrides[serialNumber].hidden ? 'Building hidden!' : 'Building shown!');
 }
@@ -507,9 +632,15 @@ async function loadBuildingImages(serialNumber) {
             return;
         }
 
-        // Check if there's a custom order stored
-        const orderKey = `cpb_image_order_${serialNumber}`;
-        let orderedImages = JSON.parse(localStorage.getItem(orderKey) || 'null');
+        // Check if there's a custom order stored (check database cache first)
+        let orderedImages = null;
+        if (dbCache.imageOrders && dbCache.imageOrders[serialNumber]) {
+            orderedImages = dbCache.imageOrders[serialNumber];
+        } else {
+            // Fallback to localStorage
+            const orderKey = `cpb_image_order_${serialNumber}`;
+            orderedImages = JSON.parse(localStorage.getItem(orderKey) || 'null');
+        }
 
         // If no custom order, use default (by upload time)
         if (!orderedImages) {
@@ -523,8 +654,6 @@ async function loadBuildingImages(serialNumber) {
                     orderedImages.push(url);
                 }
             });
-            // Update stored order
-            localStorage.setItem(orderKey, JSON.stringify(orderedImages));
         }
 
         container.classList.remove('empty');
@@ -558,9 +687,15 @@ async function getBuildingImages(serialNumber) {
             return [];
         }
 
-        // Check for custom order
-        const orderKey = `cpb_image_order_${serialNumber}`;
-        let orderedImages = JSON.parse(localStorage.getItem(orderKey) || 'null');
+        // Check for custom order (database cache first)
+        let orderedImages = null;
+        if (dbCache.imageOrders && dbCache.imageOrders[serialNumber]) {
+            orderedImages = dbCache.imageOrders[serialNumber];
+        } else {
+            // Fallback to localStorage
+            const orderKey = `cpb_image_order_${serialNumber}`;
+            orderedImages = JSON.parse(localStorage.getItem(orderKey) || 'null');
+        }
 
         // If no custom order, use default
         if (!orderedImages) {
@@ -762,14 +897,14 @@ async function setMainImage(imageUrl) {
         const images = data.images.filter(url => url !== imageUrl);
         images.unshift(imageUrl);
 
-        // Save to centralized image order storage
-        let allOrders = JSON.parse(localStorage.getItem('cpb_image_order') || '{}');
-        allOrders[currentBuilding] = images;
-        localStorage.setItem('cpb_image_order', JSON.stringify(allOrders));
+        // Save to localStorage for backwards compatibility
+        localStorage.setItem('cpb_image_order', JSON.stringify({ ...JSON.parse(localStorage.getItem('cpb_image_order') || '{}'), [currentBuilding]: images }));
+        localStorage.setItem(`cpb_image_order_${currentBuilding}`, JSON.stringify(images));
 
-        // Also save to individual building key for backwards compatibility
-        const orderKey = `cpb_image_order_${currentBuilding}`;
-        localStorage.setItem(orderKey, JSON.stringify(images));
+        // Update cache and save to database
+        if (!dbCache.imageOrders) dbCache.imageOrders = {};
+        dbCache.imageOrders[currentBuilding] = images;
+        await saveToDatabase('imageOrders', dbCache.imageOrders);
 
         await loadBuildingImages(currentBuilding);
         showToast('Main image updated!');
@@ -813,21 +948,23 @@ function addImageDragAndDrop() {
                     }
 
                     // Get current order or use default
-                    let allOrders = JSON.parse(localStorage.getItem('cpb_image_order') || '{}');
-                    let images = allOrders[currentBuilding] || data.images;
+                    let images = (dbCache.imageOrders && dbCache.imageOrders[currentBuilding]) || data.images;
 
                     // Remove dragged image and insert at target position
                     const draggedIndex = images.indexOf(draggedUrl);
                     images.splice(draggedIndex, 1);
                     images.splice(targetIndex, 0, draggedUrl);
 
-                    // Save to centralized storage
+                    // Save to localStorage for backwards compatibility
+                    let allOrders = JSON.parse(localStorage.getItem('cpb_image_order') || '{}');
                     allOrders[currentBuilding] = images;
                     localStorage.setItem('cpb_image_order', JSON.stringify(allOrders));
+                    localStorage.setItem(`cpb_image_order_${currentBuilding}`, JSON.stringify(images));
 
-                    // Also save to individual key for backwards compatibility
-                    const orderKey = `cpb_image_order_${currentBuilding}`;
-                    localStorage.setItem(orderKey, JSON.stringify(images));
+                    // Update cache and save to database
+                    if (!dbCache.imageOrders) dbCache.imageOrders = {};
+                    dbCache.imageOrders[currentBuilding] = images;
+                    await saveToDatabase('imageOrders', dbCache.imageOrders);
 
                     await loadBuildingImages(currentBuilding);
                     showToast('Image order updated!');
@@ -1181,32 +1318,28 @@ function loadColorScheme() {
 // Business Information Management
 function loadBusinessInfo() {
     // Load business name
-    const savedName = localStorage.getItem(STORAGE_KEYS.BUSINESS_NAME);
-    const businessName = savedName || 'Community Portable Buildings';
+    const businessName = getSetting(STORAGE_KEYS.BUSINESS_NAME, 'Community Portable Buildings');
     const nameInput = document.getElementById('businessName');
     if (nameInput) {
         nameInput.value = businessName;
     }
 
     // Load phone
-    const savedPhone = localStorage.getItem(STORAGE_KEYS.BUSINESS_PHONE);
-    const businessPhone = savedPhone || '318-594-5909';
+    const businessPhone = getSetting(STORAGE_KEYS.BUSINESS_PHONE, '318-594-5909');
     const phoneInput = document.getElementById('businessPhone');
     if (phoneInput) {
         phoneInput.value = businessPhone;
     }
 
     // Load email
-    const savedEmail = localStorage.getItem(STORAGE_KEYS.BUSINESS_EMAIL);
-    const businessEmail = savedEmail || '';
+    const businessEmail = getSetting(STORAGE_KEYS.BUSINESS_EMAIL, '');
     const emailInput = document.getElementById('businessEmail');
     if (emailInput) {
         emailInput.value = businessEmail;
     }
 
     // Load address
-    const savedAddress = localStorage.getItem(STORAGE_KEYS.BUSINESS_ADDRESS);
-    const businessAddress = savedAddress || '';
+    const businessAddress = getSetting(STORAGE_KEYS.BUSINESS_ADDRESS, '');
     const addressInput = document.getElementById('businessAddress');
     if (addressInput) {
         addressInput.value = businessAddress;
@@ -1214,25 +1347,24 @@ function loadBusinessInfo() {
 }
 
 function getBusinessName() {
-    return localStorage.getItem(STORAGE_KEYS.BUSINESS_NAME) || 'Community Portable Buildings';
+    return getSetting(STORAGE_KEYS.BUSINESS_NAME, 'Community Portable Buildings');
 }
 
 function getBusinessPhone() {
-    return localStorage.getItem(STORAGE_KEYS.BUSINESS_PHONE) || '318-594-5909';
+    return getSetting(STORAGE_KEYS.BUSINESS_PHONE, '318-594-5909');
 }
 
 function getBusinessEmail() {
-    return localStorage.getItem(STORAGE_KEYS.BUSINESS_EMAIL) || '';
+    return getSetting(STORAGE_KEYS.BUSINESS_EMAIL, '');
 }
 
 function getBusinessAddress() {
-    return localStorage.getItem(STORAGE_KEYS.BUSINESS_ADDRESS) || '';
+    return getSetting(STORAGE_KEYS.BUSINESS_ADDRESS, '');
 }
 
 // Social Media Management
 function loadSocialMedia() {
-    const saved = localStorage.getItem(STORAGE_KEYS.SOCIAL_MEDIA);
-    const social = saved ? JSON.parse(saved) : {};
+    const social = getSetting(STORAGE_KEYS.SOCIAL_MEDIA, {});
 
     const facebookInput = document.getElementById('facebookUrl');
     const instagramInput = document.getElementById('instagramUrl');
@@ -1244,14 +1376,12 @@ function loadSocialMedia() {
 }
 
 function getSocialMedia() {
-    const saved = localStorage.getItem(STORAGE_KEYS.SOCIAL_MEDIA);
-    return saved ? JSON.parse(saved) : {};
+    return getSetting(STORAGE_KEYS.SOCIAL_MEDIA, {});
 }
 
 // Facebook Auto-Post Configuration
 function loadFacebookConfig() {
-    const saved = localStorage.getItem(STORAGE_KEYS.FACEBOOK_CONFIG);
-    const config = saved ? JSON.parse(saved) : {
+    const config = getSetting(STORAGE_KEYS.FACEBOOK_CONFIG, {
         enabled: false,
         pageId: '',
         accessToken: '',
@@ -1267,7 +1397,7 @@ function loadFacebookConfig() {
 Call us at {{phone}} or visit our website to learn more!
 
 #PortableBuildings #{{type}} #ForSale`
-    };
+    });
 
     const enabledInput = document.getElementById('enableAutoPost');
     const pageIdInput = document.getElementById('facebookPageId');
@@ -1287,13 +1417,12 @@ Call us at {{phone}} or visit our website to learn more!
 }
 
 function getFacebookConfig() {
-    const saved = localStorage.getItem(STORAGE_KEYS.FACEBOOK_CONFIG);
-    return saved ? JSON.parse(saved) : null;
+    return getSetting(STORAGE_KEYS.FACEBOOK_CONFIG, null);
 }
 
 // Button Color Management
 function loadButtonColor() {
-    const saved = localStorage.getItem(STORAGE_KEYS.BUTTON_COLOR);
+    const saved = getSetting(STORAGE_KEYS.BUTTON_COLOR, null);
 
     if (saved) {
         const colorPicker = document.getElementById('buttonColor');
@@ -1305,7 +1434,7 @@ function loadButtonColor() {
 }
 
 function getButtonColor() {
-    return localStorage.getItem(STORAGE_KEYS.BUTTON_COLOR);
+    return getSetting(STORAGE_KEYS.BUTTON_COLOR, null);
 }
 
 function resetButtonColor() {
@@ -1361,29 +1490,29 @@ function initializeColorInputSync() {
     }
 }
 
-function saveCustomization() {
+async function saveCustomization() {
     // Save business name
     const businessName = document.getElementById('businessName');
     if (businessName) {
-        localStorage.setItem(STORAGE_KEYS.BUSINESS_NAME, businessName.value.trim());
+        await saveSetting(STORAGE_KEYS.BUSINESS_NAME, businessName.value.trim());
     }
 
     // Save business phone
     const businessPhone = document.getElementById('businessPhone');
     if (businessPhone) {
-        localStorage.setItem(STORAGE_KEYS.BUSINESS_PHONE, businessPhone.value.trim());
+        await saveSetting(STORAGE_KEYS.BUSINESS_PHONE, businessPhone.value.trim());
     }
 
     // Save business email
     const businessEmail = document.getElementById('businessEmail');
     if (businessEmail) {
-        localStorage.setItem(STORAGE_KEYS.BUSINESS_EMAIL, businessEmail.value.trim());
+        await saveSetting(STORAGE_KEYS.BUSINESS_EMAIL, businessEmail.value.trim());
     }
 
     // Save business address
     const businessAddress = document.getElementById('businessAddress');
     if (businessAddress) {
-        localStorage.setItem(STORAGE_KEYS.BUSINESS_ADDRESS, businessAddress.value.trim());
+        await saveSetting(STORAGE_KEYS.BUSINESS_ADDRESS, businessAddress.value.trim());
     }
 
     // Save social media
@@ -1392,7 +1521,7 @@ function saveCustomization() {
         instagram: document.getElementById('instagramUrl')?.value.trim() || '',
         twitter: document.getElementById('twitterUrl')?.value.trim() || ''
     };
-    localStorage.setItem(STORAGE_KEYS.SOCIAL_MEDIA, JSON.stringify(social));
+    await saveSetting(STORAGE_KEYS.SOCIAL_MEDIA, social);
 
     // Save Facebook auto-post configuration
     const fbConfig = {
@@ -1404,27 +1533,27 @@ function saveCustomization() {
         availableOnly: document.getElementById('autoPostAvailableOnly')?.checked ?? true,
         template: document.getElementById('autoPostTemplate')?.value || ''
     };
-    localStorage.setItem(STORAGE_KEYS.FACEBOOK_CONFIG, JSON.stringify(fbConfig));
+    await saveSetting(STORAGE_KEYS.FACEBOOK_CONFIG, fbConfig);
 
     // Save color scheme
     const selectedScheme = document.querySelector('input[name="colorScheme"]:checked');
     if (selectedScheme) {
-        localStorage.setItem(STORAGE_KEYS.COLOR_SCHEME, selectedScheme.value);
+        await saveSetting(STORAGE_KEYS.COLOR_SCHEME, selectedScheme.value);
     }
 
     // Save button color
     const buttonColor = document.getElementById('buttonColor');
     if (buttonColor) {
-        localStorage.setItem(STORAGE_KEYS.BUTTON_COLOR, buttonColor.value);
+        await saveSetting(STORAGE_KEYS.BUTTON_COLOR, buttonColor.value);
     }
 
     // Save welcome message
-    saveWelcomeMessage();
+    await saveWelcomeMessage();
 
-    // Save carousel
+    // Save carousel (no async needed - just shows toast)
     saveCarousel();
 
-    // Save background settings
+    // Save background settings (no async needed)
     saveBackgroundSettings();
 
     showToast('Site customization saved successfully!');
