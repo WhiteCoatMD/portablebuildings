@@ -463,6 +463,22 @@
 
                 if (data.success) {
                     allUsers = data.users;
+
+                    // Fetch actual inventory count
+                    const invResponse = await fetch('/api/admin/user-inventory-count', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const invData = await invResponse.json();
+                    const inventoryCount = invData.success ? invData.count : 0;
+
+                    // Add inventory count to each user
+                    allUsers.forEach(user => {
+                        user.inventory_count = inventoryCount;
+                    });
+
                     renderUsersTable(allUsers);
                 } else {
                     if (response.status === 403) {
@@ -519,7 +535,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    ${user.building_count} buildings<br>
+                                    <strong>${user.inventory_count || 0}</strong> buildings<br>
                                     <small style="color: #666;">${user.images_count} images, ${user.posts_count} posts</small>
                                 </td>
                                 <td>

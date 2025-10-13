@@ -48,9 +48,25 @@ async function handler(req, res) {
             ORDER BY subscription_status, subscription_plan
         `);
 
-        // Get total buildings across all users
-        const totalBuildingsResult = await pool.query('SELECT COUNT(*) as count FROM building_overrides');
-        const totalBuildings = parseInt(totalBuildingsResult.rows[0].count);
+        // Get total buildings from inventory file
+        let totalBuildings = 0;
+        try {
+            const fs = require('fs');
+            const path = require('path');
+            const inventoryPath = path.join(process.cwd(), 'inventory.js');
+
+            if (fs.existsSync(inventoryPath)) {
+                const inventoryContent = fs.readFileSync(inventoryPath, 'utf-8');
+                const match = inventoryContent.match(/window\.PROCESSED_INVENTORY\s*=\s*(\[[\s\S]*?\]);/);
+                if (match) {
+                    const inventory = eval(match[1]);
+                    totalBuildings = Array.isArray(inventory) ? inventory.length : 0;
+                }
+            }
+        } catch (error) {
+            console.error('Error reading inventory:', error);
+            totalBuildings = 0;
+        }
 
         // Get total images uploaded
         const totalImagesResult = await pool.query('SELECT COUNT(*) as count FROM image_orders');
