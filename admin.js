@@ -1422,6 +1422,86 @@ async function checkAndPostToFacebook(building) {
     }
 }
 
+// Test Facebook Posting
+async function testFacebookPost() {
+    const btn = document.getElementById('test-fb-btn');
+    const status = document.getElementById('test-fb-status');
+
+    const config = getFacebookConfig();
+
+    if (!config || !config.pageId || !config.accessToken) {
+        status.textContent = '❌ Please configure your Facebook Page ID and Access Token first!';
+        status.style.color = 'var(--danger-color)';
+        return;
+    }
+
+    // Get a sample building from inventory
+    const inventory = window.PROCESSED_INVENTORY || [];
+    if (inventory.length === 0) {
+        status.textContent = '❌ No buildings found in inventory to test with!';
+        status.style.color = 'var(--danger-color)';
+        return;
+    }
+
+    // Find a building with images if possible
+    let testBuilding = null;
+    for (const building of inventory) {
+        const images = await getBuildingImages(building.serialNumber);
+        if (images && images.length > 0) {
+            testBuilding = { ...building, images };
+            break;
+        }
+    }
+
+    // If no building with images, just use first building
+    if (!testBuilding) {
+        testBuilding = inventory[0];
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Posting to Facebook...';
+    status.textContent = 'Sending test post...';
+    status.style.color = 'var(--text-light)';
+
+    const businessPhone = getBusinessPhone();
+
+    try {
+        const response = await fetch('/api/post-to-facebook', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                building: testBuilding,
+                config,
+                businessPhone
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            status.textContent = `✅ Test post successful! Posted "${testBuilding.title}" to your Facebook page.`;
+            status.style.color = 'var(--success-color)';
+            showToast('✅ Test post sent to Facebook!');
+        } else {
+            status.textContent = `❌ Failed: ${result.error || 'Unknown error'}`;
+            status.style.color = 'var(--danger-color)';
+            showToast(`❌ Test post failed: ${result.error}`, true);
+        }
+    } catch (error) {
+        console.error('Test post error:', error);
+        status.textContent = `❌ Error: ${error.message}`;
+        status.style.color = 'var(--danger-color)';
+        showToast(`❌ Test post error: ${error.message}`, true);
+    } finally {
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = '📤 Send Test Post to Facebook';
+        }, 3000);
+    }
+}
+
 // Trigger auto-post when images are uploaded
 const originalHandleImageUpload = handleImageUpload;
 async function handleImageUploadWithAutoPost(event) {
@@ -1458,3 +1538,4 @@ window.syncLot = syncLot;
 window.triggerManualSync = triggerManualSync;
 window.resetButtonColor = resetButtonColor;
 window.checkAndPostToFacebook = checkAndPostToFacebook;
+window.testFacebookPost = testFacebookPost;
