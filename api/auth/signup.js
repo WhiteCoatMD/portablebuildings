@@ -23,13 +23,20 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        const { email, password, businessName } = req.body;
+        const { email, password, businessName, fullName, phone, address, bestContactEmail } = req.body;
 
-        // Validate input
+        // Validate required fields
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
                 error: 'Email and password are required'
+            });
+        }
+
+        if (!businessName || !fullName || !phone || !address) {
+            return res.status(400).json({
+                success: false,
+                error: 'Business name, full name, phone, and address are required'
             });
         }
 
@@ -42,6 +49,14 @@ module.exports = async function handler(req, res) {
             });
         }
 
+        // Validate best contact email if provided
+        if (bestContactEmail && !emailRegex.test(bestContactEmail)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid contact email format'
+            });
+        }
+
         // Validate password length
         if (password.length < 8) {
             return res.status(400).json({
@@ -50,8 +65,8 @@ module.exports = async function handler(req, res) {
             });
         }
 
-        // Create user
-        const user = await createUser(email, password, businessName);
+        // Create user with all fields
+        const user = await createUser(email, password, businessName, fullName, phone, address, bestContactEmail);
 
         return res.status(201).json({
             success: true,
@@ -59,7 +74,8 @@ module.exports = async function handler(req, res) {
             user: {
                 id: user.id,
                 email: user.email,
-                businessName: user.business_name
+                businessName: user.business_name,
+                fullName: user.full_name
             }
         });
 

@@ -7,6 +7,11 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     business_name VARCHAR(255),
+    full_name VARCHAR(255),
+    phone VARCHAR(50),
+    address TEXT,
+    best_contact_email VARCHAR(255),
+    location_hours JSONB DEFAULT '{}'::jsonb, -- Store hours by day of week
     is_admin BOOLEAN DEFAULT FALSE,
     subscription_status VARCHAR(50) DEFAULT 'trial', -- trial, active, cancelled, expired
     subscription_plan VARCHAR(50) DEFAULT 'free', -- free, basic, premium
