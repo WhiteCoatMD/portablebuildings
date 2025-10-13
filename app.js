@@ -102,7 +102,8 @@ class InventoryApp {
         if (businessAddress) {
             const footerAddressEl = document.getElementById('footer-address');
             if (footerAddressEl) {
-                footerAddressEl.textContent = businessAddress;
+                // Replace line breaks with <br> tags for proper display
+                footerAddressEl.innerHTML = businessAddress.replace(/\n/g, '<br>');
             }
         }
 
