@@ -44,14 +44,14 @@ Call us at {{phone}} or visit our website to learn more!
         const rto60 = building.rto60 ? `$${building.rto60.toFixed(2)}/mo` : 'N/A';
         const rto72 = building.rto72 ? `$${building.rto72.toFixed(2)}/mo` : 'N/A';
 
-        // Format all RTO options together
+        // Format all RTO options together (matching the tooltip format)
         let rtoAll = '';
         if (building.rto36) {
             rtoAll = `Rent-to-Own Options:
-36 months: $${building.rto36.toFixed(2)}/mo
-48 months: $${building.rto48.toFixed(2)}/mo
-60 months: $${building.rto60.toFixed(2)}/mo
-72 months: $${building.rto72.toFixed(2)}/mo
+• 36 months: $${building.rto36.toFixed(2)}/mo
+• 48 months: $${building.rto48.toFixed(2)}/mo
+• 60 months: $${building.rto60.toFixed(2)}/mo
+• 72 months: $${building.rto72.toFixed(2)}/mo
 *Plus your local sales tax`;
         }
 
