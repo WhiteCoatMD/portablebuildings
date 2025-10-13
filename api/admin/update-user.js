@@ -3,8 +3,13 @@
  * Update user subscription, features, and status
  */
 
-const { sql } = require('@vercel/postgres');
+const { Pool } = require('pg');
 const { requireAuth } = require('../../lib/auth');
+
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
+    ssl: { rejectUnauthorized: false }
+});
 
 async function handler(req, res) {
     // Check if user is admin
@@ -87,7 +92,7 @@ async function handler(req, res) {
         `;
         values.push(userId);
 
-        const result = await sql.query(query, values);
+        const result = await pool.query(query, values);
 
         if (result.rowCount === 0) {
             return res.status(404).json({

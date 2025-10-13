@@ -3,8 +3,13 @@
  * List all users and get statistics
  */
 
-const { sql } = require('@vercel/postgres');
+const { Pool } = require('pg');
 const { requireAuth } = require('../../lib/auth');
+
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
+    ssl: { rejectUnauthorized: false }
+});
 
 async function handler(req, res) {
     // Check if user is admin
@@ -28,7 +33,7 @@ async function handler(req, res) {
 async function getUsers(req, res) {
     try {
         // Get all users with their stats
-        const result = await sql`
+        const result = await pool.query(`
             SELECT
                 u.id,
                 u.email,
@@ -47,7 +52,7 @@ async function getUsers(req, res) {
                 (SELECT COUNT(*) FROM other_lots WHERE user_id = u.id) as other_lots_count
             FROM users u
             ORDER BY u.created_at DESC
-        `;
+        `);
 
         return res.status(200).json({
             success: true,

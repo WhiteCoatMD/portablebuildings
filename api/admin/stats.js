@@ -3,8 +3,13 @@
  * Get system-wide statistics
  */
 
-const { sql } = require('@vercel/postgres');
+const { Pool } = require('pg');
 const { requireAuth } = require('../../lib/auth');
+
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
+    ssl: { rejectUnauthorized: false }
+});
 
 async function handler(req, res) {
     // Check if user is admin
@@ -24,57 +29,51 @@ async function handler(req, res) {
 
     try {
         // Get total users count
-        const totalUsersResult = await sql`SELECT COUNT(*) as count FROM users`;
+        const totalUsersResult = await pool.query('SELECT COUNT(*) as count FROM users');
         const totalUsers = parseInt(totalUsersResult.rows[0].count);
 
         // Get active users (logged in within last 30 days)
-        const activeUsersResult = await sql`
+        const activeUsersResult = await pool.query(`
             SELECT COUNT(*) as count
             FROM users
             WHERE last_login_at > NOW() - INTERVAL '30 days'
-        `;
+        `);
         const activeUsers = parseInt(activeUsersResult.rows[0].count);
 
         // Get subscription breakdown
-        const subscriptionsResult = await sql`
+        const subscriptionsResult = await pool.query(`
             SELECT subscription_status, subscription_plan, COUNT(*) as count
             FROM users
             GROUP BY subscription_status, subscription_plan
             ORDER BY subscription_status, subscription_plan
-        `;
+        `);
 
         // Get total buildings across all users
-        const totalBuildingsResult = await sql`
-            SELECT COUNT(*) as count FROM building_overrides
-        `;
+        const totalBuildingsResult = await pool.query('SELECT COUNT(*) as count FROM building_overrides');
         const totalBuildings = parseInt(totalBuildingsResult.rows[0].count);
 
         // Get total images uploaded
-        const totalImagesResult = await sql`
-            SELECT COUNT(*) as count FROM image_orders
-        `;
+        const totalImagesResult = await pool.query('SELECT COUNT(*) as count FROM image_orders');
         const totalImages = parseInt(totalImagesResult.rows[0].count);
 
         // Get total Facebook posts
-        const totalPostsResult = await sql`
-            SELECT COUNT(*) as count FROM posted_buildings
-        `;
+        const totalPostsResult = await pool.query('SELECT COUNT(*) as count FROM posted_buildings');
         const totalPosts = parseInt(totalPostsResult.rows[0].count);
 
         // Get recent signups (last 7 days)
-        const recentSignupsResult = await sql`
+        const recentSignupsResult = await pool.query(`
             SELECT COUNT(*) as count
             FROM users
             WHERE created_at > NOW() - INTERVAL '7 days'
-        `;
+        `);
         const recentSignups = parseInt(recentSignupsResult.rows[0].count);
 
         // Get users with multi-lot feature enabled
-        const multiLotUsersResult = await sql`
+        const multiLotUsersResult = await pool.query(`
             SELECT COUNT(*) as count
             FROM users
             WHERE features->>'multiLot' = 'true'
-        `;
+        `);
         const multiLotUsers = parseInt(multiLotUsersResult.rows[0].count);
 
         return res.status(200).json({
