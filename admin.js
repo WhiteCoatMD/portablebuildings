@@ -2623,10 +2623,18 @@ function previewCustomColors() {
 async function saveCustomColors() {
     const colors = getCustomColorsFromForm();
 
-    // Save to database
-    await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, colors);
+    // Check if any custom colors are actually set (not empty)
+    const hasCustomColors = Object.values(colors).some(color => color && color !== '');
 
-    showToast('Custom colors saved!');
+    if (hasCustomColors) {
+        // Save to database
+        await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, colors);
+        showToast('Custom colors saved!');
+    } else {
+        // No custom colors set, clear them from database
+        await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, null);
+        console.log('[Custom Colors] No custom colors set, cleared from database');
+    }
 }
 
 function resetCustomColors() {
