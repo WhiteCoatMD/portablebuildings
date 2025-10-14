@@ -37,10 +37,11 @@ async function handler(req, res) {
 
         const inventoryContent = fs.readFileSync(inventoryPath, 'utf-8');
 
-        // Extract the PROCESSED_INVENTORY array
-        const match = inventoryContent.match(/window\.PROCESSED_INVENTORY\s*=\s*(\[[\s\S]*?\]);/);
+        // Extract the INVENTORY array (not PROCESSED_INVENTORY which is a function call)
+        const match = inventoryContent.match(/const\s+INVENTORY\s*=\s*(\[[\s\S]*?\]);/);
 
         if (!match) {
+            console.error('Could not find INVENTORY array in inventory.js');
             return res.status(200).json({
                 success: true,
                 count: 0
@@ -48,7 +49,7 @@ async function handler(req, res) {
         }
 
         // Parse the inventory array
-        const inventory = eval(match[1]);
+        const inventory = JSON.parse(match[1]);
 
         return res.status(200).json({
             success: true,
