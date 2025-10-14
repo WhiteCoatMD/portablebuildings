@@ -428,19 +428,19 @@ class InventoryApp {
                     ${building.rto36 ? `
                     <div class="rto-option">
                         <span class="rto-term">36 months:</span>
-                        <span class="rto-price">$${building.rto36.toFixed(2)}/mo</span>
+                        <span class="rto-price">$${parseFloat(building.rto36).toFixed(2)}/mo</span>
                     </div>
                     <div class="rto-option">
                         <span class="rto-term">48 months:</span>
-                        <span class="rto-price">$${building.rto48.toFixed(2)}/mo</span>
+                        <span class="rto-price">$${parseFloat(building.rto48).toFixed(2)}/mo</span>
                     </div>
                     <div class="rto-option">
                         <span class="rto-term">60 months:</span>
-                        <span class="rto-price">$${building.rto60.toFixed(2)}/mo</span>
+                        <span class="rto-price">$${parseFloat(building.rto60).toFixed(2)}/mo</span>
                     </div>
                     <div class="rto-option">
                         <span class="rto-term">72 months:</span>
-                        <span class="rto-price">$${building.rto72.toFixed(2)}/mo</span>
+                        <span class="rto-price">$${parseFloat(building.rto72).toFixed(2)}/mo</span>
                     </div>
                     <div class="rto-note">*Plus your local sales tax</div>
                     ` : `<div class="rto-note">RTO pricing not available</div>`}
