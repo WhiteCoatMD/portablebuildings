@@ -70,15 +70,24 @@ async function saveSettings(req, res) {
 
         // Save each setting
         for (const [key, value] of Object.entries(settings)) {
-            const valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
+            // If value is null, delete the setting from database
+            if (value === null) {
+                await pool.query(
+                    'DELETE FROM user_settings WHERE user_id = $1 AND setting_key = $2',
+                    [userId, key]
+                );
+                console.log(`[Settings] Deleted setting: ${key} for user ${userId}`);
+            } else {
+                const valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
 
-            await pool.query(
-                `INSERT INTO user_settings (user_id, setting_key, setting_value, updated_at)
-                 VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
-                 ON CONFLICT (user_id, setting_key)
-                 DO UPDATE SET setting_value = $3, updated_at = CURRENT_TIMESTAMP`,
-                [userId, key, valueStr]
-            );
+                await pool.query(
+                    `INSERT INTO user_settings (user_id, setting_key, setting_value, updated_at)
+                     VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+                     ON CONFLICT (user_id, setting_key)
+                     DO UPDATE SET setting_value = $3, updated_at = CURRENT_TIMESTAMP`,
+                    [userId, key, valueStr]
+                );
+            }
         }
 
         return res.status(200).json({
