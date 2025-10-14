@@ -33,6 +33,56 @@
     --background: #FEFDF8;
 }
 
+/* Slate Blue */
+[data-color-scheme="slate-blue"] {
+    --primary-gradient-start: #4A5568;
+    --primary-gradient-end: #2D3748;
+    --primary-color: #4A5568;
+    --secondary-color: #2D3748;
+    --button-color: #4A5568;
+    --background: #F7FAFC;
+}
+
+/* Forest Sage */
+[data-color-scheme="forest-sage"] {
+    --primary-gradient-start: #6B8E6F;
+    --primary-gradient-end: #4A6B4E;
+    --primary-color: #6B8E6F;
+    --secondary-color: #4A6B4E;
+    --button-color: #6B8E6F;
+    --background: #F5F9F5;
+}
+
+/* Navy Steel */
+[data-color-scheme="navy-steel"] {
+    --primary-gradient-start: #2C5282;
+    --primary-gradient-end: #1A365D;
+    --primary-color: #2C5282;
+    --secondary-color: #1A365D;
+    --button-color: #2C5282;
+    --background: #F0F7FF;
+}
+
+/* Autumn Oak */
+[data-color-scheme="autumn-oak"] {
+    --primary-gradient-start: #A0522D;
+    --primary-gradient-end: #6B4423;
+    --primary-color: #A0522D;
+    --secondary-color: #6B4423;
+    --button-color: #A0522D;
+    --background: #FFF8F0;
+}
+
+/* Pewter Charcoal */
+[data-color-scheme="pewter-charcoal"] {
+    --primary-gradient-start: #6C757D;
+    --primary-gradient-end: #495057;
+    --primary-color: #6C757D;
+    --secondary-color: #495057;
+    --button-color: #6C757D;
+    --background: #F8F9FA;
+}
+
 /* Custom button color override */
 [data-custom-button-color] {
     --button-color: var(--custom-button-color);
