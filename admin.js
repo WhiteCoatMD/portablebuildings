@@ -1827,29 +1827,43 @@ function initializeColorInputSync() {
 }
 
 async function saveCustomization() {
-    // Save business name
-    const businessName = document.getElementById('businessName');
-    if (businessName) {
-        await saveSetting(STORAGE_KEYS.BUSINESS_NAME, businessName.value.trim());
+    // Save business profile to users table (so it shows on the live site)
+    const businessName = document.getElementById('businessName')?.value.trim() || '';
+    const businessPhone = document.getElementById('businessPhone')?.value.trim() || '';
+    const businessEmail = document.getElementById('businessEmail')?.value.trim() || '';
+    const businessAddress = document.getElementById('businessAddress')?.value.trim() || '';
+
+    try {
+        const token = localStorage.getItem('auth_token');
+        const profileResponse = await fetch('/api/user/update-profile', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                businessName,
+                phone: businessPhone,
+                email: businessEmail,
+                address: businessAddress
+            })
+        });
+
+        const profileResult = await profileResponse.json();
+        if (!profileResult.success) {
+            console.error('Failed to update profile:', profileResult.error);
+            showToast('Warning: Profile update failed - ' + profileResult.error, true);
+        }
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        showToast('Warning: Profile update failed', true);
     }
 
-    // Save business phone
-    const businessPhone = document.getElementById('businessPhone');
-    if (businessPhone) {
-        await saveSetting(STORAGE_KEYS.BUSINESS_PHONE, businessPhone.value.trim());
-    }
-
-    // Save business email
-    const businessEmail = document.getElementById('businessEmail');
-    if (businessEmail) {
-        await saveSetting(STORAGE_KEYS.BUSINESS_EMAIL, businessEmail.value.trim());
-    }
-
-    // Save business address
-    const businessAddress = document.getElementById('businessAddress');
-    if (businessAddress) {
-        await saveSetting(STORAGE_KEYS.BUSINESS_ADDRESS, businessAddress.value.trim());
-    }
+    // Also save to settings for backward compatibility
+    await saveSetting(STORAGE_KEYS.BUSINESS_NAME, businessName);
+    await saveSetting(STORAGE_KEYS.BUSINESS_PHONE, businessPhone);
+    await saveSetting(STORAGE_KEYS.BUSINESS_EMAIL, businessEmail);
+    await saveSetting(STORAGE_KEYS.BUSINESS_ADDRESS, businessAddress);
 
     // Save social media
     const social = {
