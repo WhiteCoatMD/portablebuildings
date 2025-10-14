@@ -256,6 +256,12 @@ class InventoryApp {
     }
 
     populateSizeFilter() {
+        // Clear existing options except "All Sizes"
+        const sizeFilter = this.elements.sizeFilter;
+        while (sizeFilter.options.length > 1) {
+            sizeFilter.remove(1);
+        }
+
         // Get unique sizes from inventory
         const sizes = [...new Set(this.inventory.map(item => item.sizeDisplay))];
         sizes.sort((a, b) => {
@@ -268,11 +274,17 @@ class InventoryApp {
             const option = document.createElement('option');
             option.value = size;
             option.textContent = size;
-            this.elements.sizeFilter.appendChild(option);
+            sizeFilter.appendChild(option);
         });
     }
 
     populateLocationFilter() {
+        // Clear existing options except "All Locations"
+        const locationFilter = this.elements.locationFilter;
+        while (locationFilter.options.length > 1) {
+            locationFilter.remove(1);
+        }
+
         // Get unique locations from inventory
         const locations = [...new Set(this.inventory.map(item => item.location))];
         locations.sort();
@@ -281,7 +293,7 @@ class InventoryApp {
             const option = document.createElement('option');
             option.value = location;
             option.textContent = location;
-            this.elements.locationFilter.appendChild(option);
+            locationFilter.appendChild(option);
         });
     }
 
@@ -712,11 +724,14 @@ function navigateGallery(serialNumber, direction) {
     });
 }
 
-// Initialize app when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+// App will be initialized by site-loader.js after data is loaded
+// For backwards compatibility (non-multi-tenant sites), initialize if PROCESSED_INVENTORY exists
+if (window.PROCESSED_INVENTORY && window.PROCESSED_INVENTORY.length > 0 && !window.app) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            window.app = new InventoryApp();
+        });
+    } else {
         window.app = new InventoryApp();
-    });
-} else {
-    window.app = new InventoryApp();
+    }
 }

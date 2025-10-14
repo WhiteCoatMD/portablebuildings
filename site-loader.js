@@ -48,6 +48,19 @@ window.PROCESSED_INVENTORY = [];
         // Apply site configuration to page
         applySiteConfiguration();
 
+        // Trigger app initialization after data is loaded
+        if (window.app) {
+            // App already exists, reload it with new data
+            window.app.inventory = window.PROCESSED_INVENTORY;
+            window.app.filteredInventory = [...window.PROCESSED_INVENTORY];
+            window.app.populateSizeFilter();
+            window.app.populateLocationFilter();
+            window.app.renderBuildings();
+        } else {
+            // Create the app now that data is loaded
+            window.app = new InventoryApp();
+        }
+
     } catch (error) {
         console.error('[Site Loader] Failed to load site configuration:', error);
         document.body.innerHTML = `
