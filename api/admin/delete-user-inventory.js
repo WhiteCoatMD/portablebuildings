@@ -58,10 +58,15 @@ async function handler(req, res) {
             [userId]
         );
 
-        const imagesCount = await pool.query(
-            'SELECT COUNT(*) as count FROM building_images WHERE user_id = $1',
-            [userId]
-        );
+        let imagesCount = { rows: [{ count: 0 }] };
+        try {
+            imagesCount = await pool.query(
+                'SELECT COUNT(*) as count FROM building_images WHERE user_id = $1',
+                [userId]
+            );
+        } catch (err) {
+            console.log('[Delete Inventory] building_images table may not exist, skipping count');
+        }
 
         let postsCount = { rows: [{ count: 0 }] };
         try {
@@ -74,10 +79,15 @@ async function handler(req, res) {
         }
 
         // Get image file paths before deleting records
-        const imageFiles = await pool.query(
-            'SELECT image_path FROM building_images WHERE user_id = $1',
-            [userId]
-        );
+        let imageFiles = { rows: [] };
+        try {
+            imageFiles = await pool.query(
+                'SELECT image_path FROM building_images WHERE user_id = $1',
+                [userId]
+            );
+        } catch (err) {
+            console.log('[Delete Inventory] building_images table may not exist, skipping image files');
+        }
 
         // Start transaction
         await pool.query('BEGIN');
@@ -94,10 +104,14 @@ async function handler(req, res) {
             }
 
             // Delete building images
-            await pool.query(
-                'DELETE FROM building_images WHERE user_id = $1',
-                [userId]
-            );
+            try {
+                await pool.query(
+                    'DELETE FROM building_images WHERE user_id = $1',
+                    [userId]
+                );
+            } catch (err) {
+                console.log('[Delete Inventory] building_images table may not exist, skipping');
+            }
 
             // Delete building overrides
             try {
