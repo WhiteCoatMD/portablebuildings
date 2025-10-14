@@ -752,9 +752,9 @@ main {
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: 1fr;
     gap: 2.5rem;
-    max-width: 1100px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
@@ -778,10 +778,14 @@ main {
 .feature-number {
     font-size: 3rem;
     font-weight: 700;
-    color: #f0f0f0;
+    color: #dc3545;
     line-height: 1;
     margin-bottom: 1rem;
-    font-family: 'Georgia', serif;
+    font-family: Arial, sans-serif;
+}
+
+.feature-number::before {
+    content: '✓';
 }
 
 .feature-card h3 {
@@ -1081,4 +1085,88 @@ footer {
     .building-info {
         padding: 1rem;
     }
+}
+
+/* ====================================
+   COLOR SCHEMES - Comprehensive Theming
+   ==================================== */
+
+/* Rustic Earth - Fresh pine to deep forest */
+[data-color-scheme="rustic-earth"] {
+    --primary-color: #3D7A40;
+    --secondary-color: #2C5F2D;
+    --accent-color: #5A9F5D;
+    --header-bg: linear-gradient(135deg, #3D7A40 0%, #2C5F2D 100%);
+    --footer-bg: #2C5F2D;
+    --button-color: #3D7A40;
+}
+
+/* Modern Ranch - Warm barn red to deep burgundy */
+[data-color-scheme="modern-ranch"] {
+    --primary-color: #8B3236;
+    --secondary-color: #7C2529;
+    --accent-color: #A54245;
+    --header-bg: linear-gradient(135deg, #8B3236 0%, #7C2529 100%);
+    --footer-bg: #7C2529;
+    --button-color: #8B3236;
+}
+
+/* Desert Timber - Warm sand to rich wood */
+[data-color-scheme="desert-timber"] {
+    --primary-color: #C19A6B;
+    --secondary-color: #8B7355;
+    --accent-color: #D4A76A;
+    --header-bg: linear-gradient(135deg, #C19A6B 0%, #8B7355 100%);
+    --footer-bg: #8B7355;
+    --button-color: #C19A6B;
+}
+
+/* Slate Blue - Cool gray to deep slate */
+[data-color-scheme="slate-blue"] {
+    --primary-color: #4A5568;
+    --secondary-color: #2D3748;
+    --accent-color: #5A6C7D;
+    --header-bg: linear-gradient(135deg, #4A5568 0%, #2D3748 100%);
+    --footer-bg: #2D3748;
+    --button-color: #4A5568;
+}
+
+/* Forest Sage - Soft sage to forest green */
+[data-color-scheme="forest-sage"] {
+    --primary-color: #6B8E6F;
+    --secondary-color: #4A6B4E;
+    --accent-color: #7FA283;
+    --header-bg: linear-gradient(135deg, #6B8E6F 0%, #4A6B4E 100%);
+    --footer-bg: #4A6B4E;
+    --button-color: #6B8E6F;
+}
+
+/* Navy Steel - Steel blue to deep navy */
+[data-color-scheme="navy-steel"] {
+    --primary-color: #2C5282;
+    --secondary-color: #1A365D;
+    --accent-color: #3A6EA5;
+    --header-bg: linear-gradient(135deg, #2C5282 0%, #1A365D 100%);
+    --footer-bg: #1A365D;
+    --button-color: #2C5282;
+}
+
+/* Autumn Oak - Burnt sienna to rich oak */
+[data-color-scheme="autumn-oak"] {
+    --primary-color: #A0522D;
+    --secondary-color: #6B4423;
+    --accent-color: #BC6C3C;
+    --header-bg: linear-gradient(135deg, #A0522D 0%, #6B4423 100%);
+    --footer-bg: #6B4423;
+    --button-color: #A0522D;
+}
+
+/* Pewter Charcoal - Soft pewter to charcoal */
+[data-color-scheme="pewter-charcoal"] {
+    --primary-color: #6C757D;
+    --secondary-color: #495057;
+    --accent-color: #7D8896;
+    --header-bg: linear-gradient(135deg, #6C757D 0%, #495057 100%);
+    --footer-bg: #495057;
+    --button-color: #6C757D;
 }
