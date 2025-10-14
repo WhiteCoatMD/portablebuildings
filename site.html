@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Portable Buildings - Current Inventory</title>
+    <link rel="stylesheet" href="color-schemes.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="header-left">
+                <h1 id="business-name-header">Community Portable Buildings</h1>
+                <p class="phone-text">Call us at <a href="tel:318-594-5909" id="header-phone-link" class="phone-link">318-594-5909</a></p>
+                <p class="hours-text" id="header-hours-text" style="display: none;">
+                    <!-- Will be populated by JavaScript with "Open Today from XX:XX til XX:XX" -->
+                </p>
+            </div>
+            <div class="header-right">
+                <img src="public/graceland_logo.png" alt="Graceland Portable Buildings" class="header-logo">
+                <p class="dealer-text">Authorized Dealer</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section with Photo Gallery -->
+    <section class="hero">
+        <div class="hero-gallery">
+            <div class="gallery-slide active">
+                <img src="Cabin-12x24-Angle.jpg" alt="Cabin">
+            </div>
+            <div class="gallery-slide">
+                <img src="BARN-ANGLED-8x12.jpg" alt="Barn">
+            </div>
+            <div class="gallery-slide">
+                <img src="Corner-Porch-Cabin.png" alt="Corner Porch Cabin">
+            </div>
+            <div class="gallery-slide">
+                <img src="GHP-6307.jpg" alt="Portable Building">
+            </div>
+            <div class="gallery-slide">
+                <img src="Side-Lofted-Barn-10X16-Front-Angled.png" alt="Side Lofted Barn">
+            </div>
+            <div class="gallery-slide">
+                <img src="Mini-Closed.png" alt="Mini Shed">
+            </div>
+        </div>
+        <button class="gallery-prev" onclick="changeSlide(-1)">❮</button>
+        <button class="gallery-next" onclick="changeSlide(1)">❯</button>
+        <div class="gallery-dots">
+            <span class="dot active" onclick="currentSlide(0)"></span>
+            <span class="dot" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+            <span class="dot" onclick="currentSlide(4)"></span>
+            <span class="dot" onclick="currentSlide(5)"></span>
+        </div>
+    </section>
+
+    <!-- Welcome Message -->
+    <section class="welcome-section">
+        <div class="container">
+            <div class="welcome-message">
+                <h2>Welcome to Community Portable Buildings of West Monroe, LA and Columbia, LA</h2>
+                <p>Take a look at what we have in stock, and let us know if we can design you a custom Graceland Building or help in any way!</p>
+                <a href="#inventory" class="live-inventory-btn">
+                    <span class="live-indicator"></span>
+                    View Our Live Inventory
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Graceland Features Section -->
+    <section class="graceland-features">
+        <div class="container">
+            <h2 class="section-title">Why Choose Graceland Portable Buildings?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-number">01</div>
+                    <h3>Unsurpassed Quality</h3>
+                    <p>Built to last for generations, not years. Our master-builders create durable structures designed to stand the test of time.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-number">02</div>
+                    <h3>Innovative Design</h3>
+                    <p>Featuring our patented soffit ventilation system that allows buildings to breathe, providing unique features not available from other manufacturers.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-number">03</div>
+                    <h3>Limitless Customization</h3>
+                    <p>Choose from a huge selection of building styles with limitless color combinations. Each building is custom-built to your exact specifications.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-number">04</div>
+                    <h3>7-Year Warranty</h3>
+                    <p>Backed by comprehensive support and a 7-year warranty, ensuring your investment is protected for years to come.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Graceland Section -->
+    <section class="about-graceland">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Your Local Graceland Dealer</h2>
+                    <p>Community Portable Buildings is proud to be an authorized dealer of Graceland Portable Buildings, a company that has been a leader in manufacturing portable buildings since 2005. Founded by Daniel and Valorie Burnett in Bardwell, Kentucky, Graceland has built its reputation on quality craftsmanship and innovative design.</p>
+                    <p>As your local dealer, we offer Graceland's extensive lineup of barns, sheds, garages, cabins, and tiny homes - all built with the same commitment to excellence and designed to meet your specific needs. We're here to help you find the perfect building and provide local support.</p>
+                    <p class="tagline">"Make Room for Life™"</p>
+                </div>
+                <div class="about-stats">
+                    <div class="stat-box">
+                        <div class="stat-number">20+</div>
+                        <div class="stat-label">Years in Business</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">7</div>
+                        <div class="stat-label">Year Warranty</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container" id="inventory">
+        <section class="filters">
+            <h2>Find Your Building</h2>
+            <div class="filter-group">
+                <label for="type-filter">Building Type:</label>
+                <select id="type-filter">
+                    <option value="all">All Types</option>
+                    <option value="MS">Mini Shed</option>
+                    <option value="LB">Lofted Barn</option>
+                    <option value="UB">Utility Barn</option>
+                    <option value="CB">Cabin</option>
+                    <option value="GR">Garage</option>
+                </select>
+
+                <label for="size-filter">Size:</label>
+                <select id="size-filter">
+                    <option value="all">All Sizes</option>
+                </select>
+
+                <label for="location-filter">Location:</label>
+                <select id="location-filter">
+                    <option value="all">All Locations</option>
+                </select>
+
+                <label for="status-filter">Status:</label>
+                <select id="status-filter">
+                    <option value="all">All</option>
+                    <option value="available">New Inventory</option>
+                    <option value="repo">Repo</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="inventory">
+            <div class="inventory-count">
+                <span id="count">0</span> buildings available
+            </div>
+            <div id="buildings-grid" class="buildings-grid">
+                <!-- Buildings will be populated here by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-section">
+                <h3 id="footer-business-name">Community Portable Buildings</h3>
+                <p id="footer-address" class="footer-address"></p>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Us</h4>
+                <p class="footer-contact">
+                    <span>📞 <a href="tel:318-594-5909" id="footer-phone-link">318-594-5909</a></span>
+                </p>
+                <p class="footer-contact" id="footer-email-container" style="display: none;">
+                    <span>✉️ <a href="mailto:" id="footer-email-link"></a></span>
+                </p>
+            </div>
+            <div class="footer-section">
+                <h4>Hours</h4>
+                <div id="footer-hours" class="footer-hours">
+                    <!-- Business hours will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-links" id="social-links">
+                    <!-- Social links will be populated by JavaScript -->
+                </div>
+                <p class="footer-copyright" style="margin-top: 1.5rem;">&copy; 2025 <span id="footer-copyright-name">Community Portable Buildings</span>. All rights reserved.</p>
+                <p class="footer-dealer">Authorized Graceland Portable Buildings Dealer</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="decoder.js"></script>
+    <script src="site-loader.js"></script>
+    <script src="inventory.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -3,222 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Portable Buildings - Current Inventory</title>
-    <link rel="stylesheet" href="color-schemes.css">
-    <link rel="stylesheet" href="styles.css">
-    <script>
-        // Apply color scheme and customizations before page loads
-        (function() {
-            // Apply color scheme
-            const scheme = localStorage.getItem('cpb_color_scheme') || 'rustic-earth';
-            if (scheme !== 'rustic-earth') {
-                document.documentElement.setAttribute('data-color-scheme', scheme);
+    <title>ShedSync - Multi-Dealer Inventory Management Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #2C5F2D 0%, #3D7A40 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            opacity: 0.95;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #2C5F2D;
+            padding: 1rem 2.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2C5F2D;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #2C5F2D;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.125rem;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        .demo-section {
+            background: #f8f9fa;
+            padding: 4rem 0;
+        }
+
+        .demo-list {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .demo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .demo-item:last-child {
+            border-bottom: none;
+        }
+
+        .demo-info h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #2C5F2D;
+        }
+
+        .demo-info p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .demo-link {
+            padding: 0.75rem 1.5rem;
+            background: #2C5F2D;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .demo-link:hover {
+            background: #3D7A40;
+        }
+
+        footer {
+            background: #2C5F2D;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
             }
 
-            // Apply custom button color if set
-            const buttonColor = localStorage.getItem('cpb_button_color');
-            if (buttonColor) {
-                document.documentElement.setAttribute('data-custom-button-color', '');
-                document.documentElement.style.setProperty('--custom-button-color', buttonColor);
+            .hero p {
+                font-size: 1rem;
             }
-        })();
-    </script>
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .demo-item {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container header-content">
-            <div class="header-left">
-                <h1 id="business-name-header">Community Portable Buildings</h1>
-                <p class="phone-text">Call us at <a href="tel:318-594-5909" id="header-phone-link" class="phone-link">318-594-5909</a></p>
-                <p class="hours-text" id="header-hours-text" style="display: none;">
-                    <!-- Will be populated by JavaScript with "Open Today from XX:XX til XX:XX" -->
-                </p>
-            </div>
-            <div class="header-right">
-                <img src="public/graceland_logo.png" alt="Graceland Portable Buildings" class="header-logo">
-                <p class="dealer-text">Authorized Dealer</p>
-            </div>
-        </div>
-    </header>
+    <div class="hero">
+        <h1>🏡 ShedSync</h1>
+        <p>The modern multi-dealer inventory management platform for portable building dealers. Manage your inventory, customize your website, and grow your business.</p>
+        <a href="login.html" class="cta-button">Dealer Login →</a>
+    </div>
 
-    <!-- Hero Section with Photo Gallery -->
-    <section class="hero">
-        <div class="hero-gallery">
-            <div class="gallery-slide active">
-                <img src="Cabin-12x24-Angle.jpg" alt="Cabin">
-            </div>
-            <div class="gallery-slide">
-                <img src="BARN-ANGLED-8x12.jpg" alt="Barn">
-            </div>
-            <div class="gallery-slide">
-                <img src="Corner-Porch-Cabin.png" alt="Corner Porch Cabin">
-            </div>
-            <div class="gallery-slide">
-                <img src="GHP-6307.jpg" alt="Portable Building">
-            </div>
-            <div class="gallery-slide">
-                <img src="Side-Lofted-Barn-10X16-Front-Angled.png" alt="Side Lofted Barn">
-            </div>
-            <div class="gallery-slide">
-                <img src="Mini-Closed.png" alt="Mini Shed">
-            </div>
-        </div>
-        <button class="gallery-prev" onclick="changeSlide(-1)">❮</button>
-        <button class="gallery-next" onclick="changeSlide(1)">❯</button>
-        <div class="gallery-dots">
-            <span class="dot active" onclick="currentSlide(0)"></span>
-            <span class="dot" onclick="currentSlide(1)"></span>
-            <span class="dot" onclick="currentSlide(2)"></span>
-            <span class="dot" onclick="currentSlide(3)"></span>
-            <span class="dot" onclick="currentSlide(4)"></span>
-            <span class="dot" onclick="currentSlide(5)"></span>
-        </div>
-    </section>
+    <div class="container">
+        <h2 class="section-title">Built for Dealers</h2>
+        <p class="section-subtitle">Everything you need to manage and showcase your portable buildings inventory online</p>
 
-    <!-- Welcome Message -->
-    <section class="welcome-section">
+        <div class="features">
+            <div class="feature-card">
+                <h3>🔄 Automated Sync</h3>
+                <p>Connect your GPB Sales account and automatically sync your inventory daily. No manual updates needed.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>🎨 Custom Branding</h3>
+                <p>Full control over your website appearance with custom colors, logos, business info, and welcome messages.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>🌐 Your Domain</h3>
+                <p>Get a free subdomain (yourbusiness.shed-sync.com) or connect your own custom domain.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>📱 Mobile Responsive</h3>
+                <p>Your customers get a beautiful experience on any device - desktop, tablet, or mobile.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>📷 Photo Management</h3>
+                <p>Upload and organize photos for each building. Drag to reorder, set main images.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>📍 Multi-Location</h3>
+                <p>Manage inventory across multiple lot locations with automatic tagging and filtering.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
         <div class="container">
-            <div class="welcome-message">
-                <h2>Welcome to Community Portable Buildings of West Monroe, LA and Columbia, LA</h2>
-                <p>Take a look at what we have in stock, and let us know if we can design you a custom Graceland Building or help in any way!</p>
-                <a href="#inventory" class="live-inventory-btn">
-                    <span class="live-indicator"></span>
-                    View Our Live Inventory
-                </a>
+            <h2 class="section-title">Demo Sites</h2>
+            <p class="section-subtitle">Check out live examples of dealer websites powered by ShedSync</p>
+
+            <div class="demo-list" id="demo-list">
+                <p style="text-align: center; color: #666;">Loading dealer sites...</p>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Graceland Features Section -->
-    <section class="graceland-features">
-        <div class="container">
-            <h2 class="section-title">Why Choose Graceland Portable Buildings?</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-number">01</div>
-                    <h3>Unsurpassed Quality</h3>
-                    <p>Built to last for generations, not years. Our master-builders create durable structures designed to stand the test of time.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number">02</div>
-                    <h3>Innovative Design</h3>
-                    <p>Featuring our patented soffit ventilation system that allows buildings to breathe, providing unique features not available from other manufacturers.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number">03</div>
-                    <h3>Limitless Customization</h3>
-                    <p>Choose from a huge selection of building styles with limitless color combinations. Each building is custom-built to your exact specifications.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number">04</div>
-                    <h3>7-Year Warranty</h3>
-                    <p>Backed by comprehensive support and a 7-year warranty, ensuring your investment is protected for years to come.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Graceland Section -->
-    <section class="about-graceland">
-        <div class="container">
-            <div class="about-content">
-                <div class="about-text">
-                    <h2>Your Local Graceland Dealer</h2>
-                    <p>Community Portable Buildings is proud to be an authorized dealer of Graceland Portable Buildings, a company that has been a leader in manufacturing portable buildings since 2005. Founded by Daniel and Valorie Burnett in Bardwell, Kentucky, Graceland has built its reputation on quality craftsmanship and innovative design.</p>
-                    <p>As your local dealer, we offer Graceland's extensive lineup of barns, sheds, garages, cabins, and tiny homes - all built with the same commitment to excellence and designed to meet your specific needs. We're here to help you find the perfect building and provide local support.</p>
-                    <p class="tagline">"Make Room for Life™"</p>
-                </div>
-                <div class="about-stats">
-                    <div class="stat-box">
-                        <div class="stat-number">20+</div>
-                        <div class="stat-label">Years in Business</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">7</div>
-                        <div class="stat-label">Year Warranty</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <main class="container" id="inventory">
-        <section class="filters">
-            <h2>Find Your Building</h2>
-            <div class="filter-group">
-                <label for="type-filter">Building Type:</label>
-                <select id="type-filter">
-                    <option value="all">All Types</option>
-                    <option value="MS">Mini Shed</option>
-                    <option value="LB">Lofted Barn</option>
-                    <option value="UB">Utility Barn</option>
-                    <option value="CB">Cabin</option>
-                    <option value="GR">Garage</option>
-                </select>
-
-                <label for="size-filter">Size:</label>
-                <select id="size-filter">
-                    <option value="all">All Sizes</option>
-                </select>
-
-                <label for="location-filter">Location:</label>
-                <select id="location-filter">
-                    <option value="all">All Locations</option>
-                </select>
-
-                <label for="status-filter">Status:</label>
-                <select id="status-filter">
-                    <option value="all">All</option>
-                    <option value="available">New Inventory</option>
-                    <option value="repo">Repo</option>
-                </select>
-            </div>
-        </section>
-
-        <section class="inventory">
-            <div class="inventory-count">
-                <span id="count">0</span> buildings available
-            </div>
-            <div id="buildings-grid" class="buildings-grid">
-                <!-- Buildings will be populated here by JavaScript -->
-            </div>
-        </section>
-    </main>
+    <div class="container" style="text-align: center; padding: 4rem 2rem;">
+        <h2 class="section-title">Ready to Get Started?</h2>
+        <p class="section-subtitle">Join other portable building dealers using ShedSync to manage their inventory</p>
+        <a href="mailto:support@shed-sync.com" class="cta-button">Contact Us</a>
+    </div>
 
     <footer>
-        <div class="container footer-content">
-            <div class="footer-section">
-                <h3 id="footer-business-name">Community Portable Buildings</h3>
-                <p id="footer-address" class="footer-address"></p>
-            </div>
-            <div class="footer-section">
-                <h4>Contact Us</h4>
-                <p class="footer-contact">
-                    <span>📞 <a href="tel:318-594-5909" id="footer-phone-link">318-594-5909</a></span>
-                </p>
-                <p class="footer-contact" id="footer-email-container" style="display: none;">
-                    <span>✉️ <a href="mailto:" id="footer-email-link"></a></span>
-                </p>
-            </div>
-            <div class="footer-section">
-                <h4>Hours</h4>
-                <div id="footer-hours" class="footer-hours">
-                    <!-- Business hours will be populated by JavaScript -->
-                </div>
-            </div>
-            <div class="footer-section">
-                <h4>Follow Us</h4>
-                <div class="social-links" id="social-links">
-                    <!-- Social links will be populated by JavaScript -->
-                </div>
-                <p class="footer-copyright" style="margin-top: 1.5rem;">&copy; 2025 <span id="footer-copyright-name">Community Portable Buildings</span>. All rights reserved.</p>
-                <p class="footer-dealer">Authorized Graceland Portable Buildings Dealer</p>
-            </div>
-        </div>
+        <p>&copy; 2025 ShedSync. All rights reserved.</p>
+        <p style="margin-top: 0.5rem;"><a href="login.html">Dealer Login</a> | <a href="mailto:support@shed-sync.com">Support</a></p>
     </footer>
 
-    <script src="decoder.js"></script>
-    <script src="inventory.js"></script>
-    <script src="app.js"></script>
+    <script>
+        // Load and display demo dealer sites
+        async function loadDemoSites() {
+            try {
+                const response = await fetch('/api/site/list-dealers');
+                const data = await response.json();
+
+                if (data.success && data.dealers && data.dealers.length > 0) {
+                    const demoList = document.getElementById('demo-list');
+                    demoList.innerHTML = data.dealers.map(dealer => `
+                        <div class="demo-item">
+                            <div class="demo-info">
+                                <h4>${dealer.businessName || dealer.email}</h4>
+                                <p>
+                                    ${dealer.subdomain}.shed-sync.com
+                                    ${dealer.customDomain ? ` • ${dealer.customDomain}` : ''}
+                                </p>
+                            </div>
+                            <a href="https://${dealer.customDomain || dealer.subdomain + '.shed-sync.com'}" class="demo-link" target="_blank">
+                                View Site →
+                            </a>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('demo-list').innerHTML = '<p style="text-align: center; color: #666;">No demo sites available yet.</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load demo sites:', error);
+                document.getElementById('demo-list').innerHTML = '<p style="text-align: center; color: #666;">Unable to load dealer sites.</p>';
+            }
+        }
+
+        loadDemoSites();
+    </script>
 </body>
 </html>

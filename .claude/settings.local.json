@@ -22,7 +22,13 @@
       "Bash(findstr:*)",
       "Bash(node check-schema.js)",
       "Bash(node test-database.js)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(curl -v http://45.55.237.121:3001/health)",
+      "Bash(curl http://45.55.237.121:3001/health)",
+      "Bash(curl -X POST http://45.55.237.121:3001/sync-lot -H \"Content-Type: application/json\" -H \"Authorization: Bearer my-super-secret-sync-key-12345\" -d \"{\"\"username\"\":\"\"test\"\",\"\"password\"\":\"\"test\"\",\"\"lotName\"\":\"\"Test Lot\"\",\"\"userId\"\":1}\")",
+      "Bash(ssh:*)",
+      "Bash(curl http://134.199.200.206:3001/health)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []
