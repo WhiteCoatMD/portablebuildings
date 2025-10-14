@@ -44,9 +44,14 @@ class InventoryApp {
     }
 
     init() {
-        this.loadBusinessInfo();
-        this.loadBusinessHours();
-        this.loadWelcomeMessage();
+        // Only load from localStorage if we're not on a multi-tenant site (no SITE_CONFIG)
+        if (!window.SITE_CONFIG) {
+            this.loadBusinessInfo();
+            this.loadBusinessHours();
+            this.loadWelcomeMessage();
+        }
+        // site-loader.js already handled business info, hours, and welcome message for multi-tenant sites
+
         this.populateSizeFilter();
         this.populateLocationFilter();
         this.attachEventListeners();
@@ -54,6 +59,9 @@ class InventoryApp {
     }
 
     loadBusinessInfo() {
+        // Only used for non-multi-tenant sites (when loaded directly)
+        // Multi-tenant sites use site-loader.js which sets this from the database
+
         // Load business name
         const businessName = localStorage.getItem('cpb_business_name') || 'Community Portable Buildings';
         const headerEl = document.getElementById('business-name-header');
@@ -113,6 +121,8 @@ class InventoryApp {
     }
 
     loadSocialLinks() {
+        // Only used for non-multi-tenant sites
+        // Multi-tenant sites get social links from site-loader.js
         const saved = localStorage.getItem('cpb_social_media');
         const social = saved ? JSON.parse(saved) : {};
         const container = document.getElementById('social-links');
@@ -159,7 +169,8 @@ class InventoryApp {
     }
 
     loadBusinessHours() {
-        // Get location hours from localStorage (saved from admin panel)
+        // Only used for non-multi-tenant sites
+        // Multi-tenant sites get hours from site-loader.js
         const saved = localStorage.getItem('cpb_location_hours');
         if (!saved) return;
 

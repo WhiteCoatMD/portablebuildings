@@ -80,13 +80,19 @@ async function handler(req, res) {
         let settings = {};
         try {
             const settingsResult = await pool.query(
-                'SELECT settings FROM user_settings WHERE user_id = $1',
+                'SELECT setting_key, setting_value FROM user_settings WHERE user_id = $1',
                 [user.id]
             );
 
-            settings = settingsResult.rows.length > 0
-                ? settingsResult.rows[0].settings
-                : {};
+            // Convert key-value rows to settings object
+            settingsResult.rows.forEach(row => {
+                try {
+                    // Try to parse as JSON, otherwise use as string
+                    settings[row.setting_key] = JSON.parse(row.setting_value);
+                } catch {
+                    settings[row.setting_key] = row.setting_value;
+                }
+            });
 
             console.log(`[Site] Loaded settings for user ${user.id}: ${Object.keys(settings).length} keys`);
         } catch (error) {
