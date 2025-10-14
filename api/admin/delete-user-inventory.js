@@ -63,10 +63,15 @@ async function handler(req, res) {
             [userId]
         );
 
-        const postsCount = await pool.query(
-            'SELECT COUNT(*) as count FROM facebook_posts WHERE user_id = $1',
-            [userId]
-        );
+        let postsCount = { rows: [{ count: 0 }] };
+        try {
+            postsCount = await pool.query(
+                'SELECT COUNT(*) as count FROM facebook_posts WHERE user_id = $1',
+                [userId]
+            );
+        } catch (err) {
+            console.log('[Delete Inventory] facebook_posts table may not exist, skipping count');
+        }
 
         // Get image file paths before deleting records
         const imageFiles = await pool.query(
@@ -79,10 +84,14 @@ async function handler(req, res) {
 
         try {
             // Delete Facebook posts first (has foreign key to user_inventory)
-            await pool.query(
-                'DELETE FROM facebook_posts WHERE user_id = $1',
-                [userId]
-            );
+            try {
+                await pool.query(
+                    'DELETE FROM facebook_posts WHERE user_id = $1',
+                    [userId]
+                );
+            } catch (err) {
+                console.log('[Delete Inventory] facebook_posts table may not exist, skipping');
+            }
 
             // Delete building images
             await pool.query(
@@ -91,16 +100,24 @@ async function handler(req, res) {
             );
 
             // Delete building overrides
-            await pool.query(
-                'DELETE FROM building_overrides WHERE user_id = $1',
-                [userId]
-            );
+            try {
+                await pool.query(
+                    'DELETE FROM building_overrides WHERE user_id = $1',
+                    [userId]
+                );
+            } catch (err) {
+                console.log('[Delete Inventory] building_overrides table may not exist, skipping');
+            }
 
             // Delete image order settings
-            await pool.query(
-                'DELETE FROM image_orders WHERE user_id = $1',
-                [userId]
-            );
+            try {
+                await pool.query(
+                    'DELETE FROM image_orders WHERE user_id = $1',
+                    [userId]
+                );
+            } catch (err) {
+                console.log('[Delete Inventory] image_orders table may not exist, skipping');
+            }
 
             // Delete user inventory
             await pool.query(
