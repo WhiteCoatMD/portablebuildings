@@ -1982,6 +1982,9 @@ async function saveCustomization() {
     // Save background settings (no async needed)
     saveBackgroundSettings();
 
+    // Save custom colors
+    await saveCustomColors();
+
     // Save location hours
     await saveLocationHours();
 
@@ -2586,7 +2589,7 @@ function updateCustomColorPreview() {
     }
 }
 
-async function applyCustomColors() {
+function getCustomColorsFromForm() {
     const colors = {
         primary: document.getElementById('primaryColor')?.value || '',
         secondary: document.getElementById('secondaryColor')?.value || '',
@@ -2608,11 +2611,22 @@ async function applyCustomColors() {
         colors.background = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
     }
 
+    return colors;
+}
+
+function previewCustomColors() {
+    // Just update the preview, don't save
+    updateCustomColorPreview();
+    showToast('Preview updated! Click "Save All Customization" at the bottom to save these colors.');
+}
+
+async function saveCustomColors() {
+    const colors = getCustomColorsFromForm();
+
     // Save to database
     await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, colors);
 
-    updateCustomColorPreview();
-    showToast('Custom colors saved! These will override your color scheme.');
+    showToast('Custom colors saved!');
 }
 
 function resetCustomColors() {
@@ -3148,7 +3162,8 @@ window.triggerUserSync = triggerUserSync;
 window.resetButtonColor = resetButtonColor;
 window.checkAndPostToFacebook = checkAndPostToFacebook;
 window.testFacebookPost = testFacebookPost;
-window.applyCustomColors = applyCustomColors;
+window.previewCustomColors = previewCustomColors;
+window.saveCustomColors = saveCustomColors;
 window.resetCustomColors = resetCustomColors;
 window.toggleDayHours = toggleDayHours;
 window.syncUserInventory = syncUserInventory;
