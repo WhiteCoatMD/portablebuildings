@@ -18,7 +18,7 @@
         }
 
         .hero {
-            background: linear-gradient(135deg, #2C5F2D 0%, #3D7A40 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
             padding: 4rem 2rem;
             text-align: center;
@@ -27,12 +27,28 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 214, 10, 0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .hero h1 {
             font-size: 3rem;
             margin-bottom: 1rem;
             font-weight: 700;
+            color: #ffd60a;
+            position: relative;
+            z-index: 1;
         }
 
         .hero p {
@@ -40,24 +56,29 @@
             max-width: 600px;
             margin: 0 auto 2rem;
             opacity: 0.95;
+            color: #e0e0e0;
+            position: relative;
+            z-index: 1;
         }
 
         .cta-button {
             display: inline-block;
-            background: white;
-            color: #2C5F2D;
+            background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%);
+            color: #1a1a2e;
             padding: 1rem 2.5rem;
             font-size: 1.125rem;
-            font-weight: 600;
+            font-weight: 700;
             text-decoration: none;
             border-radius: 8px;
             transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(255, 214, 10, 0.3);
+            position: relative;
+            z-index: 1;
         }
 
         .cta-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 20px rgba(255, 214, 10, 0.5);
         }
 
         .container {
@@ -74,20 +95,21 @@
         }
 
         .feature-card {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             padding: 2rem;
             border-radius: 12px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid #2a2a3e;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
 
         .feature-card h3 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
-            color: #2C5F2D;
+            color: #ffd60a;
         }
 
         .feature-card p {
-            color: #666;
+            color: #a8a8b8;
             line-height: 1.8;
         }
 
@@ -95,27 +117,28 @@
             font-size: 2.5rem;
             text-align: center;
             margin-bottom: 1rem;
-            color: #2C5F2D;
+            color: #ffd60a;
         }
 
         .section-subtitle {
             text-align: center;
             font-size: 1.125rem;
-            color: #666;
+            color: #a8a8b8;
             max-width: 700px;
             margin: 0 auto 3rem;
         }
 
         .demo-section {
-            background: #f8f9fa;
+            background: #0f1419;
             padding: 4rem 0;
         }
 
         .demo-list {
-            background: white;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             border-radius: 12px;
             padding: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            border: 1px solid #2a2a3e;
         }
 
         .demo-item {
@@ -123,49 +146,61 @@
             justify-content: space-between;
             align-items: center;
             padding: 1.5rem;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #2a2a3e;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            margin-bottom: 1rem;
         }
 
         .demo-item:last-child {
-            border-bottom: none;
+            margin-bottom: 0;
         }
 
         .demo-info h4 {
             font-size: 1.25rem;
             margin-bottom: 0.5rem;
-            color: #2C5F2D;
+            color: #ffd60a;
+            font-weight: 700;
         }
 
         .demo-info p {
-            color: #666;
+            color: #a8a8b8;
             font-size: 0.95rem;
         }
 
         .demo-link {
             padding: 0.75rem 1.5rem;
-            background: #2C5F2D;
-            color: white;
+            background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%);
+            color: #1a1a2e;
             text-decoration: none;
             border-radius: 6px;
-            font-weight: 600;
-            transition: background 0.2s;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(255, 214, 10, 0.3);
         }
 
         .demo-link:hover {
-            background: #3D7A40;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 214, 10, 0.5);
         }
 
         footer {
-            background: #2C5F2D;
-            color: white;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
             text-align: center;
             padding: 2rem;
+            border-top: 2px solid #ffd60a;
         }
 
         footer a {
-            color: white;
+            color: #ffd60a;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
+            transition: color 0.2s ease;
+        }
+
+        footer a:hover {
+            color: #ffea00;
         }
 
         @media (max-width: 768px) {
@@ -239,7 +274,7 @@
             <p class="section-subtitle">Check out live examples of dealer websites powered by ShedSync</p>
 
             <div class="demo-list" id="demo-list">
-                <p style="text-align: center; color: #666;">Loading dealer sites...</p>
+                <p style="text-align: center; color: #a8a8b8;">Loading dealer sites...</p>
             </div>
         </div>
     </div>
@@ -279,11 +314,11 @@
                         </div>
                     `).join('');
                 } else {
-                    document.getElementById('demo-list').innerHTML = '<p style="text-align: center; color: #666;">No demo sites available yet.</p>';
+                    document.getElementById('demo-list').innerHTML = '<p style="text-align: center; color: #a8a8b8;">No demo sites available yet.</p>';
                 }
             } catch (error) {
                 console.error('Failed to load demo sites:', error);
-                document.getElementById('demo-list').innerHTML = '<p style="text-align: center; color: #666;">Unable to load dealer sites.</p>';
+                document.getElementById('demo-list').innerHTML = '<p style="text-align: center; color: #a8a8b8;">Unable to load dealer sites.</p>';
             }
         }
 
