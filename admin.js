@@ -389,6 +389,82 @@ async function saveSettings() {
     showToast('Settings saved successfully!');
 }
 
+// Password Change
+async function changePassword() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const statusEl = document.getElementById('password-change-status');
+
+    // Clear previous status
+    statusEl.textContent = '';
+    statusEl.style.color = '';
+
+    // Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        statusEl.textContent = 'Please fill in all fields';
+        statusEl.style.color = '#e74c3c';
+        return;
+    }
+
+    if (newPassword.length < 8) {
+        statusEl.textContent = 'New password must be at least 8 characters long';
+        statusEl.style.color = '#e74c3c';
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        statusEl.textContent = 'New passwords do not match';
+        statusEl.style.color = '#e74c3c';
+        return;
+    }
+
+    if (currentPassword === newPassword) {
+        statusEl.textContent = 'New password must be different from current password';
+        statusEl.style.color = '#e74c3c';
+        return;
+    }
+
+    try {
+        statusEl.textContent = 'Changing password...';
+        statusEl.style.color = '#3498db';
+
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('/api/user/change-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                currentPassword,
+                newPassword
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            statusEl.textContent = 'Password changed successfully!';
+            statusEl.style.color = '#27ae60';
+
+            // Clear the form
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+
+            showToast('Password changed successfully!');
+        } else {
+            statusEl.textContent = data.error || 'Failed to change password';
+            statusEl.style.color = '#e74c3c';
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        statusEl.textContent = 'Error changing password. Please try again.';
+        statusEl.style.color = '#e74c3c';
+    }
+}
+
 // Welcome Message Management
 function loadWelcomeMessage() {
     const welcome = getWelcomeMessage();
