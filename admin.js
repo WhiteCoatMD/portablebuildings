@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadBuildings();
     initializeBuildingFilters();
     loadGpbCredentials();
-    loadDomainInfo();
+    // loadDomainInfo will be called when user switches to domain tab
 });
 
 // Tab Management
@@ -316,6 +316,11 @@ function switchTab(tabName) {
         content.classList.remove('active');
     });
     document.getElementById(`${tabName}-tab`).classList.add('active');
+
+    // Load domain info when switching to domain tab
+    if (tabName === 'domain') {
+        loadDomainInfo();
+    }
 }
 
 // Settings Management
