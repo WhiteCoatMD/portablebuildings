@@ -58,10 +58,22 @@ async function handler(req, res) {
         else if (domain !== 'shed-sync.com' && domain !== 'localhost') {
             console.log(`[Site] Looking up custom domain: ${domain}`);
 
-            const result = await pool.query(
+            // Try exact match first
+            let result = await pool.query(
                 'SELECT * FROM users WHERE custom_domain = $1 AND domain_verified = true',
                 [domain]
             );
+
+            // If no exact match and this is a root domain, try www version
+            if (result.rows.length === 0 && !domain.startsWith('www.')) {
+                const wwwDomain = `www.${domain}`;
+                console.log(`[Site] No exact match, trying www version: ${wwwDomain}`);
+
+                result = await pool.query(
+                    'SELECT * FROM users WHERE custom_domain = $1 AND domain_verified = true',
+                    [wwwDomain]
+                );
+            }
 
             if (result.rows.length > 0) {
                 user = result.rows[0];
