@@ -2636,10 +2636,41 @@ async function loadDomainInfo() {
     const user = window.currentUser;
     if (!user) return;
 
-    // Load subdomain URL
-    const subdomainUrlEl = document.getElementById('subdomain-url');
-    if (subdomainUrlEl && user.subdomain) {
-        subdomainUrlEl.textContent = `https://${user.subdomain}.shed-sync.com`;
+    // Show either subdomain picker or subdomain display
+    const pickerCard = document.getElementById('subdomain-picker-card');
+    const displayCard = document.getElementById('subdomain-display-card');
+
+    if (!user.subdomain) {
+        // User doesn't have subdomain yet - show picker
+        if (pickerCard) pickerCard.style.display = 'block';
+        if (displayCard) displayCard.style.display = 'none';
+
+        // Pre-fill with business name suggestion if available
+        if (user.businessName) {
+            const suggestion = user.businessName
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '')
+                .substring(0, 30);
+
+            const input = document.getElementById('subdomain-input');
+            if (input && suggestion.length >= 3) {
+                input.value = suggestion;
+                // Trigger availability check
+                checkSubdomainAvailability();
+            }
+        }
+    } else {
+        // User has subdomain - show display
+        if (pickerCard) pickerCard.style.display = 'none';
+        if (displayCard) displayCard.style.display = 'block';
+
+        // Load subdomain URL
+        const subdomainUrlEl = document.getElementById('subdomain-url');
+        if (subdomainUrlEl) {
+            subdomainUrlEl.textContent = `https://${user.subdomain}.shed-sync.com`;
+        }
     }
 
     // Load custom domain if exists
@@ -2795,6 +2826,143 @@ async function removeCustomDomain() {
     } catch (error) {
         console.error('Remove custom domain error:', error);
         showToast('Failed to remove custom domain', true);
+    }
+}
+
+// Subdomain picker functions
+let subdomainCheckTimeout = null;
+
+async function checkSubdomainAvailability() {
+    const input = document.getElementById('subdomain-input');
+    const validation = document.getElementById('subdomain-validation');
+    const saveBtn = document.getElementById('save-subdomain-btn');
+
+    if (!input || !validation || !saveBtn) return;
+
+    const subdomain = input.value.trim().toLowerCase();
+
+    // Clear previous timeout
+    if (subdomainCheckTimeout) {
+        clearTimeout(subdomainCheckTimeout);
+    }
+
+    // Reset button state
+    saveBtn.disabled = true;
+    saveBtn.style.opacity = '0.5';
+    saveBtn.style.cursor = 'not-allowed';
+
+    // Hide validation if empty
+    if (!subdomain) {
+        validation.style.display = 'none';
+        return;
+    }
+
+    // Validate format
+    const regex = /^[a-z0-9]([a-z0-9-]{1,28}[a-z0-9])?$/;
+    if (!regex.test(subdomain)) {
+        validation.style.display = 'block';
+        validation.style.color = '#f44336';
+        validation.innerHTML = '❌ Invalid format. Use 3-30 characters: lowercase letters, numbers, hyphens.';
+        return;
+    }
+
+    // Show checking message
+    validation.style.display = 'block';
+    validation.style.color = '#a8a8b8';
+    validation.innerHTML = '⏳ Checking availability...';
+
+    // Debounce the API call
+    subdomainCheckTimeout = setTimeout(async () => {
+        try {
+            const token = localStorage.getItem('auth_token');
+            const response = await fetch('/api/user/check-subdomain', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ subdomain })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                if (result.available) {
+                    validation.style.display = 'block';
+                    validation.style.color = '#4caf50';
+                    validation.innerHTML = '✅ Available! This subdomain is ready to claim.';
+
+                    // Enable save button
+                    saveBtn.disabled = false;
+                    saveBtn.style.opacity = '1';
+                    saveBtn.style.cursor = 'pointer';
+                } else {
+                    validation.style.display = 'block';
+                    validation.style.color = '#f44336';
+                    validation.innerHTML = '❌ ' + (result.message || 'This subdomain is already taken.');
+                }
+            } else {
+                validation.style.display = 'block';
+                validation.style.color = '#f44336';
+                validation.innerHTML = '❌ ' + (result.error || 'Unable to check availability.');
+            }
+        } catch (error) {
+            console.error('Subdomain check error:', error);
+            validation.style.display = 'block';
+            validation.style.color = '#f44336';
+            validation.innerHTML = '❌ Error checking availability. Please try again.';
+        }
+    }, 500); // 500ms debounce
+}
+
+async function saveSubdomain() {
+    const input = document.getElementById('subdomain-input');
+    const saveBtn = document.getElementById('save-subdomain-btn');
+
+    if (!input || saveBtn.disabled) return;
+
+    const subdomain = input.value.trim().toLowerCase();
+
+    if (!subdomain) {
+        showToast('Please enter a subdomain', true);
+        return;
+    }
+
+    // Disable button during save
+    saveBtn.disabled = true;
+    saveBtn.textContent = '💾 Saving...';
+
+    try {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('/api/user/save-subdomain', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ subdomain })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('🎉 Subdomain claimed successfully!');
+
+            // Update current user object
+            window.currentUser.subdomain = result.subdomain;
+
+            // Reload domain info to show the new subdomain
+            await loadDomainInfo();
+        } else {
+            showToast('Failed to save subdomain: ' + (result.error || 'Unknown error'), true);
+            saveBtn.disabled = false;
+            saveBtn.textContent = '💾 Claim This Subdomain';
+        }
+    } catch (error) {
+        console.error('Save subdomain error:', error);
+        showToast('Failed to save subdomain. Please try again.', true);
+        saveBtn.disabled = false;
+        saveBtn.textContent = '💾 Claim This Subdomain';
     }
 }
 

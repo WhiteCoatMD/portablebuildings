@@ -857,8 +857,42 @@ Call us at {{phone}} or visit our website to learn more!
                 }
             </style>
 
-            <!-- Your Subdomain -->
-            <div class="domain-card">
+            <!-- Subdomain Picker (shown if user doesn't have subdomain) -->
+            <div class="domain-card" id="subdomain-picker-card" style="display: none;">
+                <h2>🌐 Choose Your Website Address</h2>
+                <p>Pick a unique subdomain for your website. This will be your permanent web address.</p>
+
+                <div class="domain-section">
+                    <div class="form-group">
+                        <label style="color: #ffd60a; font-weight: 600; display: block; margin-bottom: 0.75rem;">
+                            Your Subdomain
+                        </label>
+                        <div style="display: flex; gap: 0.75rem; align-items: center;">
+                            <input type="text"
+                                   id="subdomain-input"
+                                   class="domain-input"
+                                   placeholder="yourbusiness"
+                                   style="flex: 1; text-transform: lowercase;"
+                                   oninput="checkSubdomainAvailability()">
+                            <span style="color: #a8a8b8; font-weight: 600; white-space: nowrap;">.shed-sync.com</span>
+                        </div>
+                        <div id="subdomain-validation" style="margin-top: 0.75rem; font-weight: 600; display: none;">
+                            <!-- Validation message will appear here -->
+                        </div>
+                        <p class="help-note">
+                            💡 Use 3-30 characters: lowercase letters, numbers, and hyphens. Cannot start or end with a hyphen.<br>
+                            <strong style="color: #ffd60a;">Example:</strong> mountain-sheds → mountain-sheds.shed-sync.com
+                        </p>
+                    </div>
+
+                    <button class="domain-action-btn" onclick="saveSubdomain()" id="save-subdomain-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+                        💾 Claim This Subdomain
+                    </button>
+                </div>
+            </div>
+
+            <!-- Your Subdomain (shown if user has subdomain) -->
+            <div class="domain-card" id="subdomain-display-card" style="display: none;">
                 <h2>🌐 Your Website Address</h2>
                 <p>Your website is live at:</p>
 
