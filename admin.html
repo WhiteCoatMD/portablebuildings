@@ -942,115 +942,79 @@ Call us at {{phone}} or visit our website to learn more!
         <!-- Payment Settings Tab -->
         <div class="tab-content" id="payments-tab">
             <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 1.25rem; border-radius: 8px; margin-bottom: 2rem;">
-                <h3 style="margin: 0 0 0.5rem 0; color: #1976d2; font-size: 1.1rem;">Payment Settings</h3>
-                <p style="margin: 0; color: #1565c0; line-height: 1.6;">Accept payments directly on your website using Stripe. Configure your Stripe account to enable secure online payments for building purchases and deposits.</p>
+                <h3 style="margin: 0 0 0.5rem 0; color: #1976d2; font-size: 1.1rem;">Subscription & Billing</h3>
+                <p style="margin: 0; color: #1565c0; line-height: 1.6;">Manage your Shed-Sync subscription and billing information. Update your payment method or view billing history.</p>
             </div>
 
             <div class="card">
-                <h2>💳 Stripe Integration</h2>
-                <p class="help-text">Connect your Stripe account to accept payments on your website
-                    <a href="https://dashboard.stripe.com/register" target="_blank" style="margin-left: 0.5rem; color: #2196f3; text-decoration: none; font-weight: 600;">Create Stripe Account →</a>
-                </p>
+                <h2>💳 Current Subscription</h2>
 
-                <div class="info-box" style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem;">
-                    <p style="margin: 0; font-weight: 600; color: #856404;">⚠️ Stripe Account Required</p>
+                <div id="subscription-info" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <div>
+                            <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Plan</div>
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #1a5490;" id="subscription-plan">Monthly Subscription</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Amount</div>
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #1a5490;" id="subscription-amount">$29/month</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Status</div>
+                            <div style="font-size: 1.25rem; font-weight: 600;" id="subscription-status">
+                                <span style="color: #4caf50;">● Active</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Next Billing Date</div>
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #1a5490;" id="subscription-next-billing">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Payment Method</h3>
+
+                <div id="payment-method-info" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="font-size: 2rem;">💳</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;" id="card-info">No payment method on file</div>
+                            <div style="color: #666; font-size: 0.875rem;" id="card-expires">—</div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="updatePaymentMethod()">
+                            Update Payment Method
+                        </button>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Billing History</h3>
+
+                <div id="billing-history" style="margin-bottom: 1.5rem;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e0e0e0; text-align: left;">
+                                <th style="padding: 0.75rem; color: #666; font-weight: 600;">Date</th>
+                                <th style="padding: 0.75rem; color: #666; font-weight: 600;">Description</th>
+                                <th style="padding: 0.75rem; color: #666; font-weight: 600;">Amount</th>
+                                <th style="padding: 0.75rem; color: #666; font-weight: 600;">Status</th>
+                                <th style="padding: 0.75rem; color: #666; font-weight: 600;">Receipt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="billing-history-body">
+                            <tr>
+                                <td colspan="5" style="padding: 2rem; text-align: center; color: #999;">
+                                    Loading billing history...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; border-radius: 4px; margin-top: 2rem;">
+                    <p style="margin: 0; font-weight: 600; color: #856404;">Need help with billing?</p>
                     <p style="margin: 0.5rem 0 0 0; color: #856404; font-size: 0.9rem;">
-                        You'll need a Stripe account to accept payments. Sign up at
-                        <a href="https://stripe.com" target="_blank" style="color: #856404; text-decoration: underline;">stripe.com</a>.
-                        Stripe charges 2.9% + $0.30 per transaction.
+                        Contact our support team at <a href="mailto:billing@shed-sync.com" style="color: #856404; text-decoration: underline;">billing@shed-sync.com</a> for assistance with billing questions or to cancel your subscription.
                     </p>
-                </div>
-
-                <div class="setting-group">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="enableStripePayments">
-                        <span class="toggle-slider"></span>
-                        <span class="toggle-text">Enable Stripe Payments on Website</span>
-                    </label>
-                </div>
-
-                <div class="form-group" style="margin-top: 1.5rem;">
-                    <label for="stripePublishableKey">Stripe Publishable Key
-                        <a href="https://dashboard.stripe.com/apikeys" target="_blank" style="margin-left: 0.5rem; font-size: 0.875rem; color: #2196f3; text-decoration: none;">Get API Keys →</a>
-                    </label>
-                    <input type="text" id="stripePublishableKey" class="form-control"
-                           placeholder="pk_live_... or pk_test_... for testing">
-                    <p class="help-text">Starts with pk_live_ (for production) or pk_test_ (for testing)</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="stripeSecretKey">Stripe Secret Key
-                        <a href="https://dashboard.stripe.com/apikeys" target="_blank" style="margin-left: 0.5rem; font-size: 0.875rem; color: #2196f3; text-decoration: none;">Get API Keys →</a>
-                    </label>
-                    <input type="password" id="stripeSecretKey" class="form-control"
-                           placeholder="sk_live_... or sk_test_... for testing">
-                    <p class="help-text">Starts with sk_live_ (for production) or sk_test_ (for testing). Kept secure and encrypted.</p>
-                </div>
-
-                <div class="form-group">
-                    <label>Payment Options</label>
-                    <div style="margin-top: 0.5rem; display: block;">
-                        <label class="toggle-label" style="margin-bottom: 0.75rem; display: inline-flex;">
-                            <input type="checkbox" id="acceptFullPayments" checked>
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-text">Accept full cash price payments</span>
-                        </label>
-                    </div>
-                    <div style="display: block;">
-                        <label class="toggle-label" style="margin-bottom: 0.75rem; display: inline-flex;">
-                            <input type="checkbox" id="acceptDeposits" checked>
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-text">Accept deposits/down payments</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group" id="deposit-settings" style="margin-left: 2rem;">
-                    <label for="defaultDepositAmount">Default Deposit Amount</label>
-                    <div style="display: flex; gap: 1rem; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="radio" name="depositType" id="depositTypeFixed" value="fixed" checked>
-                            <label for="depositTypeFixed" style="margin: 0; font-weight: normal;">Fixed Amount $</label>
-                            <input type="number" id="depositFixed" class="form-control" value="500" style="max-width: 120px;" min="0">
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="radio" name="depositType" id="depositTypePercent" value="percent">
-                            <label for="depositTypePercent" style="margin: 0; font-weight: normal;">Percentage</label>
-                            <input type="number" id="depositPercent" class="form-control" value="10" style="max-width: 100px;" min="0" max="100">
-                            <span>%</span>
-                        </div>
-                    </div>
-                    <p class="help-text">Set the default deposit amount for buildings</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="paymentSuccessMessage">Payment Success Message</label>
-                    <textarea id="paymentSuccessMessage" class="form-control" rows="3"
-                              placeholder="Thank you for your payment!">Thank you for your payment! We'll contact you shortly to arrange delivery and finalize details. A receipt has been sent to your email.</textarea>
-                    <p class="help-text">Message shown to customers after successful payment</p>
-                </div>
-
-                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                    <button class="btn btn-primary" onclick="saveStripeSettings()">
-                        💾 Save Stripe Settings
-                    </button>
-                    <button class="btn btn-warning" onclick="testStripeConnection()" id="test-stripe-btn">
-                        🧪 Test Connection
-                    </button>
-                </div>
-                <p id="stripe-status" class="help-text" style="margin-top: 1rem; font-weight: 600;"></p>
-
-                <div class="form-group" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border: 2px solid #e9ecef; margin-top: 2rem;">
-                    <h3 style="margin-top: 0; color: #1a5490; font-size: 1.1rem;">📚 Getting Your Stripe API Keys</h3>
-                    <ol style="color: #666; line-height: 1.8; margin: 1rem 0 0 1.5rem;">
-                        <li>Go to <a href="https://dashboard.stripe.com/register" target="_blank" style="color: #2196f3;">Stripe Dashboard</a> and sign up or log in</li>
-                        <li>Click "Developers" in the left sidebar</li>
-                        <li>Click "API keys" in the submenu</li>
-                        <li>Copy your <strong>Publishable key</strong> (starts with pk_)</li>
-                        <li>Click "Reveal test key" or "Reveal live key" to get your <strong>Secret key</strong> (starts with sk_)</li>
-                        <li>Paste both keys into the fields above</li>
-                        <li>Use <strong>test keys</strong> (pk_test_ / sk_test_) for testing, then switch to <strong>live keys</strong> when ready for real payments</li>
-                    </ol>
                 </div>
             </div>
         </div>
