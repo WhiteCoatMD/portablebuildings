@@ -96,6 +96,48 @@ function logout() {
     window.location.href = 'login.html';
 }
 
+// View Site from header
+function viewSiteFromHeader(event) {
+    if (event) event.preventDefault();
+
+    const user = window.currentUser;
+    if (!user) {
+        alert('User information not loaded');
+        return;
+    }
+
+    if (!user.subdomain) {
+        alert('Please set up your subdomain in the Domain & Website tab first');
+        return;
+    }
+
+    const url = user.custom_domain && user.domain_verified
+        ? `https://${user.custom_domain}`
+        : `https://${user.subdomain}.shed-sync.com`;
+
+    window.open(url, '_blank');
+}
+
+// Update View Site link URL
+function updateViewSiteLink() {
+    const user = window.currentUser;
+    if (!user) return;
+
+    const viewSiteLink = document.getElementById('view-site-link');
+    if (!viewSiteLink) return;
+
+    if (user.subdomain) {
+        const url = user.custom_domain && user.domain_verified
+            ? `https://${user.custom_domain}`
+            : `https://${user.subdomain}.shed-sync.com`;
+
+        viewSiteLink.href = url;
+    } else {
+        viewSiteLink.href = '#';
+        viewSiteLink.title = 'Please set up your subdomain first';
+    }
+}
+
 // Database API helpers
 let dbCache = {
     settings: null,
@@ -239,6 +281,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (userEmailEl) {
             userEmailEl.textContent = user.email;
         }
+
+        // Update View Site link
+        updateViewSiteLink();
 
         // Show super admin link if user is admin
         if (user.is_admin) {
