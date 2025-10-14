@@ -706,20 +706,32 @@ Call us at {{phone}} or visit our website to learn more!
 
                 <div class="card" style="background: var(--background); margin-top: 1.5rem;">
                     <h3>Add New Lot Location</h3>
-                    <p class="help-text">Enter GPB Sales credentials for another lot location. Buildings will be automatically synced daily and tagged with the lot name.</p>
-                    <div class="form-group">
-                        <label for="lot-name">Lot Name/Location</label>
-                        <input type="text" id="lot-name" class="form-control" placeholder="e.g., Columbia, LA">
+
+                    <!-- Multi-lot feature disabled message -->
+                    <div id="multi-lot-disabled" style="display: none;">
+                        <p class="help-text" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #2196f3;">
+                            📍 Want to manage multiple lot locations? Contact DealerSync to find out how to add support for your other locations:<br>
+                            <strong style="color: #2196f3; margin-top: 0.5rem; display: inline-block;">support@dealersync.com</strong>
+                        </p>
                     </div>
-                    <div class="form-group">
-                        <label for="lot-username">GPB Sales Username/Email</label>
-                        <input type="email" id="lot-username" class="form-control" placeholder="Enter GPB Sales email">
+
+                    <!-- Multi-lot feature enabled form -->
+                    <div id="multi-lot-enabled" style="display: none;">
+                        <p class="help-text">Enter GPB Sales credentials for another lot location. Buildings will be automatically synced daily and tagged with the lot name.</p>
+                        <div class="form-group">
+                            <label for="lot-name">Lot Name/Location</label>
+                            <input type="text" id="lot-name" class="form-control" placeholder="e.g., Columbia, LA">
+                        </div>
+                        <div class="form-group">
+                            <label for="lot-username">GPB Sales Username/Email</label>
+                            <input type="email" id="lot-username" class="form-control" placeholder="Enter GPB Sales email">
+                        </div>
+                        <div class="form-group">
+                            <label for="lot-password">GPB Sales Password</label>
+                            <input type="password" id="lot-password" class="form-control" placeholder="Enter GPB Sales password">
+                        </div>
+                        <button class="btn btn-primary" onclick="addLot()">Add Lot Location</button>
                     </div>
-                    <div class="form-group">
-                        <label for="lot-password">GPB Sales Password</label>
-                        <input type="password" id="lot-password" class="form-control" placeholder="Enter GPB Sales password">
-                    </div>
-                    <button class="btn btn-primary" onclick="addLot()">Add Lot Location</button>
                 </div>
             </div>
         </div>

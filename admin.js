@@ -248,6 +248,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
+        // Check multi-lot feature flag
+        const multiLotEnabled = user.features && user.features.multiLot;
+        const multiLotDisabledDiv = document.getElementById('multi-lot-disabled');
+        const multiLotEnabledDiv = document.getElementById('multi-lot-enabled');
+
+        if (multiLotEnabled) {
+            // Show the form
+            if (multiLotEnabledDiv) multiLotEnabledDiv.style.display = 'block';
+            if (multiLotDisabledDiv) multiLotDisabledDiv.style.display = 'none';
+        } else {
+            // Show the contact message
+            if (multiLotDisabledDiv) multiLotDisabledDiv.style.display = 'block';
+            if (multiLotEnabledDiv) multiLotEnabledDiv.style.display = 'none';
+        }
+
         // Store user info for business profile loading
         window.currentUser = user;
     }
