@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShedSync - Multi-Dealer Inventory Management Platform</title>
+
+    <!-- Domain Router: Redirect subdomains to site.html -->
+    <script>
+        (function() {
+            const hostname = window.location.hostname;
+
+            // Check if this is a subdomain (not www, not bare domain, not localhost)
+            if (hostname.endsWith('.shed-sync.com') &&
+                hostname !== 'shed-sync.com' &&
+                hostname !== 'www.shed-sync.com' &&
+                !hostname.startsWith('www.')) {
+
+                // This is a dealer subdomain - redirect to site.html
+                console.log('[Router] Subdomain detected:', hostname, '- Redirecting to site.html');
+                window.location.replace('/site.html' + window.location.search + window.location.hash);
+            }
+            // Otherwise, continue loading the SaaS landing page
+        })();
+    </script>
+
     <style>
         * {
             margin: 0;

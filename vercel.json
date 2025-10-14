@@ -3,12 +3,6 @@
   "devCommand": null,
   "installCommand": null,
   "outputDirectory": ".",
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/site.html"
-    }
-  ],
   "headers": [
     {
       "source": "/api/(.*)",

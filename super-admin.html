@@ -400,6 +400,17 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Subdomain</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="text" id="edit-subdomain" placeholder="Enter subdomain" style="flex: 1;">
+                        <span style="color: #666;">.shed-sync.com</span>
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 0.25rem;">
+                        3-30 characters: lowercase, numbers, hyphens. Leave empty if not set yet.
+                    </small>
+                </div>
+
+                <div class="form-group">
                     <label>
                         <input type="checkbox" id="edit-multi-lot">
                         Enable Multi-Lot Feature
@@ -531,6 +542,7 @@
                         <tr>
                             <th>User</th>
                             <th>Business</th>
+                            <th>Subdomain</th>
                             <th>Status</th>
                             <th>Plan</th>
                             <th>Buildings</th>
@@ -547,6 +559,11 @@
                                     ${user.is_admin ? '<span class="admin-badge">ADMIN</span>' : ''}
                                 </td>
                                 <td>${user.business_name || '<em>Not set</em>'}</td>
+                                <td>
+                                    ${user.subdomain
+                                        ? `<a href="https://${user.subdomain}.shed-sync.com" target="_blank" style="color: #667eea; text-decoration: none;">${user.subdomain}</a>`
+                                        : '<em style="color: #999;">Not set</em>'}
+                                </td>
                                 <td>
                                     <span class="status-badge status-${user.subscription_status}">
                                         ${user.subscription_status}
@@ -627,6 +644,7 @@
 
             document.getElementById('edit-user-id').value = user.id;
             document.getElementById('edit-email').value = user.email;
+            document.getElementById('edit-subdomain').value = user.subdomain || '';
             document.getElementById('edit-subscription-status').value = user.subscription_status;
             document.getElementById('edit-subscription-plan').value = user.subscription_plan;
             document.getElementById('edit-multi-lot').checked = user.features?.multiLot || false;
@@ -688,15 +706,41 @@
             e.preventDefault();
 
             const userId = document.getElementById('edit-user-id').value;
-            const updates = {
-                subscription_status: document.getElementById('edit-subscription-status').value,
-                subscription_plan: document.getElementById('edit-subscription-plan').value,
-                features: {
-                    multiLot: document.getElementById('edit-multi-lot').checked
-                }
-            };
+            const subdomain = document.getElementById('edit-subdomain').value.trim().toLowerCase();
+            const user = allUsers.find(u => u.id == userId);
+
+            // Check if subdomain changed
+            const subdomainChanged = subdomain !== (user.subdomain || '');
 
             try {
+                // Update subdomain if changed
+                if (subdomainChanged && subdomain) {
+                    const subdomainResponse = await fetch('/api/admin/update-user-subdomain', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ userId, subdomain })
+                    });
+
+                    const subdomainData = await subdomainResponse.json();
+
+                    if (!subdomainData.success) {
+                        showError('Subdomain error: ' + (subdomainData.error || 'Failed to update'));
+                        return;
+                    }
+                }
+
+                // Update other user settings
+                const updates = {
+                    subscription_status: document.getElementById('edit-subscription-status').value,
+                    subscription_plan: document.getElementById('edit-subscription-plan').value,
+                    features: {
+                        multiLot: document.getElementById('edit-multi-lot').checked
+                    }
+                };
+
                 const response = await fetch('/api/admin/update-user', {
                     method: 'PATCH',
                     headers: {
@@ -712,6 +756,9 @@
                     closeEditModal();
                     loadUsers();
                     loadStats();
+                    if (subdomainChanged) {
+                        showError(`✅ User updated successfully! Subdomain: ${subdomain}.shed-sync.com`);
+                    }
                 } else {
                     showError(data.error || 'Failed to update user');
                 }
