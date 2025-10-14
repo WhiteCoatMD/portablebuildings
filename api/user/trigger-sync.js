@@ -71,6 +71,7 @@ async function handler(req, res) {
         const webhookSecret = process.env.WEBHOOK_SECRET || 'change-this-secret';
 
         console.log(`[${new Date().toISOString()}] Triggering sync for user ${req.user.id}: ${lotName}`);
+        console.log(`DEBUG - Webhook secret being sent: ${webhookSecret}`);
 
         const response = await fetch(`${syncServerUrl}/sync-lot`, {
             method: 'POST',
