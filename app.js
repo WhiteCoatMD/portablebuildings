@@ -45,6 +45,7 @@ class InventoryApp {
 
     init() {
         this.loadBusinessInfo();
+        this.loadBusinessHours();
         this.loadWelcomeMessage();
         this.populateSizeFilter();
         this.populateLocationFilter();
@@ -154,6 +155,76 @@ class InventoryApp {
             container.innerHTML = linksHTML;
         } else {
             container.innerHTML = '<p style="opacity: 0.6; font-size: 0.9rem;">No social media links added yet</p>';
+        }
+    }
+
+    loadBusinessHours() {
+        // Get location hours from localStorage (saved from admin panel)
+        const saved = localStorage.getItem('cpb_location_hours');
+        if (!saved) return;
+
+        const hours = JSON.parse(saved);
+
+        // Display in header - "Open Today from XX:XX til XX:XX"
+        this.displayTodayHours(hours);
+
+        // Display full hours in footer
+        this.displayFooterHours(hours);
+    }
+
+    displayTodayHours(hours) {
+        const headerHoursText = document.getElementById('header-hours-text');
+        if (!headerHoursText) return;
+
+        // Get current day
+        const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const today = days[new Date().getDay()];
+
+        // Check if hours exist for today
+        if (hours[today] && hours[today].open && hours[today].close) {
+            const todayHours = hours[today];
+            headerHoursText.textContent = `Open Today from ${todayHours.open} til ${todayHours.close}`;
+            headerHoursText.style.display = 'block';
+        } else {
+            headerHoursText.style.display = 'none';
+        }
+    }
+
+    displayFooterHours(hours) {
+        const footerHours = document.getElementById('footer-hours');
+        if (!footerHours) return;
+
+        const dayNames = {
+            monday: 'Monday',
+            tuesday: 'Tuesday',
+            wednesday: 'Wednesday',
+            thursday: 'Thursday',
+            friday: 'Friday',
+            saturday: 'Saturday',
+            sunday: 'Sunday'
+        };
+
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+        let hoursHTML = '';
+        let hasHours = false;
+
+        days.forEach(day => {
+            if (hours[day] && hours[day].open && hours[day].close) {
+                hasHours = true;
+                hoursHTML += `
+                    <div class="hours-item">
+                        <span class="hours-day">${dayNames[day]}:</span>
+                        <span class="hours-time">${hours[day].open} - ${hours[day].close}</span>
+                    </div>
+                `;
+            }
+        });
+
+        if (hasHours) {
+            footerHours.innerHTML = hoursHTML;
+        } else {
+            footerHours.innerHTML = '<p style="opacity: 0.6; font-size: 0.9rem;">Hours not set</p>';
         }
     }
 

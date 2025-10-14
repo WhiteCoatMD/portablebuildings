@@ -2005,6 +2005,9 @@ async function saveLocationHours() {
         }
     });
 
+    // Save to localStorage so public website can access it
+    localStorage.setItem('cpb_location_hours', JSON.stringify(hours));
+
     const token = localStorage.getItem('auth_token');
     if (!token) return;
 

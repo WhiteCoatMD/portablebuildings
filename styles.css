@@ -73,6 +73,14 @@ header .phone-text {
     opacity: 0.95;
 }
 
+header .hours-text {
+    font-size: 0.95rem;
+    font-weight: 400;
+    opacity: 0.9;
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
 header .phone-link {
     color: var(--white);
     text-decoration: none;
@@ -911,6 +919,26 @@ footer {
 
 .footer-contact a:hover {
     border-bottom-color: var(--white);
+}
+
+.footer-hours {
+    margin-top: 0.5rem;
+}
+
+.hours-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.hours-day {
+    font-weight: 600;
+}
+
+.hours-time {
+    opacity: 0.85;
 }
 
 .footer-copyright {
