@@ -331,7 +331,21 @@ function loadWelcomeMessage() {
 }
 
 function getWelcomeMessage() {
-    return getSetting(STORAGE_KEYS.WELCOME, DEFAULT_WELCOME);
+    // Check if user has saved a custom welcome message
+    const saved = getSetting(STORAGE_KEYS.WELCOME, null);
+
+    if (saved) {
+        return saved;
+    }
+
+    // Generate default welcome message using user's business name
+    const user = window.currentUser;
+    const businessName = user?.business_name || user?.businessName || 'Your Business';
+
+    return {
+        title: `Welcome to ${businessName}`,
+        message: `Browse our inventory of quality portable buildings. Contact us if you have any questions or would like to schedule a visit!`
+    };
 }
 
 async function saveWelcomeMessage() {
