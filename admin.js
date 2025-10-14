@@ -288,6 +288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadBuildings();
     initializeBuildingFilters();
     loadGpbCredentials();
+    loadDomainInfo();
 });
 
 // Tab Management
@@ -2625,6 +2626,185 @@ function showSyncModal() {
     }, 2000);
 }
 
+// Domain Management Functions
+async function loadDomainInfo() {
+    const user = window.currentUser;
+    if (!user) return;
+
+    // Load subdomain URL
+    const subdomainUrlEl = document.getElementById('subdomain-url');
+    if (subdomainUrlEl && user.subdomain) {
+        subdomainUrlEl.textContent = `https://${user.subdomain}.shed-sync.com`;
+    }
+
+    // Load custom domain if exists
+    if (user.custom_domain && user.domain_verified) {
+        document.getElementById('custom-domain-display').style.display = 'block';
+        document.getElementById('custom-domain-form').style.display = 'none';
+        document.getElementById('current-custom-domain').textContent = user.custom_domain;
+    }
+
+    // Load building stats
+    const inventory = await getUserInventory();
+    const overrides = getBuildingOverrides();
+
+    document.getElementById('building-count').textContent = inventory.length;
+
+    const availableCount = inventory.filter(b => {
+        const override = overrides[b.serialNumber] || {};
+        const status = override.status || 'available';
+        return status === 'available' && !override.hidden;
+    }).length;
+    document.getElementById('available-count').textContent = availableCount;
+
+    // Count photos
+    let photoCount = 0;
+    try {
+        const imageOrders = dbCache.imageOrders || {};
+        photoCount = Object.values(imageOrders).reduce((sum, images) => sum + images.length, 0);
+    } catch (e) {
+        // Fallback to checking localStorage
+        for (const key in localStorage) {
+            if (key.startsWith('cpb_image_order_')) {
+                try {
+                    const images = JSON.parse(localStorage.getItem(key));
+                    if (Array.isArray(images)) {
+                        photoCount += images.length;
+                    }
+                } catch (e) {}
+            }
+        }
+    }
+    document.getElementById('photo-count').textContent = photoCount;
+}
+
+function viewLiveSite() {
+    const user = window.currentUser;
+    if (!user) return;
+
+    const url = user.custom_domain && user.domain_verified
+        ? `https://${user.custom_domain}`
+        : `https://${user.subdomain}.shed-sync.com`;
+
+    window.open(url, '_blank');
+}
+
+function copySubdomainUrl() {
+    const user = window.currentUser;
+    if (!user) return;
+
+    const url = `https://${user.subdomain}.shed-sync.com`;
+    navigator.clipboard.writeText(url).then(() => {
+        showToast('URL copied to clipboard!');
+    }).catch(() => {
+        showToast('Failed to copy URL', true);
+    });
+}
+
+async function saveCustomDomain() {
+    const input = document.getElementById('custom-domain-input');
+    const domain = input.value.trim().toLowerCase();
+
+    if (!domain) {
+        showToast('Please enter a domain name', true);
+        return;
+    }
+
+    // Validate domain format
+    if (!/^[a-z0-9][a-z0-9-]*\.[a-z]{2,}$/i.test(domain)) {
+        showToast('Please enter a valid domain (e.g., buytheshed.com)', true);
+        return;
+    }
+
+    showToast('Saving custom domain...');
+
+    try {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('/api/user/save-custom-domain', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ customDomain: domain })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Custom domain saved! Please configure DNS.');
+
+            // Show DNS instructions
+            const user = window.currentUser;
+            document.getElementById('dns-domain-name').textContent = domain;
+            document.getElementById('dns-subdomain-value').textContent = `${user.subdomain}.shed-sync.com`;
+            document.getElementById('dns-instructions').style.display = 'block';
+
+            // Update user object
+            user.custom_domain = domain;
+            user.domain_verified = false;
+        } else {
+            showToast('Failed to save custom domain: ' + (result.error || 'Unknown error'), true);
+        }
+    } catch (error) {
+        console.error('Save custom domain error:', error);
+        showToast('Failed to save custom domain', true);
+    }
+}
+
+async function removeCustomDomain() {
+    if (!confirm('Remove your custom domain? Your site will only be accessible via subdomain.')) {
+        return;
+    }
+
+    showToast('Removing custom domain...');
+
+    try {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('/api/user/remove-custom-domain', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Custom domain removed!');
+
+            // Hide custom domain display, show form
+            document.getElementById('custom-domain-display').style.display = 'none';
+            document.getElementById('custom-domain-form').style.display = 'block';
+            document.getElementById('custom-domain-input').value = '';
+            document.getElementById('dns-instructions').style.display = 'none';
+
+            // Update user object
+            const user = window.currentUser;
+            user.custom_domain = null;
+            user.domain_verified = false;
+        } else {
+            showToast('Failed to remove custom domain: ' + (result.error || 'Unknown error'), true);
+        }
+    } catch (error) {
+        console.error('Remove custom domain error:', error);
+        showToast('Failed to remove custom domain', true);
+    }
+}
+
+function copyDnsValue() {
+    const user = window.currentUser;
+    if (!user) return;
+
+    const value = `${user.subdomain}.shed-sync.com`;
+    navigator.clipboard.writeText(value).then(() => {
+        showToast('DNS value copied to clipboard!');
+    }).catch(() => {
+        showToast('Failed to copy DNS value', true);
+    });
+}
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveCustomization = saveCustomization;
@@ -2655,3 +2835,8 @@ window.syncUserInventory = syncUserInventory;
 window.showSyncModal = showSyncModal;
 window.uploadInventoryCSV = uploadInventoryCSV;
 window.showCSVUpload = showCSVUpload;
+window.viewLiveSite = viewLiveSite;
+window.copySubdomainUrl = copySubdomainUrl;
+window.saveCustomDomain = saveCustomDomain;
+window.removeCustomDomain = removeCustomDomain;
+window.copyDnsValue = copyDnsValue;
