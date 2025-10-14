@@ -33,10 +33,15 @@
             opacity: 0.9;
         }
 
-        .logout-btn {
+        .header-actions {
             position: absolute;
             top: 2rem;
             right: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .logout-btn, .admin-link-btn {
             padding: 0.75rem 1.5rem;
             background: rgba(255,255,255,0.2);
             border: 1px solid rgba(255,255,255,0.3);
@@ -45,9 +50,11 @@
             cursor: pointer;
             font-size: 0.95rem;
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .logout-btn:hover {
+        .logout-btn:hover, .admin-link-btn:hover {
             background: rgba(255,255,255,0.3);
         }
 
@@ -331,7 +338,10 @@
     <div class="header">
         <h1>🔐 Super Admin Dashboard</h1>
         <p>Manage all user accounts and system settings</p>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+        <div class="header-actions">
+            <a href="admin.html" class="admin-link-btn">My Dealer Site</a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
     </div>
 
     <div class="container">
