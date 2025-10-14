@@ -3,6 +3,7 @@
  * Runs locally and accepts sync requests from the admin panel
  * This allows the admin panel to trigger scraping without needing Vercel to run Playwright
  */
+require("dotenv").config({ path: ".env.local" });
 
 const express = require('express');
 const cors = require('cors');
