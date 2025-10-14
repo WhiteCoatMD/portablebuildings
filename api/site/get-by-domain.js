@@ -45,8 +45,13 @@ async function handler(req, res) {
                 [subdomain]
             );
 
+            console.log(`[Site] Query result for subdomain '${subdomain}': ${result.rows.length} rows found`);
+
             if (result.rows.length > 0) {
                 user = result.rows[0];
+                console.log(`[Site] Found user: ${user.email} (ID: ${user.id})`);
+            } else {
+                console.log(`[Site] No user found with subdomain: ${subdomain}`);
             }
         }
         // Check if it's a custom domain
@@ -72,22 +77,39 @@ async function handler(req, res) {
         }
 
         // Load user's settings from database
-        const settingsResult = await pool.query(
-            'SELECT settings FROM user_settings WHERE user_id = $1',
-            [user.id]
-        );
+        let settings = {};
+        try {
+            const settingsResult = await pool.query(
+                'SELECT settings FROM user_settings WHERE user_id = $1',
+                [user.id]
+            );
 
-        const settings = settingsResult.rows.length > 0
-            ? settingsResult.rows[0].settings
-            : {};
+            settings = settingsResult.rows.length > 0
+                ? settingsResult.rows[0].settings
+                : {};
+
+            console.log(`[Site] Loaded settings for user ${user.id}: ${Object.keys(settings).length} keys`);
+        } catch (error) {
+            console.error(`[Site] Error loading settings for user ${user.id}:`, error.message);
+            // Continue with empty settings
+        }
 
         // Load user's inventory
-        const inventoryResult = await pool.query(
-            `SELECT * FROM user_inventory
-             WHERE user_id = $1
-             ORDER BY created_at DESC`,
-            [user.id]
-        );
+        let inventory = [];
+        try {
+            const inventoryResult = await pool.query(
+                `SELECT * FROM user_inventory
+                 WHERE user_id = $1
+                 ORDER BY created_at DESC`,
+                [user.id]
+            );
+
+            inventory = inventoryResult.rows;
+            console.log(`[Site] Loaded ${inventory.length} inventory items for user ${user.id}`);
+        } catch (error) {
+            console.error(`[Site] Error loading inventory for user ${user.id}:`, error.message);
+            // Continue with empty inventory
+        }
 
         // Return site configuration
         return res.status(200).json({
@@ -103,7 +125,7 @@ async function handler(req, res) {
                 customDomain: user.custom_domain,
                 settings: settings,
                 locationHours: user.location_hours || {},
-                inventory: inventoryResult.rows.map(item => ({
+                inventory: inventory.map(item => ({
                     serialNumber: item.serial_number,
                     typeCode: item.type_code,
                     typeName: item.type_name,
