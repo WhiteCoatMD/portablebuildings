@@ -230,6 +230,12 @@ function applyCustomColors(colors) {
     if (colors.header) root.style.setProperty('--header-bg', colors.header);
     if (colors.footer) root.style.setProperty('--footer-bg', colors.footer);
     if (colors.text) root.style.setProperty('--text-color', colors.text);
+    if (colors.background) {
+        root.style.setProperty('--background', colors.background);
+        document.body.style.background = colors.background;
+    }
+
+    console.log('[Site Loader] Custom colors applied:', colors);
 }
 
 function updateSocialLinks(social) {

@@ -2596,6 +2596,18 @@ async function applyCustomColors() {
         text: document.getElementById('textColor')?.value || ''
     };
 
+    // Get background settings
+    const backgroundType = document.querySelector('input[name="backgroundType"]:checked')?.value || 'solid';
+
+    if (backgroundType === 'solid') {
+        const bgColor = document.getElementById('customBgColor')?.value || '#ffffff';
+        colors.background = bgColor;
+    } else if (backgroundType === 'gradient') {
+        const color1 = document.getElementById('gradientColor1')?.value || '#667eea';
+        const color2 = document.getElementById('gradientColor2')?.value || '#764ba2';
+        colors.background = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+    }
+
     // Save to database
     await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, colors);
 
