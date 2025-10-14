@@ -888,14 +888,26 @@ Call us at {{phone}} or visit our website to learn more!
                 <div class="dns-instructions" id="dns-instructions" style="display: none;">
                     <h4>⚙️ DNS Configuration Required</h4>
                     <p style="color: #a8a8b8; margin-bottom: 1rem;">
-                        Add these DNS records at your domain registrar (GoDaddy, Namecheap, Cloudflare, etc.):
+                        <strong style="color: #ffd60a;">For GoDaddy and most registrars:</strong> Add a CNAME record pointing the <code>www</code> subdomain to your shed-sync subdomain.
                     </p>
 
                     <div class="dns-record">
                         <strong>Type:</strong> <code>CNAME</code><br>
-                        <strong>Name:</strong> <code>@</code> or <code id="dns-domain-name">yourdomain.com</code><br>
+                        <strong>Name:</strong> <code>www</code><br>
                         <strong>Value:</strong> <code id="dns-subdomain-value">your-subdomain.shed-sync.com</code>
                         <button class="copy-btn" onclick="copyDnsValue()">Copy</button>
+                    </div>
+
+                    <p class="help-note" style="margin-top: 1rem;">
+                        📌 <strong>Note:</strong> Most domain registrars (including GoDaddy) don't allow CNAME records for the root domain (e.g., buytheshed.com).
+                        Using <code>www</code> subdomain is the standard solution. Your site will work at <code>www.yourdomain.com</code>
+                    </p>
+
+                    <div style="background: rgba(76, 175, 80, 0.1); border-left: 3px solid #4caf50; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                        <strong style="color: #4caf50;">✓ Alternative (Advanced):</strong>
+                        <p style="color: #a8a8b8; margin: 0.5rem 0 0 0; font-size: 0.9rem;">
+                            If your registrar supports domain forwarding, you can forward your root domain (e.g., buytheshed.com) to <code>www.buytheshed.com</code>, then use the CNAME record above for the www subdomain.
+                        </p>
                     </div>
 
                     <p class="help-note">
