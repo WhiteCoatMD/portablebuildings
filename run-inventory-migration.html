@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run Inventory Migration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 3rem;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .error-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            display: none;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        ul {
+            margin: 1rem 0 1rem 1.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Check authentication before loading page
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            alert('You must be logged in to run this migration. Redirecting to login...');
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <div class="container">
+        <h1>🔄 Inventory Migration</h1>
+
+        <div class="info-box">
+            <strong>ℹ️ What this does:</strong>
+            <p style="margin-top: 0.5rem;">This migration creates a new database table called <code>user_inventory</code> that allows each user to have their own separate inventory.</p>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ Important Notes:</strong>
+            <ul>
+                <li>This migration only needs to be run ONCE by an admin</li>
+                <li>After migration, each user must import their inventory from GPB Sales</li>
+                <li>The old shared <code>inventory.js</code> file will no longer be used</li>
+                <li>This change enables true multi-tenant support</li>
+            </ul>
+        </div>
+
+        <button id="runMigration" onclick="runMigration()">
+            🚀 Run Migration
+        </button>
+
+        <div class="success-box" id="successBox">
+            <strong>✅ Migration Complete!</strong>
+            <p style="margin-top: 0.5rem;" id="successMessage"></p>
+        </div>
+
+        <div class="error-box" id="errorBox">
+            <strong>❌ Migration Failed</strong>
+            <p style="margin-top: 0.5rem;" id="errorMessage"></p>
+        </div>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        async function runMigration() {
+            const btn = document.getElementById('runMigration');
+            const status = document.getElementById('status');
+            const successBox = document.getElementById('successBox');
+            const errorBox = document.getElementById('errorBox');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Hide previous messages
+            successBox.style.display = 'none';
+            errorBox.style.display = 'none';
+
+            // Disable button
+            btn.disabled = true;
+            btn.textContent = '⏳ Running migration...';
+            status.textContent = 'This may take a few seconds...';
+
+            const token = localStorage.getItem('auth_token');
+
+            try {
+                const response = await fetch('/api/admin/run-inventory-migration', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    successMessage.textContent = result.message || 'Migration completed successfully!';
+                    successBox.style.display = 'block';
+                    status.textContent = 'Next step: Each user should log in and click "Import from GPB Sales" in the admin panel.';
+                    btn.textContent = '✅ Migration Complete';
+                } else {
+                    throw new Error(result.error || 'Migration failed');
+                }
+
+            } catch (error) {
+                console.error('Migration error:', error);
+                errorMessage.textContent = error.message;
+                errorBox.style.display = 'block';
+                status.textContent = '';
+                btn.disabled = false;
+                btn.textContent = '🔄 Try Again';
+            }
+        }
+    </script>
+</body>
+</html>
