@@ -472,8 +472,10 @@ Call us at {{phone}} or visit our website to learn more!
             </div>
 
             <div class="card">
-                <h2>Choose Your Own Color Scheme Options</h2>
-                <p class="help-text">Override individual colors and background for complete control (optional - overrides color scheme above)</p>
+                <h2>Advanced: Custom Colors</h2>
+                <p class="help-text" style="background: #fff3cd; padding: 1rem; border-left: 4px solid #ffc107; border-radius: 4px; color: #856404;">
+                    <strong>⚠️ Note:</strong> Custom colors will override your selected color scheme above. To use a preset scheme, leave these fields empty or click "Reset to Scheme Defaults".
+                </p>
 
                 <div class="custom-colors-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
                     <div class="form-group">
@@ -532,20 +534,12 @@ Call us at {{phone}} or visit our website to learn more!
                 </div>
 
                 <div class="form-group" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-                    <button class="btn btn-secondary" onclick="resetCustomColors()">Reset to Scheme Defaults</button>
-                    <button class="btn btn-primary" onclick="previewCustomColors()">Preview Custom Colors</button>
+                    <button class="btn btn-secondary" onclick="resetCustomColors()">Clear All Custom Colors</button>
+                    <button class="btn btn-primary" onclick="saveCustomColorsOnly()">💾 Save Custom Colors</button>
                 </div>
-
-                <div id="custom-colors-preview" style="margin-top: 1.5rem; padding: 1.5rem; border: 2px solid #e0e0e0; border-radius: 8px; display: none;">
-                    <h4 style="margin-bottom: 1rem;">Color Preview</h4>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <div id="preview-primary" style="width: 100px; height: 100px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">Primary</div>
-                        <div id="preview-secondary" style="width: 100px; height: 100px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">Secondary</div>
-                        <div id="preview-accent" style="width: 100px; height: 100px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">Accent</div>
-                        <div id="preview-header" style="width: 100px; height: 100px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">Header</div>
-                        <div id="preview-footer" style="width: 100px; height: 100px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">Footer</div>
-                    </div>
-                </div>
+                <p class="help-text" style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                    Saves only these custom colors. To save all customizations, use the "Save All Customization" button at the bottom of the page.
+                </p>
 
                 <hr style="margin: 2rem 0; border: none; border-top: 2px solid #e0e0e0;">
 

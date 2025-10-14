@@ -182,9 +182,12 @@ function applyCustomizationSettings(settings) {
         updateCarouselImages(settings.cpb_carousel_images);
     }
 
-    // Apply custom colors
-    if (settings.cpb_custom_colors) {
-        applyCustomColors(settings.cpb_custom_colors);
+    // Apply custom colors ONLY if they are explicitly set (not null, not empty object)
+    if (settings.cpb_custom_colors && typeof settings.cpb_custom_colors === 'object') {
+        const hasColors = Object.values(settings.cpb_custom_colors).some(val => val && val !== '');
+        if (hasColors) {
+            applyCustomColors(settings.cpb_custom_colors);
+        }
     }
 
     // Apply social media links

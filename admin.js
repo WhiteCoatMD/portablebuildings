@@ -1982,17 +1982,9 @@ async function saveCustomization() {
     // Save background settings (no async needed)
     saveBackgroundSettings();
 
-    // Check if custom colors are set - if ANY custom color field has a value
-    const colors = getCustomColorsFromForm();
-    const hasCustomColors = Object.values(colors).some(color => color && color !== '');
-
-    if (hasCustomColors) {
-        // User has custom colors set - save them (will override the preset scheme)
-        await saveCustomColors();
-    } else {
-        // No custom colors - clear them so preset scheme takes effect
-        await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, null);
-    }
+    // Always clear custom colors - preset scheme takes priority
+    // Custom colors only apply if user explicitly sets them after selecting a scheme
+    await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, null);
 
     // Save location hours
     await saveLocationHours();
@@ -2636,6 +2628,30 @@ async function saveCustomColors() {
     console.log('[Custom Colors] Custom colors saved:', colors);
 }
 
+async function saveCustomColorsOnly() {
+    try {
+        const colors = getCustomColorsFromForm();
+
+        // Check if any colors are actually set
+        const hasColors = Object.values(colors).some(val => val && val !== '#000000');
+
+        if (!hasColors) {
+            // If no colors set, save null to clear custom colors
+            await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, null);
+            showToast('Custom colors cleared!');
+        } else {
+            // Save custom colors to database
+            await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, colors);
+            showToast('Custom colors saved! These will override your selected color scheme.');
+        }
+
+        console.log('[Custom Colors] Custom colors saved:', colors);
+    } catch (error) {
+        console.error('[Custom Colors] Error saving custom colors:', error);
+        showToast('Error saving custom colors. Please try again.', 'error');
+    }
+}
+
 function resetCustomColors() {
     if (!confirm('Reset all custom colors to color scheme defaults?')) return;
 
@@ -3171,6 +3187,7 @@ window.checkAndPostToFacebook = checkAndPostToFacebook;
 window.testFacebookPost = testFacebookPost;
 window.previewCustomColors = previewCustomColors;
 window.saveCustomColors = saveCustomColors;
+window.saveCustomColorsOnly = saveCustomColorsOnly;
 window.resetCustomColors = resetCustomColors;
 window.toggleDayHours = toggleDayHours;
 window.syncUserInventory = syncUserInventory;
