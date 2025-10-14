@@ -78,24 +78,39 @@ async function handler(req, res) {
             };
         }).filter(item => item !== null);
 
-        // Delete existing inventory for this user
-        await pool.query('DELETE FROM user_inventory WHERE user_id = $1', [req.user.id]);
+        // Upsert inventory (insert only if serial_number doesn't exist for this user)
+        let insertedCount = 0;
+        let updatedCount = 0;
+        let skippedCount = 0;
 
-        // Insert new inventory
-        if (inventory.length > 0) {
-            const values = [];
-            const placeholders = [];
-
-            inventory.forEach((building, index) => {
-                const offset = index * 16;
-                placeholders.push(`(
-                    $${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4},
-                    $${offset + 5}, $${offset + 6}, $${offset + 7}, $${offset + 8},
-                    $${offset + 9}, $${offset + 10}, $${offset + 11}, $${offset + 12},
-                    $${offset + 13}, $${offset + 14}, $${offset + 15}, $${offset + 16}
-                )`);
-
-                values.push(
+        for (const building of inventory) {
+            try {
+                const result = await pool.query(`
+                    INSERT INTO user_inventory (
+                        user_id, serial_number, type_code, type_name, title,
+                        size_display, width, length, date_built, price,
+                        rto36, rto48, rto60, rto72, is_repo, location
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                    ON CONFLICT (user_id, serial_number)
+                    DO UPDATE SET
+                        type_code = EXCLUDED.type_code,
+                        type_name = EXCLUDED.type_name,
+                        title = EXCLUDED.title,
+                        size_display = EXCLUDED.size_display,
+                        width = EXCLUDED.width,
+                        length = EXCLUDED.length,
+                        date_built = EXCLUDED.date_built,
+                        price = EXCLUDED.price,
+                        rto36 = EXCLUDED.rto36,
+                        rto48 = EXCLUDED.rto48,
+                        rto60 = EXCLUDED.rto60,
+                        rto72 = EXCLUDED.rto72,
+                        is_repo = EXCLUDED.is_repo,
+                        location = EXCLUDED.location,
+                        updated_at = NOW()
+                    WHERE user_inventory.user_id = EXCLUDED.user_id
+                      AND user_inventory.serial_number = EXCLUDED.serial_number
+                `, [
                     req.user.id,
                     building.serialNumber,
                     building.typeCode,
@@ -112,26 +127,41 @@ async function handler(req, res) {
                     building.rto72,
                     building.isRepo,
                     building.location
-                );
-            });
+                ]);
 
-            const query = `
-                INSERT INTO user_inventory (
-                    user_id, serial_number, type_code, type_name, title,
-                    size_display, width, length, date_built, price,
-                    rto36, rto48, rto60, rto72, is_repo, location
-                ) VALUES ${placeholders.join(', ')}
-            `;
+                if (result.rowCount > 0) {
+                    // Check if it was an insert or update by checking if created_at was just set
+                    const check = await pool.query(
+                        'SELECT created_at, updated_at FROM user_inventory WHERE user_id = $1 AND serial_number = $2',
+                        [req.user.id, building.serialNumber]
+                    );
 
-            await pool.query(query, values);
+                    if (check.rows.length > 0) {
+                        const row = check.rows[0];
+                        // If created_at and updated_at are very close (within 1 second), it's a new insert
+                        const timeDiff = Math.abs(new Date(row.updated_at) - new Date(row.created_at));
+                        if (timeDiff < 1000) {
+                            insertedCount++;
+                        } else {
+                            updatedCount++;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(`Error upserting building ${building.serialNumber}:`, error);
+                skippedCount++;
+            }
         }
 
-        console.log(`Saved ${inventory.length} buildings to database for user ${req.user.email}`);
+        console.log(`Sync complete for user ${req.user.email}: ${insertedCount} new, ${updatedCount} updated, ${skippedCount} skipped`);
 
         return res.status(200).json({
             success: true,
-            message: `Successfully synced ${inventory.length} buildings`,
-            count: inventory.length
+            message: `Successfully synced ${inventory.length} buildings (${insertedCount} new, ${updatedCount} updated)`,
+            count: inventory.length,
+            inserted: insertedCount,
+            updated: updatedCount,
+            skipped: skippedCount
         });
 
     } catch (error) {
