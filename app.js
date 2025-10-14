@@ -502,12 +502,62 @@ class InventoryApp {
                         </button>
                     </div>
 
+                    ${this.renderPaymentButtons(building, status)}
+
                     <div class="building-serial">
                         SN: ${building.serialNumber}
                     </div>
                 </div>
             </div>
         `;
+    }
+
+    renderPaymentButtons(building, status) {
+        // Don't show payment buttons if sold
+        if (status === 'sold') return '';
+
+        // Check if Stripe is enabled for this site (loaded via site-loader.js)
+        const stripeEnabled = window.SITE_CONFIG?.settings?.cpb_stripe_enabled || false;
+        if (!stripeEnabled) return '';
+
+        const acceptDeposits = window.SITE_CONFIG?.settings?.cpb_stripe_accept_deposits !== false;
+        const acceptFull = window.SITE_CONFIG?.settings?.cpb_stripe_accept_full !== false;
+
+        // Don't show buttons if neither payment type is accepted
+        if (!acceptDeposits && !acceptFull) return '';
+
+        // Calculate deposit amount
+        let depositAmount = 500; // default
+        const depositType = window.SITE_CONFIG?.settings?.cpb_stripe_deposit_type || 'fixed';
+
+        if (depositType === 'fixed') {
+            depositAmount = window.SITE_CONFIG?.settings?.cpb_stripe_deposit_fixed || 500;
+        } else {
+            const depositPercent = window.SITE_CONFIG?.settings?.cpb_stripe_deposit_percent || 10;
+            depositAmount = Math.round(building.price * (depositPercent / 100));
+        }
+
+        let buttonsHTML = '<div class="payment-buttons">';
+
+        if (acceptFull && !building.isRepo) {
+            buttonsHTML += `
+                <button class="payment-btn payment-btn-full" onclick="initiatePayment(event, '${building.serialNumber}', 'full', ${building.price})">
+                    💳 Buy Now - $${building.price.toLocaleString()}
+                </button>
+            `;
+        }
+
+        if (acceptDeposits && !building.isRepo) {
+            buttonsHTML += `
+                <button class="payment-btn payment-btn-deposit" onclick="initiatePayment(event, '${building.serialNumber}', 'deposit', ${depositAmount})">
+                    📝 Pay Deposit - $${depositAmount.toLocaleString()}
+                </button>
+            `;
+        }
+
+        buttonsHTML += '</div>';
+
+        return buttonsHTML;
     }
 
     renderEmptyState() {

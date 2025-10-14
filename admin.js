@@ -19,7 +19,16 @@ const STORAGE_KEYS = {
     SOCIAL_MEDIA: 'cpb_social_media',
     FACEBOOK_CONFIG: 'cpb_facebook_config',
     POSTED_BUILDINGS: 'cpb_posted_buildings',
-    CUSTOM_COLORS: 'cpb_custom_colors'
+    CUSTOM_COLORS: 'cpb_custom_colors',
+    STRIPE_ENABLED: 'cpb_stripe_enabled',
+    STRIPE_PUBLISHABLE_KEY: 'cpb_stripe_publishable_key',
+    STRIPE_SECRET_KEY: 'cpb_stripe_secret_key',
+    STRIPE_ACCEPT_DEPOSITS: 'cpb_stripe_accept_deposits',
+    STRIPE_ACCEPT_FULL: 'cpb_stripe_accept_full',
+    STRIPE_DEPOSIT_TYPE: 'cpb_stripe_deposit_type',
+    STRIPE_DEPOSIT_FIXED: 'cpb_stripe_deposit_fixed',
+    STRIPE_DEPOSIT_PERCENT: 'cpb_stripe_deposit_percent',
+    STRIPE_SUCCESS_MESSAGE: 'cpb_stripe_success_message'
 };
 
 // Default settings
@@ -322,6 +331,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadColorScheme();
     loadBusinessInfo(); // Now will use window.currentUser
     loadSocialMedia();
+    loadStripeSettings();
     loadFacebookConfig();
     loadButtonColor();
     initializeColorInputSync();
@@ -2974,6 +2984,163 @@ function copyDnsValue() {
     });
 }
 
+// Stripe Payment Settings
+async function loadStripeSettings() {
+    try {
+        // Load Stripe settings
+        const enabledSetting = await loadSetting(STORAGE_KEYS.STRIPE_ENABLED);
+        const publishableKeySetting = await loadSetting(STORAGE_KEYS.STRIPE_PUBLISHABLE_KEY);
+        const depositsSetting = await loadSetting(STORAGE_KEYS.STRIPE_ACCEPT_DEPOSITS);
+        const fullPaymentsSetting = await loadSetting(STORAGE_KEYS.STRIPE_ACCEPT_FULL);
+        const depositTypeSetting = await loadSetting(STORAGE_KEYS.STRIPE_DEPOSIT_TYPE);
+        const depositFixedSetting = await loadSetting(STORAGE_KEYS.STRIPE_DEPOSIT_FIXED);
+        const depositPercentSetting = await loadSetting(STORAGE_KEYS.STRIPE_DEPOSIT_PERCENT);
+        const successMessageSetting = await loadSetting(STORAGE_KEYS.STRIPE_SUCCESS_MESSAGE);
+
+        // Set form values
+        document.getElementById('enableStripePayments').checked = enabledSetting || false;
+        document.getElementById('stripePublishableKey').value = publishableKeySetting || '';
+        // Secret key is not loaded for security (one-way save only)
+        document.getElementById('acceptDeposits').checked = depositsSetting !== false;
+        document.getElementById('acceptFullPayments').checked = fullPaymentsSetting !== false;
+
+        const depositType = depositTypeSetting || 'fixed';
+        document.getElementById('depositTypeFixed').checked = depositType === 'fixed';
+        document.getElementById('depositTypePercent').checked = depositType === 'percent';
+        document.getElementById('depositFixed').value = depositFixedSetting || 500;
+        document.getElementById('depositPercent').value = depositPercentSetting || 10;
+        document.getElementById('paymentSuccessMessage').value = successMessageSetting ||
+            'Thank you for your payment! We\'ll contact you shortly to arrange delivery and finalize details. A receipt has been sent to your email.';
+
+    } catch (error) {
+        console.error('Error loading Stripe settings:', error);
+    }
+}
+
+async function saveStripeSettings() {
+    try {
+        const enabled = document.getElementById('enableStripePayments').checked;
+        const publishableKey = document.getElementById('stripePublishableKey').value.trim();
+        const secretKey = document.getElementById('stripeSecretKey').value.trim();
+        const acceptDeposits = document.getElementById('acceptDeposits').checked;
+        const acceptFullPayments = document.getElementById('acceptFullPayments').checked;
+        const depositType = document.querySelector('input[name="depositType"]:checked').value;
+        const depositFixed = parseInt(document.getElementById('depositFixed').value);
+        const depositPercent = parseInt(document.getElementById('depositPercent').value);
+        const successMessage = document.getElementById('paymentSuccessMessage').value.trim();
+
+        // Validate keys if Stripe is enabled
+        if (enabled) {
+            if (!publishableKey || !publishableKey.startsWith('pk_')) {
+                showToast('Please enter a valid Stripe publishable key (starts with pk_)', true);
+                return;
+            }
+
+            // Only validate secret key if it's being updated (not empty)
+            if (secretKey && !secretKey.startsWith('sk_')) {
+                showToast('Please enter a valid Stripe secret key (starts with sk_)', true);
+                return;
+            }
+
+            if (!secretKey) {
+                // Check if secret key was saved before
+                const existingSecret = await loadSetting(STORAGE_KEYS.STRIPE_SECRET_KEY);
+                if (!existingSecret) {
+                    showToast('Please enter your Stripe secret key', true);
+                    return;
+                }
+            }
+        }
+
+        // Save all settings
+        await saveSetting(STORAGE_KEYS.STRIPE_ENABLED, enabled);
+        await saveSetting(STORAGE_KEYS.STRIPE_PUBLISHABLE_KEY, publishableKey);
+
+        // Only save secret key if it's provided (allows updating other settings without re-entering secret)
+        if (secretKey) {
+            await saveSetting(STORAGE_KEYS.STRIPE_SECRET_KEY, secretKey);
+        }
+
+        await saveSetting(STORAGE_KEYS.STRIPE_ACCEPT_DEPOSITS, acceptDeposits);
+        await saveSetting(STORAGE_KEYS.STRIPE_ACCEPT_FULL, acceptFullPayments);
+        await saveSetting(STORAGE_KEYS.STRIPE_DEPOSIT_TYPE, depositType);
+        await saveSetting(STORAGE_KEYS.STRIPE_DEPOSIT_FIXED, depositFixed);
+        await saveSetting(STORAGE_KEYS.STRIPE_DEPOSIT_PERCENT, depositPercent);
+        await saveSetting(STORAGE_KEYS.STRIPE_SUCCESS_MESSAGE, successMessage);
+
+        showToast('Stripe settings saved successfully!');
+
+        // Clear the secret key field after saving for security
+        document.getElementById('stripeSecretKey').value = '';
+
+    } catch (error) {
+        console.error('Error saving Stripe settings:', error);
+        showToast('Failed to save Stripe settings', true);
+    }
+}
+
+async function testStripeConnection() {
+    const btn = document.getElementById('test-stripe-btn');
+    const statusEl = document.getElementById('stripe-status');
+
+    try {
+        btn.disabled = true;
+        btn.textContent = '🔄 Testing...';
+        statusEl.textContent = 'Testing connection to Stripe...';
+        statusEl.style.color = '#2196f3';
+
+        const publishableKey = document.getElementById('stripePublishableKey').value.trim();
+        const secretKey = document.getElementById('stripeSecretKey').value.trim();
+
+        if (!publishableKey || !secretKey) {
+            // Try to get from saved settings
+            const savedSecret = await loadSetting(STORAGE_KEYS.STRIPE_SECRET_KEY);
+
+            if (!publishableKey || !savedSecret) {
+                showToast('Please enter both Stripe keys first', true);
+                statusEl.textContent = '❌ Missing API keys';
+                statusEl.style.color = '#f44336';
+                btn.disabled = false;
+                btn.textContent = '🧪 Test Connection';
+                return;
+            }
+        }
+
+        const response = await fetch('/api/payments/test-stripe', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            },
+            body: JSON.stringify({
+                publishableKey,
+                secretKey: secretKey || undefined
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('✓ Stripe connection successful!');
+            statusEl.textContent = `✓ Connected to Stripe (${result.mode} mode)`;
+            statusEl.style.color = '#4caf50';
+        } else {
+            showToast('Stripe connection failed: ' + result.error, true);
+            statusEl.textContent = '❌ Connection failed: ' + result.error;
+            statusEl.style.color = '#f44336';
+        }
+
+    } catch (error) {
+        console.error('Test Stripe error:', error);
+        showToast('Failed to test Stripe connection', true);
+        statusEl.textContent = '❌ Connection test failed';
+        statusEl.style.color = '#f44336';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🧪 Test Connection';
+    }
+}
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveCustomization = saveCustomization;
@@ -3007,3 +3174,7 @@ window.copySubdomainUrl = copySubdomainUrl;
 window.saveCustomDomain = saveCustomDomain;
 window.removeCustomDomain = removeCustomDomain;
 window.copyDnsValue = copyDnsValue;
+window.saveStripeSettings = saveStripeSettings;
+window.testStripeConnection = testStripeConnection;
+window.checkSubdomainAvailability = checkSubdomainAvailability;
+window.saveSubdomain = saveSubdomain;
