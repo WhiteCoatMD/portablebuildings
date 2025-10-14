@@ -287,7 +287,14 @@ class GPBScraper {
 
         } catch (error) {
             console.error('GPB Scraper error:', error);
-            await this.page.screenshot({ path: 'screenshots/ERROR-gpb-scrape.png' });
+            // Only take screenshot if page exists
+            if (this.page) {
+                try {
+                    await this.page.screenshot({ path: 'screenshots/ERROR-gpb-scrape.png' });
+                } catch (screenshotError) {
+                    console.error('Could not take error screenshot:', screenshotError.message);
+                }
+            }
             throw error;
         } finally {
             await this.close();
