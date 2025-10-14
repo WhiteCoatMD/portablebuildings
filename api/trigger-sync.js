@@ -30,10 +30,13 @@ module.exports = async (req, res) => {
         }
 
         // Try to trigger the sync on the DigitalOcean server
+        const webhookSecret = process.env.WEBHOOK_SECRET || 'change-this-secret-key';
+
         const response = await fetch(`${syncServerUrl}/trigger-sync`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${webhookSecret}`
             },
             signal: AbortSignal.timeout(5000) // 5 second timeout
         });

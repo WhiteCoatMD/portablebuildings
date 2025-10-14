@@ -1,0 +1,21 @@
+[Unit]
+Description=Portable Buildings Webhook Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/portablebuildings
+ExecStart=/usr/bin/node /opt/portablebuildings/webhook-server.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Environment variables
+Environment=NODE_ENV=production
+Environment=WEBHOOK_PORT=3001
+Environment=WEBHOOK_SECRET=change-this-secret-key
+
+[Install]
+WantedBy=multi-user.target
