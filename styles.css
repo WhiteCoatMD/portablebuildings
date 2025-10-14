@@ -873,7 +873,7 @@ main {
 
 /* Footer */
 footer {
-    background: var(--text-dark);
+    background: var(--footer-bg, var(--text-dark));
     color: var(--white);
     padding: 3rem 0 2rem 0;
     margin-top: 4rem;
