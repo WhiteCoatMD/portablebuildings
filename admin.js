@@ -489,7 +489,16 @@ async function loadBuildings() {
     const container = document.getElementById('buildings-list');
 
     if (inventory.length === 0) {
-        container.innerHTML = '<p>No buildings found in your inventory. <button class="btn btn-primary" onclick="showSyncModal()">Import from GPB Sales</button></p>';
+        container.innerHTML = `
+            <div style="text-align: center; padding: 3rem;">
+                <h3>No buildings in your inventory</h3>
+                <p style="margin: 1rem 0; color: #666;">Import your inventory to get started</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
+                    <button class="btn btn-primary" onclick="showCSVUpload()">📄 Upload CSV File</button>
+                    <p style="width: 100%; color: #999; font-size: 0.9rem;">Export your inventory from GPB Sales as CSV and upload it here</p>
+                </div>
+            </div>
+        `;
         return;
     }
 
@@ -2340,48 +2349,71 @@ function makeCustomizationCollapsible() {
 // Call after DOM loads
 setTimeout(makeCustomizationCollapsible, 100);
 
-// Sync user's inventory from GPB Sales
-async function syncUserInventory(username, password) {
+// Upload inventory from CSV
+async function uploadInventoryCSV(csvData) {
     const token = localStorage.getItem('auth_token');
     if (!token) {
         showToast('Please log in first', true);
         return;
     }
 
-    showToast('Syncing your inventory from GPB Sales... This may take 1-2 minutes.');
+    showToast('Uploading your inventory...');
 
     try {
-        const response = await fetch('/api/user/sync-inventory', {
+        const response = await fetch('/api/user/upload-inventory-csv', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ csvData })
         });
 
         const result = await response.json();
 
         if (result.success) {
-            showToast(`✅ Successfully synced ${result.count} buildings!`);
+            showToast(`✅ Successfully imported ${result.count} buildings!`);
             await loadBuildings(); // Reload the buildings list
         } else {
-            showToast(`❌ Sync failed: ${result.error}`, true);
+            showToast(`❌ Import failed: ${result.error}`, true);
         }
     } catch (error) {
-        console.error('Sync error:', error);
-        showToast(`❌ Sync error: ${error.message}`, true);
+        console.error('Upload error:', error);
+        showToast(`❌ Upload error: ${error.message}`, true);
     }
 }
 
+function showCSVUpload() {
+    // Create a file input
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const csvData = event.target.result;
+            await uploadInventoryCSV(csvData);
+        };
+        reader.readAsText(file);
+    };
+
+    input.click();
+}
+
+// Sync user's inventory from GPB Sales (DISABLED - requires server with browser)
+async function syncUserInventory(username, password) {
+    showToast('⚠️ GPB Sales sync requires a server with browser support. Please use CSV upload instead.', true);
+}
+
 function showSyncModal() {
-    const username = prompt('Enter your GPB Sales username/email:');
-    if (!username) return;
-
-    const password = prompt('Enter your GPB Sales password:');
-    if (!password) return;
-
-    syncUserInventory(username, password);
+    showToast('⚠️ Direct GPB sync not available. Please export CSV from GPB Sales and upload it.', true);
+    setTimeout(() => {
+        showCSVUpload();
+    }, 2000);
 }
 
 // Export functions to global scope
@@ -2410,3 +2442,5 @@ window.resetCustomColors = resetCustomColors;
 window.toggleDayHours = toggleDayHours;
 window.syncUserInventory = syncUserInventory;
 window.showSyncModal = showSyncModal;
+window.uploadInventoryCSV = uploadInventoryCSV;
+window.showCSVUpload = showCSVUpload;
