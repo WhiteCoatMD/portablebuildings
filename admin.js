@@ -1982,8 +1982,17 @@ async function saveCustomization() {
     // Save background settings (no async needed)
     saveBackgroundSettings();
 
-    // Save custom colors
-    await saveCustomColors();
+    // Check if custom colors are set - if ANY custom color field has a value
+    const colors = getCustomColorsFromForm();
+    const hasCustomColors = Object.values(colors).some(color => color && color !== '');
+
+    if (hasCustomColors) {
+        // User has custom colors set - save them (will override the preset scheme)
+        await saveCustomColors();
+    } else {
+        // No custom colors - clear them so preset scheme takes effect
+        await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, null);
+    }
 
     // Save location hours
     await saveLocationHours();
@@ -2622,19 +2631,9 @@ function previewCustomColors() {
 
 async function saveCustomColors() {
     const colors = getCustomColorsFromForm();
-
-    // Check if any custom colors are actually set (not empty)
-    const hasCustomColors = Object.values(colors).some(color => color && color !== '');
-
-    if (hasCustomColors) {
-        // Save to database
-        await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, colors);
-        showToast('Custom colors saved!');
-    } else {
-        // No custom colors set, clear them from database
-        await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, null);
-        console.log('[Custom Colors] No custom colors set, cleared from database');
-    }
+    // Save to database
+    await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, colors);
+    console.log('[Custom Colors] Custom colors saved:', colors);
 }
 
 function resetCustomColors() {
