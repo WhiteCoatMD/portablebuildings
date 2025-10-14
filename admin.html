@@ -899,14 +899,16 @@ Call us at {{phone}} or visit our website to learn more!
                     </div>
 
                     <p class="help-note" style="margin-top: 1rem;">
-                        📌 <strong>Note:</strong> Most domain registrars (including GoDaddy) don't allow CNAME records for the root domain (e.g., buytheshed.com).
-                        Using <code>www</code> subdomain is the standard solution. Your site will work at <code>www.yourdomain.com</code>
+                        📌 <strong>Why www?</strong> DNS standards don't allow CNAME records for root domains (e.g., buytheshed.com). An A record would require a static IP address, which cloud hosting platforms don't provide. Using <code>www</code> is the industry-standard solution.
                     </p>
 
                     <div style="background: rgba(76, 175, 80, 0.1); border-left: 3px solid #4caf50; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
-                        <strong style="color: #4caf50;">✓ Alternative (Advanced):</strong>
+                        <strong style="color: #4caf50;">✓ Recommended: Forward Root Domain</strong>
                         <p style="color: #a8a8b8; margin: 0.5rem 0 0 0; font-size: 0.9rem;">
-                            If your registrar supports domain forwarding, you can forward your root domain (e.g., buytheshed.com) to <code>www.buytheshed.com</code>, then use the CNAME record above for the www subdomain.
+                            In GoDaddy, go to <strong>Domain Settings → Forwarding</strong> and set up forwarding:<br>
+                            • Forward <code>buytheshed.com</code> to <code>www.buytheshed.com</code><br>
+                            • Type: Permanent (301)<br>
+                            This way both URLs work seamlessly!
                         </p>
                     </div>
 
