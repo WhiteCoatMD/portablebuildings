@@ -292,12 +292,41 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showSuccess('Account created successfully! Redirecting to login...');
+                    showSuccess('Account created! Redirecting to payment...');
 
-                    // Redirect to login after 2 seconds
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
+                    // Store user info for payment flow
+                    localStorage.setItem('pending_user_id', data.user.id);
+                    localStorage.setItem('pending_user_email', email);
+
+                    // Create Stripe Checkout session
+                    try {
+                        const checkoutResponse = await fetch('/api/subscription/create-checkout-session', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                userId: data.user.id,
+                                email: email
+                            })
+                        });
+
+                        const checkoutData = await checkoutResponse.json();
+
+                        if (checkoutData.success && checkoutData.url) {
+                            // Redirect to Stripe Checkout
+                            window.location.href = checkoutData.url;
+                        } else {
+                            showError('Payment setup failed. Please contact support.');
+                            btn.disabled = false;
+                            btn.textContent = 'Create Account';
+                        }
+                    } catch (checkoutError) {
+                        console.error('Checkout error:', checkoutError);
+                        showError('Payment setup failed. Please contact support.');
+                        btn.disabled = false;
+                        btn.textContent = 'Create Account';
+                    }
                 } else {
                     showError(data.error || 'Sign up failed');
                     btn.disabled = false;

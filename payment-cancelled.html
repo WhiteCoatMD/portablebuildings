@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Cancelled - Shed-Sync</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .cancel-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .cancel-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            color: #f44336;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #856404;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-box p {
+            color: #856404;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 214, 10, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 25px rgba(108, 117, 125, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="cancel-container">
+        <div class="cancel-icon">⚠️</div>
+        <h1>Payment Cancelled</h1>
+        <p>Your payment was cancelled. No charges have been made.</p>
+
+        <div class="info-box">
+            <h3>Your Account Status</h3>
+            <p>Your account has been created, but your subscription is not active until payment is completed.</p>
+            <p><strong>Important:</strong> You need an active subscription to access your dealer dashboard and publish your site.</p>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <a href="signup.html" class="btn" id="retry-btn">
+                Try Payment Again
+            </a>
+            <a href="login.html" class="btn btn-secondary">
+                Back to Login
+            </a>
+        </div>
+
+        <p style="margin-top: 2rem; font-size: 0.9rem;">
+            Need help? Contact us at <a href="mailto:support@shed-sync.com" style="color: #667eea; text-decoration: none; font-weight: 600;">support@shed-sync.com</a>
+        </p>
+    </div>
+
+    <script>
+        // Retry payment button - creates new checkout session for existing user
+        document.getElementById('retry-btn').addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const userId = localStorage.getItem('pending_user_id');
+            const email = localStorage.getItem('pending_user_email');
+
+            if (!userId || !email) {
+                // If no pending user info, go to signup
+                window.location.href = 'signup.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/subscription/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: parseInt(userId),
+                        email: email
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.url) {
+                    window.location.href = data.url;
+                } else {
+                    alert('Failed to create payment session. Please try again or contact support.');
+                }
+            } catch (error) {
+                console.error('Retry error:', error);
+                alert('Failed to create payment session. Please try again or contact support.');
+            }
+        });
+    </script>
+</body>
+</html>
