@@ -64,13 +64,16 @@ function applySiteConfiguration() {
     const config = window.SITE_CONFIG;
     if (!config) return;
 
+    // Use email as fallback if businessName is not set
+    const displayName = config.businessName || config.email || 'Portable Buildings';
+
     // Update page title
-    document.title = `${config.businessName} - Current Inventory`;
+    document.title = `${displayName} - Current Inventory`;
 
     // Update business name in header
     const businessNameHeader = document.getElementById('business-name-header');
     if (businessNameHeader) {
-        businessNameHeader.textContent = config.businessName;
+        businessNameHeader.textContent = displayName;
     }
 
     // Update phone number
@@ -84,13 +87,13 @@ function applySiteConfiguration() {
     // Update footer business name
     const footerBusinessName = document.getElementById('footer-business-name');
     if (footerBusinessName) {
-        footerBusinessName.textContent = config.businessName;
+        footerBusinessName.textContent = displayName;
     }
 
     // Update footer copyright
     const footerCopyrightName = document.getElementById('footer-copyright-name');
     if (footerCopyrightName) {
-        footerCopyrightName.textContent = config.businessName;
+        footerCopyrightName.textContent = displayName;
     }
 
     // Update footer phone
