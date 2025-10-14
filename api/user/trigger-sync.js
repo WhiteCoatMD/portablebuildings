@@ -85,7 +85,7 @@ async function handler(req, res) {
                 lotName: lotName,
                 userId: req.user.id
             }),
-            signal: AbortSignal.timeout(120000) // 2 minute timeout for scraping
+            signal: AbortSignal.timeout(300000) // 5 minute timeout for scraping
         });
 
         if (!response.ok) {

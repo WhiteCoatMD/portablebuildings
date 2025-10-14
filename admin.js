@@ -489,6 +489,10 @@ async function getUserInventory() {
 async function loadBuildings() {
     // Load inventory from database instead of inventory.js
     const inventory = await getUserInventory();
+
+    // Store in global variable for other functions (like loadLots)
+    window.PROCESSED_INVENTORY = inventory;
+
     const overrides = getBuildingOverrides();
     const container = document.getElementById('buildings-list');
 
