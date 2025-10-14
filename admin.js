@@ -2215,6 +2215,66 @@ function resetCustomColors() {
     showToast('Custom colors reset to scheme defaults!');
 }
 
+// Collapsible Sections for Customization Tab
+function makeCustomizationCollapsible() {
+    const customizationTab = document.getElementById('customization-tab');
+    if (!customizationTab) return;
+
+    const cards = customizationTab.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        const h2 = card.querySelector('h2');
+        if (!h2) return;
+
+        // Skip the last card if it's just the save button
+        if (index === cards.length - 1 && !card.querySelector('.form-group')) return;
+
+        // Add collapsible class to card
+        card.classList.add('collapsible-card');
+
+        // Make h2 clickable
+        h2.style.cursor = 'pointer';
+        h2.style.display = 'flex';
+        h2.style.justifyContent = 'space-between';
+        h2.style.alignItems = 'center';
+        h2.style.userSelect = 'none';
+
+        // Add toggle icon
+        const icon = document.createElement('span');
+        icon.className = 'collapse-icon';
+        icon.textContent = '▼';
+        icon.style.transition = 'transform 0.3s ease';
+        h2.appendChild(icon);
+
+        // Wrap content (everything except h2) in collapsible div
+        const content = document.createElement('div');
+        content.className = 'collapsible-content';
+        content.style.maxHeight = card.scrollHeight + 'px';
+        content.style.overflow = 'hidden';
+        content.style.transition = 'max-height 0.3s ease';
+
+        // Move all children except h2 into content wrapper
+        const children = Array.from(card.children).filter(child => child !== h2);
+        children.forEach(child => content.appendChild(child));
+        card.appendChild(content);
+
+        // Add click handler
+        h2.addEventListener('click', () => {
+            const isCollapsed = card.classList.toggle('collapsed');
+
+            if (isCollapsed) {
+                content.style.maxHeight = '0';
+                icon.style.transform = 'rotate(-90deg)';
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.style.transform = 'rotate(0)';
+            }
+        });
+    });
+}
+
+// Call after DOM loads
+setTimeout(makeCustomizationCollapsible, 100);
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveCustomization = saveCustomization;

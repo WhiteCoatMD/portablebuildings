@@ -172,6 +172,18 @@ class InventoryApp {
         this.displayFooterHours(hours);
     }
 
+    convertTo12Hour(time24) {
+        // Convert 24-hour time (HH:MM) to 12-hour format with AM/PM
+        const [hours, minutes] = time24.split(':');
+        let hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'pm' : 'am';
+
+        hour = hour % 12;
+        hour = hour ? hour : 12; // Convert 0 to 12
+
+        return `${hour}:${minutes} ${ampm}`;
+    }
+
     displayTodayHours(hours) {
         const headerHoursText = document.getElementById('header-hours-text');
         if (!headerHoursText) return;
@@ -183,7 +195,9 @@ class InventoryApp {
         // Check if hours exist for today
         if (hours[today] && hours[today].open && hours[today].close) {
             const todayHours = hours[today];
-            headerHoursText.textContent = `Open Today from ${todayHours.open} til ${todayHours.close}`;
+            const openTime = this.convertTo12Hour(todayHours.open);
+            const closeTime = this.convertTo12Hour(todayHours.close);
+            headerHoursText.textContent = `Open Today from ${openTime} til ${closeTime}`;
             headerHoursText.style.display = 'block';
         } else {
             headerHoursText.style.display = 'none';
@@ -212,10 +226,12 @@ class InventoryApp {
         days.forEach(day => {
             if (hours[day] && hours[day].open && hours[day].close) {
                 hasHours = true;
+                const openTime = this.convertTo12Hour(hours[day].open);
+                const closeTime = this.convertTo12Hour(hours[day].close);
                 hoursHTML += `
                     <div class="hours-item">
                         <span class="hours-day">${dayNames[day]}:</span>
-                        <span class="hours-time">${hours[day].open} - ${hours[day].close}</span>
+                        <span class="hours-time">${openTime} - ${closeTime}</span>
                     </div>
                 `;
             }
