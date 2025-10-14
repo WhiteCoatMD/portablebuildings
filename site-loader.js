@@ -227,18 +227,19 @@ function applyCustomColors(colors) {
 
     const root = document.documentElement;
 
-    if (colors.primary) root.style.setProperty('--primary-color', colors.primary);
-    if (colors.secondary) root.style.setProperty('--secondary-color', colors.secondary);
-    if (colors.accent) root.style.setProperty('--accent-color', colors.accent);
-    if (colors.header) root.style.setProperty('--header-bg', colors.header);
-    if (colors.footer) root.style.setProperty('--footer-bg', colors.footer);
-    if (colors.text) root.style.setProperty('--text-color', colors.text);
+    // Use 'important' priority to override color scheme attribute selectors
+    if (colors.primary) root.style.setProperty('--primary-color', colors.primary, 'important');
+    if (colors.secondary) root.style.setProperty('--secondary-color', colors.secondary, 'important');
+    if (colors.accent) root.style.setProperty('--accent-color', colors.accent, 'important');
+    if (colors.header) root.style.setProperty('--header-bg', colors.header, 'important');
+    if (colors.footer) root.style.setProperty('--footer-bg', colors.footer, 'important');
+    if (colors.text) root.style.setProperty('--text-color', colors.text, 'important');
     if (colors.background) {
-        root.style.setProperty('--background', colors.background);
+        root.style.setProperty('--background', colors.background, 'important');
         document.body.style.background = colors.background;
     }
 
-    console.log('[Site Loader] Custom colors applied:', colors);
+    console.log('[Site Loader] Custom colors applied with !important:', colors);
 }
 
 function updateSocialLinks(social) {
