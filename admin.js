@@ -327,7 +327,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeColorInputSync();
     initializeBackgroundColorPicker();
     initializeCustomColorPickers();
-    loadCustomColors();
     loadLocationHours();
     loadLots();
     loadBuildings();
@@ -1982,10 +1981,6 @@ async function saveCustomization() {
     // Save background settings (no async needed)
     saveBackgroundSettings();
 
-    // Always clear custom colors - preset scheme takes priority
-    // Custom colors only apply if user explicitly sets them after selecting a scheme
-    await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, null);
-
     // Save location hours
     await saveLocationHours();
 
@@ -2501,191 +2496,6 @@ function initializeCustomColorPickers() {
     });
 }
 
-function loadCustomColors() {
-    const colors = getSetting(STORAGE_KEYS.CUSTOM_COLORS, null);
-
-    if (colors) {
-        // Load each color into its inputs
-        const colorMap = {
-            primary: { picker: 'primaryColor', hex: 'primaryColorHex' },
-            secondary: { picker: 'secondaryColor', hex: 'secondaryColorHex' },
-            accent: { picker: 'accentColor', hex: 'accentColorHex' },
-            header: { picker: 'headerColor', hex: 'headerColorHex' },
-            footer: { picker: 'footerColor', hex: 'footerColorHex' },
-            text: { picker: 'textColor', hex: 'textColorHex' }
-        };
-
-        Object.keys(colorMap).forEach(key => {
-            if (colors[key]) {
-                const picker = document.getElementById(colorMap[key].picker);
-                const hex = document.getElementById(colorMap[key].hex);
-                if (picker) picker.value = colors[key];
-                if (hex) hex.value = colors[key];
-            }
-        });
-
-        updateCustomColorPreview();
-    }
-}
-
-function updateCustomColorPreview() {
-    const preview = document.getElementById('custom-colors-preview');
-    if (!preview) return;
-
-    const colors = {
-        primary: document.getElementById('primaryColor')?.value,
-        secondary: document.getElementById('secondaryColor')?.value,
-        accent: document.getElementById('accentColor')?.value,
-        header: document.getElementById('headerColor')?.value,
-        footer: document.getElementById('footerColor')?.value,
-        text: document.getElementById('textColor')?.value
-    };
-
-    // Show preview if any color is set
-    const hasColors = Object.values(colors).some(c => c && c !== '#000000');
-
-    if (hasColors) {
-        preview.style.display = 'block';
-
-        // Update preview boxes
-        if (colors.primary) {
-            const primaryBox = document.getElementById('preview-primary');
-            if (primaryBox) {
-                primaryBox.style.background = colors.primary;
-                primaryBox.style.color = '#fff';
-            }
-        }
-
-        if (colors.secondary) {
-            const secondaryBox = document.getElementById('preview-secondary');
-            if (secondaryBox) {
-                secondaryBox.style.background = colors.secondary;
-                secondaryBox.style.color = '#fff';
-            }
-        }
-
-        if (colors.accent) {
-            const accentBox = document.getElementById('preview-accent');
-            if (accentBox) {
-                accentBox.style.background = colors.accent;
-                accentBox.style.color = '#fff';
-            }
-        }
-
-        if (colors.header) {
-            const headerBox = document.getElementById('preview-header');
-            if (headerBox) {
-                headerBox.style.background = colors.header;
-                headerBox.style.color = '#fff';
-            }
-        }
-
-        if (colors.footer) {
-            const footerBox = document.getElementById('preview-footer');
-            if (footerBox) {
-                footerBox.style.background = colors.footer;
-                footerBox.style.color = '#fff';
-            }
-        }
-    }
-}
-
-function getCustomColorsFromForm() {
-    const colors = {
-        primary: document.getElementById('primaryColor')?.value || '',
-        secondary: document.getElementById('secondaryColor')?.value || '',
-        accent: document.getElementById('accentColor')?.value || '',
-        header: document.getElementById('headerColor')?.value || '',
-        footer: document.getElementById('footerColor')?.value || '',
-        text: document.getElementById('textColor')?.value || ''
-    };
-
-    // Get background settings
-    const backgroundType = document.querySelector('input[name="backgroundType"]:checked')?.value || 'solid';
-
-    if (backgroundType === 'solid') {
-        const bgColor = document.getElementById('customBgColor')?.value || '#ffffff';
-        colors.background = bgColor;
-    } else if (backgroundType === 'gradient') {
-        const color1 = document.getElementById('gradientColor1')?.value || '#667eea';
-        const color2 = document.getElementById('gradientColor2')?.value || '#764ba2';
-        colors.background = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
-    }
-
-    return colors;
-}
-
-function previewCustomColors() {
-    // Just update the preview, don't save
-    updateCustomColorPreview();
-    showToast('Preview updated! Click "Save All Customization" at the bottom to save these colors.');
-}
-
-async function saveCustomColors() {
-    const colors = getCustomColorsFromForm();
-    // Save to database
-    await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, colors);
-    console.log('[Custom Colors] Custom colors saved:', colors);
-}
-
-async function saveCustomColorsOnly() {
-    try {
-        const colors = getCustomColorsFromForm();
-
-        // Check if any colors are actually set
-        const hasColors = Object.values(colors).some(val => val && val !== '#000000');
-
-        if (!hasColors) {
-            // If no colors set, save null to clear custom colors
-            await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, null);
-            showToast('Custom colors cleared!');
-        } else {
-            // Save custom colors to database
-            await saveSetting(STORAGE_KEYS.CUSTOM_COLORS, colors);
-            showToast('Custom colors saved! These will override your selected color scheme.');
-        }
-
-        console.log('[Custom Colors] Custom colors saved:', colors);
-    } catch (error) {
-        console.error('[Custom Colors] Error saving custom colors:', error);
-        showToast('Error saving custom colors. Please try again.', 'error');
-    }
-}
-
-function resetCustomColors() {
-    if (!confirm('Reset all custom colors to color scheme defaults?')) return;
-
-    // Clear all inputs
-    const colorInputs = [
-        'primaryColor', 'primaryColorHex',
-        'secondaryColor', 'secondaryColorHex',
-        'accentColor', 'accentColorHex',
-        'headerColor', 'headerColorHex',
-        'footerColor', 'footerColorHex',
-        'textColor', 'textColorHex'
-    ];
-
-    colorInputs.forEach(id => {
-        const input = document.getElementById(id);
-        if (input) {
-            input.value = input.type === 'color' ? '#000000' : '';
-        }
-    });
-
-    // Remove from database
-    localStorage.removeItem(STORAGE_KEYS.CUSTOM_COLORS);
-    if (dbCache.settings) {
-        delete dbCache.settings[STORAGE_KEYS.CUSTOM_COLORS];
-    }
-    saveToDatabase('settings', { [STORAGE_KEYS.CUSTOM_COLORS]: null });
-
-    // Hide preview
-    const preview = document.getElementById('custom-colors-preview');
-    if (preview) preview.style.display = 'none';
-
-    showToast('Custom colors reset to scheme defaults!');
-}
-
 // Collapsible Sections for Customization Tab
 function makeCustomizationCollapsible() {
     const customizationTab = document.getElementById('customization-tab');
@@ -3185,10 +2995,6 @@ window.triggerUserSync = triggerUserSync;
 window.resetButtonColor = resetButtonColor;
 window.checkAndPostToFacebook = checkAndPostToFacebook;
 window.testFacebookPost = testFacebookPost;
-window.previewCustomColors = previewCustomColors;
-window.saveCustomColors = saveCustomColors;
-window.saveCustomColorsOnly = saveCustomColorsOnly;
-window.resetCustomColors = resetCustomColors;
 window.toggleDayHours = toggleDayHours;
 window.syncUserInventory = syncUserInventory;
 window.showSyncModal = showSyncModal;

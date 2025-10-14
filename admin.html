@@ -458,6 +458,91 @@ Call us at {{phone}} or visit our website to learn more!
                             </div>
                         </div>
                     </label>
+
+                    <label class="color-scheme-option">
+                        <input type="radio" name="colorScheme" value="classic-blue">
+                        <div class="scheme-preview">
+                            <div class="scheme-header">
+                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%);"></div>
+                            </div>
+                            <div class="scheme-info">
+                                <h3>Classic Blue</h3>
+                                <p>Professional royal blue - trustworthy & corporate</p>
+                                <div class="scheme-colors">
+                                    <span class="color-dot" style="background: #1E40AF;" title="Royal Blue"></span>
+                                    <span class="color-dot" style="background: #1E3A8A;" title="Deep Blue"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="color-scheme-option">
+                        <input type="radio" name="colorScheme" value="crimson-red">
+                        <div class="scheme-preview">
+                            <div class="scheme-header">
+                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #B91C1C 0%, #7F1D1D 100%);"></div>
+                            </div>
+                            <div class="scheme-info">
+                                <h3>Crimson Red</h3>
+                                <p>Bold crimson to dark red - powerful & energetic</p>
+                                <div class="scheme-colors">
+                                    <span class="color-dot" style="background: #B91C1C;" title="Crimson"></span>
+                                    <span class="color-dot" style="background: #7F1D1D;" title="Dark Red"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="color-scheme-option">
+                        <input type="radio" name="colorScheme" value="olive-green">
+                        <div class="scheme-preview">
+                            <div class="scheme-header">
+                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #65A30D 0%, #4D7C0F 100%);"></div>
+                            </div>
+                            <div class="scheme-info">
+                                <h3>Olive Green</h3>
+                                <p>Natural olive to deep green - earthy & organic</p>
+                                <div class="scheme-colors">
+                                    <span class="color-dot" style="background: #65A30D;" title="Olive"></span>
+                                    <span class="color-dot" style="background: #4D7C0F;" title="Deep Green"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="color-scheme-option">
+                        <input type="radio" name="colorScheme" value="royal-purple">
+                        <div class="scheme-preview">
+                            <div class="scheme-header">
+                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);"></div>
+                            </div>
+                            <div class="scheme-info">
+                                <h3>Royal Purple</h3>
+                                <p>Regal violet to deep purple - luxurious & creative</p>
+                                <div class="scheme-colors">
+                                    <span class="color-dot" style="background: #7C3AED;" title="Violet"></span>
+                                    <span class="color-dot" style="background: #5B21B6;" title="Royal Purple"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="color-scheme-option">
+                        <input type="radio" name="colorScheme" value="sunset-orange">
+                        <div class="scheme-preview">
+                            <div class="scheme-header">
+                                <div class="scheme-gradient" style="background: linear-gradient(135deg, #EA580C 0%, #9A3412 100%);"></div>
+                            </div>
+                            <div class="scheme-info">
+                                <h3>Sunset Orange</h3>
+                                <p>Warm orange to burnt sienna - vibrant & welcoming</p>
+                                <div class="scheme-colors">
+                                    <span class="color-dot" style="background: #EA580C;" title="Orange"></span>
+                                    <span class="color-dot" style="background: #9A3412;" title="Burnt Orange"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
                 </div>
 
                 <div class="form-group" style="margin-top: 2rem;">
@@ -468,158 +553,6 @@ Call us at {{phone}} or visit our website to learn more!
                         <button class="btn btn-secondary btn-sm" onclick="resetButtonColor()">Reset</button>
                     </div>
                     <p class="help-text">Customize the button color on product cards (overrides scheme default)</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>Advanced: Custom Colors</h2>
-                <p class="help-text" style="background: #fff3cd; padding: 1rem; border-left: 4px solid #ffc107; border-radius: 4px; color: #856404;">
-                    <strong>⚠️ Note:</strong> Custom colors will override your selected color scheme above. To use a preset scheme, leave these fields empty or click "Reset to Scheme Defaults".
-                </p>
-
-                <div class="custom-colors-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                    <div class="form-group">
-                        <label for="primaryColor">Primary Color</label>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <input type="color" id="primaryColor" class="color-picker">
-                            <input type="text" id="primaryColorHex" class="form-control" placeholder="e.g., #2C5F2D" style="flex: 1;">
-                        </div>
-                        <p class="help-text" style="font-size: 0.85rem;">Main brand color (header, buttons)</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="secondaryColor">Secondary Color</label>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <input type="color" id="secondaryColor" class="color-picker">
-                            <input type="text" id="secondaryColorHex" class="form-control" placeholder="e.g., #5D4E37" style="flex: 1;">
-                        </div>
-                        <p class="help-text" style="font-size: 0.85rem;">Accent color (links, highlights)</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="accentColor">Accent Color</label>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <input type="color" id="accentColor" class="color-picker">
-                            <input type="text" id="accentColorHex" class="form-control" placeholder="e.g., #C19A6B" style="flex: 1;">
-                        </div>
-                        <p class="help-text" style="font-size: 0.85rem;">Special elements (badges, tags)</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="headerColor">Header Background</label>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <input type="color" id="headerColor" class="color-picker">
-                            <input type="text" id="headerColorHex" class="form-control" placeholder="e.g., #2C5F2D" style="flex: 1;">
-                        </div>
-                        <p class="help-text" style="font-size: 0.85rem;">Top header/navigation bar</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="footerColor">Footer Background</label>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <input type="color" id="footerColor" class="color-picker">
-                            <input type="text" id="footerColorHex" class="form-control" placeholder="e.g., #2D3748" style="flex: 1;">
-                        </div>
-                        <p class="help-text" style="font-size: 0.85rem;">Bottom footer section</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="textColor">Primary Text Color</label>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <input type="color" id="textColor" class="color-picker">
-                            <input type="text" id="textColorHex" class="form-control" placeholder="e.g., #333333" style="flex: 1;">
-                        </div>
-                        <p class="help-text" style="font-size: 0.85rem;">Main body text color</p>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-                    <button class="btn btn-secondary" onclick="resetCustomColors()">Clear All Custom Colors</button>
-                    <button class="btn btn-primary" onclick="saveCustomColorsOnly()">💾 Save Custom Colors</button>
-                </div>
-                <p class="help-text" style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
-                    Saves only these custom colors. To save all customizations, use the "Save All Customization" button at the bottom of the page.
-                </p>
-
-                <hr style="margin: 2rem 0; border: none; border-top: 2px solid #e0e0e0;">
-
-                <h3 style="margin-bottom: 1rem;">Background Options</h3>
-
-                <div class="form-group">
-                    <label>Background Type</label>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                        <label class="radio-option">
-                            <input type="radio" name="backgroundType" value="solid" checked>
-                            <span>Solid Color</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="backgroundType" value="gradient">
-                            <span>Gradient</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div id="solid-background-options">
-                    <div class="form-group">
-                        <label>Preset Colors</label>
-                        <div class="color-swatches">
-                            <div class="color-swatch" data-color="#ffffff" style="background: #ffffff; border: 2px solid #ddd;" title="White (Default)"></div>
-                            <div class="color-swatch" data-color="#f8f9fa" style="background: #f8f9fa;" title="Light Gray"></div>
-                            <div class="color-swatch" data-color="#f5f5f5" style="background: #f5f5f5;" title="Soft Gray"></div>
-                            <div class="color-swatch" data-color="#e9ecef" style="background: #e9ecef;" title="Medium Gray"></div>
-                            <div class="color-swatch" data-color="#fff8f0" style="background: #fff8f0;" title="Cream"></div>
-                            <div class="color-swatch" data-color="#fef6e4" style="background: #fef6e4;" title="Warm Beige"></div>
-                            <div class="color-swatch" data-color="#f0f8ff" style="background: #f0f8ff;" title="Alice Blue"></div>
-                            <div class="color-swatch" data-color="#f5f9f5" style="background: #f5f9f5;" title="Mint Cream"></div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="customBgColor">Custom Solid Color</label>
-                        <div style="display: flex; gap: 1rem; align-items: center;">
-                            <input type="color" id="customBgColor" class="color-picker" value="#ffffff">
-                            <input type="text" id="customBgColorHex" class="form-control" placeholder="#ffffff" style="max-width: 150px;">
-                        </div>
-                    </div>
-                </div>
-
-                <div id="gradient-background-options" style="display: none;">
-                    <div class="form-group">
-                        <label>Preset Gradients</label>
-                        <div class="gradient-swatches">
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="Purple Dream"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" title="Pink Sunset"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" title="Ocean Blue"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);" title="Fresh Mint"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #fa709a 0%, #fee140 100%)" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);" title="Sunset Glow"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #30cfd0 0%, #330867 100%)" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);" title="Deep Ocean"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);" title="Soft Cotton"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);" title="Warm Peach"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);" title="Cotton Candy"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);" title="Lavender Dream"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%)" style="background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%);" title="Pale Rose"></div>
-                            <div class="gradient-swatch" data-gradient="linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)" style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);" title="Sky Dreams"></div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Custom Gradient</label>
-                        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;">
-                            <label style="font-size: 0.9rem;">Start Color:</label>
-                            <input type="color" id="gradientColor1" class="color-picker" value="#667eea">
-                            <input type="text" id="gradientColor1Hex" class="form-control" placeholder="#667eea" style="max-width: 150px;">
-                        </div>
-                        <div style="display: flex; gap: 1rem; align-items: center;">
-                            <label style="font-size: 0.9rem;">End Color:</label>
-                            <input type="color" id="gradientColor2" class="color-picker" value="#764ba2">
-                            <input type="text" id="gradientColor2Hex" class="form-control" placeholder="#764ba2" style="max-width: 150px;">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Background Preview</label>
-                    <div id="background-preview" style="width: 100%; height: 100px; border: 2px solid #ddd; border-radius: 8px; background: #ffffff;"></div>
                 </div>
             </div>
 

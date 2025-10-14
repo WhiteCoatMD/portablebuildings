@@ -182,14 +182,6 @@ function applyCustomizationSettings(settings) {
         updateCarouselImages(settings.cpb_carousel_images);
     }
 
-    // Apply custom colors ONLY if they are explicitly set (not null, not empty object)
-    if (settings.cpb_custom_colors && typeof settings.cpb_custom_colors === 'object') {
-        const hasColors = Object.values(settings.cpb_custom_colors).some(val => val && val !== '');
-        if (hasColors) {
-            applyCustomColors(settings.cpb_custom_colors);
-        }
-    }
-
     // Apply social media links
     if (settings.cpb_social_media) {
         updateSocialLinks(settings.cpb_social_media);
@@ -220,26 +212,6 @@ function updateCarouselImages(images) {
             galleryDots.appendChild(dot);
         }
     });
-}
-
-function applyCustomColors(colors) {
-    if (!colors) return;
-
-    const root = document.documentElement;
-
-    // Use 'important' priority to override color scheme attribute selectors
-    if (colors.primary) root.style.setProperty('--primary-color', colors.primary, 'important');
-    if (colors.secondary) root.style.setProperty('--secondary-color', colors.secondary, 'important');
-    if (colors.accent) root.style.setProperty('--accent-color', colors.accent, 'important');
-    if (colors.header) root.style.setProperty('--header-bg', colors.header, 'important');
-    if (colors.footer) root.style.setProperty('--footer-bg', colors.footer, 'important');
-    if (colors.text) root.style.setProperty('--text-color', colors.text, 'important');
-    if (colors.background) {
-        root.style.setProperty('--background', colors.background, 'important');
-        document.body.style.background = colors.background;
-    }
-
-    console.log('[Site Loader] Custom colors applied with !important:', colors);
 }
 
 function updateSocialLinks(social) {

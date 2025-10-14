@@ -29,7 +29,8 @@
       "Bash(ssh:*)",
       "Bash(curl http://134.199.200.206:3001/health)",
       "Bash(git stash:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

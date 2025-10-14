@@ -216,8 +216,12 @@
                     localStorage.setItem('auth_token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
 
-                    // Redirect to admin
-                    window.location.href = 'admin.html';
+                    // Redirect based on user role
+                    if (data.user.isAdmin) {
+                        window.location.href = 'super-admin.html';
+                    } else {
+                        window.location.href = 'admin.html';
+                    }
                 } else {
                     showError(data.error || 'Login failed');
                     btn.disabled = false;

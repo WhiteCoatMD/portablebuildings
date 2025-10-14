@@ -1170,3 +1170,53 @@ footer {
     --footer-bg: #495057;
     --button-color: #6C757D;
 }
+
+/* Classic Blue - Professional royal blue */
+[data-color-scheme="classic-blue"] {
+    --primary-color: #1E40AF;
+    --secondary-color: #1E3A8A;
+    --accent-color: #3B82F6;
+    --header-bg: linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%);
+    --footer-bg: #1E3A8A;
+    --button-color: #1E40AF;
+}
+
+/* Crimson Red - Bold crimson to dark red */
+[data-color-scheme="crimson-red"] {
+    --primary-color: #B91C1C;
+    --secondary-color: #7F1D1D;
+    --accent-color: #DC2626;
+    --header-bg: linear-gradient(135deg, #B91C1C 0%, #7F1D1D 100%);
+    --footer-bg: #7F1D1D;
+    --button-color: #B91C1C;
+}
+
+/* Olive Green - Natural olive to deep green */
+[data-color-scheme="olive-green"] {
+    --primary-color: #65A30D;
+    --secondary-color: #4D7C0F;
+    --accent-color: #84CC16;
+    --header-bg: linear-gradient(135deg, #65A30D 0%, #4D7C0F 100%);
+    --footer-bg: #4D7C0F;
+    --button-color: #65A30D;
+}
+
+/* Royal Purple - Regal violet to deep purple */
+[data-color-scheme="royal-purple"] {
+    --primary-color: #7C3AED;
+    --secondary-color: #5B21B6;
+    --accent-color: #8B5CF6;
+    --header-bg: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+    --footer-bg: #5B21B6;
+    --button-color: #7C3AED;
+}
+
+/* Sunset Orange - Warm orange to burnt sienna */
+[data-color-scheme="sunset-orange"] {
+    --primary-color: #EA580C;
+    --secondary-color: #9A3412;
+    --accent-color: #F97316;
+    --header-bg: linear-gradient(135deg, #EA580C 0%, #9A3412 100%);
+    --footer-bg: #9A3412;
+    --button-color: #EA580C;
+}
