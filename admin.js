@@ -80,6 +80,19 @@ async function checkAuth() {
 function logout() {
     // Clear ALL localStorage to prevent data leaking between users
     localStorage.clear();
+
+    // Also clear any in-memory cached data
+    dbCache = {
+        settings: null,
+        overrides: null,
+        imageOrders: null
+    };
+
+    // Clear the global inventory reference
+    if (window.PROCESSED_INVENTORY) {
+        window.PROCESSED_INVENTORY = [];
+    }
+
     window.location.href = 'login.html';
 }
 
@@ -205,6 +218,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             localStorage.clear();
             localStorage.setItem('auth_token', token); // Restore token
             localStorage.setItem('cpb_last_user', user.email);
+
+            // Clear in-memory caches
+            dbCache = {
+                settings: null,
+                overrides: null,
+                imageOrders: null
+            };
+
+            // Clear the global inventory reference
+            if (window.PROCESSED_INVENTORY) {
+                window.PROCESSED_INVENTORY = [];
+            }
         } else if (!lastUser) {
             // First login - store the user
             localStorage.setItem('cpb_last_user', user.email);
@@ -433,14 +458,38 @@ function initializeBuildingFilters() {
     }
 }
 
+// Get user's inventory from database
+async function getUserInventory() {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return [];
+
+    try {
+        const response = await fetch('/api/user/inventory', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            return data.inventory;
+        }
+        return [];
+    } catch (error) {
+        console.error('Failed to load inventory:', error);
+        return [];
+    }
+}
+
 // Buildings Management
-function loadBuildings() {
-    const inventory = window.PROCESSED_INVENTORY || [];
+async function loadBuildings() {
+    // Load inventory from database instead of inventory.js
+    const inventory = await getUserInventory();
     const overrides = getBuildingOverrides();
     const container = document.getElementById('buildings-list');
 
     if (inventory.length === 0) {
-        container.innerHTML = '<p>No buildings found in inventory. Make sure inventory.js is loaded.</p>';
+        container.innerHTML = '<p>No buildings found in your inventory. <button class="btn btn-primary" onclick="showSyncModal()">Import from GPB Sales</button></p>';
         return;
     }
 
@@ -2244,6 +2293,7 @@ function makeCustomizationCollapsible() {
 
         // Add collapsible class to card
         card.classList.add('collapsible-card');
+        card.classList.add('collapsed'); // Start collapsed by default
 
         // Make h2 clickable
         h2.style.cursor = 'pointer';
@@ -2257,12 +2307,13 @@ function makeCustomizationCollapsible() {
         icon.className = 'collapse-icon';
         icon.textContent = '▼';
         icon.style.transition = 'transform 0.3s ease';
+        icon.style.transform = 'rotate(-90deg)'; // Start rotated (collapsed)
         h2.appendChild(icon);
 
         // Wrap content (everything except h2) in collapsible div
         const content = document.createElement('div');
         content.className = 'collapsible-content';
-        content.style.maxHeight = card.scrollHeight + 'px';
+        content.style.maxHeight = '0'; // Start collapsed
         content.style.overflow = 'hidden';
         content.style.transition = 'max-height 0.3s ease';
 
@@ -2289,6 +2340,50 @@ function makeCustomizationCollapsible() {
 // Call after DOM loads
 setTimeout(makeCustomizationCollapsible, 100);
 
+// Sync user's inventory from GPB Sales
+async function syncUserInventory(username, password) {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+        showToast('Please log in first', true);
+        return;
+    }
+
+    showToast('Syncing your inventory from GPB Sales... This may take 1-2 minutes.');
+
+    try {
+        const response = await fetch('/api/user/sync-inventory', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast(`✅ Successfully synced ${result.count} buildings!`);
+            await loadBuildings(); // Reload the buildings list
+        } else {
+            showToast(`❌ Sync failed: ${result.error}`, true);
+        }
+    } catch (error) {
+        console.error('Sync error:', error);
+        showToast(`❌ Sync error: ${error.message}`, true);
+    }
+}
+
+function showSyncModal() {
+    const username = prompt('Enter your GPB Sales username/email:');
+    if (!username) return;
+
+    const password = prompt('Enter your GPB Sales password:');
+    if (!password) return;
+
+    syncUserInventory(username, password);
+}
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveCustomization = saveCustomization;
@@ -2313,3 +2408,5 @@ window.testFacebookPost = testFacebookPost;
 window.applyCustomColors = applyCustomColors;
 window.resetCustomColors = resetCustomColors;
 window.toggleDayHours = toggleDayHours;
+window.syncUserInventory = syncUserInventory;
+window.showSyncModal = showSyncModal;
