@@ -36,7 +36,15 @@ async function setupDatabase() {
                 features JSONB DEFAULT '{"multiLot": false}'::jsonb,
                 last_login_at TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                full_name VARCHAR(255),
+                phone VARCHAR(50),
+                address TEXT,
+                best_contact_email VARCHAR(255),
+                location_hours JSONB,
+                gpb_username VARCHAR(255),
+                gpb_password_encrypted TEXT,
+                auto_sync_enabled BOOLEAN DEFAULT FALSE
             )
         `);
         console.log('✅ Users table ready\n');
@@ -131,6 +139,35 @@ async function setupDatabase() {
         `);
         console.log('✅ Sessions table ready\n');
 
+        // Create user_inventory table
+        console.log('Creating user_inventory table...');
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS user_inventory (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                serial_number VARCHAR(100) NOT NULL,
+                type_code VARCHAR(50),
+                type_name VARCHAR(255),
+                title VARCHAR(255),
+                size_display VARCHAR(100),
+                width INTEGER,
+                length INTEGER,
+                date_built VARCHAR(50),
+                price DECIMAL(10, 2),
+                rto36 DECIMAL(10, 2),
+                rto48 DECIMAL(10, 2),
+                rto60 DECIMAL(10, 2),
+                rto72 DECIMAL(10, 2),
+                is_repo BOOLEAN DEFAULT FALSE,
+                location VARCHAR(255),
+                auto_status VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(user_id, serial_number)
+            )
+        `);
+        console.log('✅ User inventory table ready\n');
+
         // Create indexes
         console.log('Creating indexes...');
         await client.query(`CREATE INDEX IF NOT EXISTS idx_user_settings_user_id ON user_settings(user_id)`);
@@ -138,6 +175,8 @@ async function setupDatabase() {
         await client.query(`CREATE INDEX IF NOT EXISTS idx_image_orders_user_id ON image_orders(user_id)`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token)`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_user_inventory_user_id ON user_inventory(user_id)`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_user_inventory_serial ON user_inventory(serial_number)`);
         console.log('✅ Indexes ready\n');
 
         console.log('🎉 Database setup complete!\n');

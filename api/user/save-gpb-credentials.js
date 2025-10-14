@@ -41,27 +41,37 @@ async function handler(req, res) {
 
     const { username, password, autoSync } = req.body;
 
-    if (!username || !password) {
+    if (!username) {
         return res.status(400).json({
             success: false,
-            error: 'Username and password required'
+            error: 'Username required'
         });
     }
 
     try {
-        // Encrypt password
-        const encryptedPassword = encrypt(password);
-
-        // Save to database
-        await pool.query(
-            `UPDATE users
-             SET gpb_username = $1,
-                 gpb_password_encrypted = $2,
-                 auto_sync_enabled = $3,
-                 updated_at = CURRENT_TIMESTAMP
-             WHERE id = $4`,
-            [username, encryptedPassword, autoSync || false, req.user.id]
-        );
+        // If password is provided, update everything including password
+        if (password) {
+            const encryptedPassword = encrypt(password);
+            await pool.query(
+                `UPDATE users
+                 SET gpb_username = $1,
+                     gpb_password_encrypted = $2,
+                     auto_sync_enabled = $3,
+                     updated_at = CURRENT_TIMESTAMP
+                 WHERE id = $4`,
+                [username, encryptedPassword, autoSync || false, req.user.id]
+            );
+        } else {
+            // Update username and autoSync only, keep existing password
+            await pool.query(
+                `UPDATE users
+                 SET gpb_username = $1,
+                     auto_sync_enabled = $2,
+                     updated_at = CURRENT_TIMESTAMP
+                 WHERE id = $3`,
+                [username, autoSync || false, req.user.id]
+            );
+        }
 
         return res.status(200).json({
             success: true,

@@ -91,6 +91,43 @@
             </div>
 
             <div class="card">
+                <h2>Inventory Sync Settings</h2>
+                <p class="help-text">Configure your GPB Sales credentials to automatically sync your inventory. Your credentials are encrypted and stored securely.</p>
+
+                <div class="form-group">
+                    <label for="gpbUsername">GPB Sales Username/Email</label>
+                    <input type="email" id="gpbUsername" class="form-control"
+                           placeholder="Enter your GPB Sales email">
+                    <p class="help-text">Your login email for GPB Sales portal</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="gpbPassword">GPB Sales Password</label>
+                    <input type="password" id="gpbPassword" class="form-control"
+                           placeholder="Enter your GPB Sales password">
+                    <p class="help-text">Your password will be encrypted before storage</p>
+                </div>
+
+                <div class="setting-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="autoSyncEnabled">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Enable Automatic Daily Sync at 2 AM</span>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button class="btn btn-primary" onclick="saveGpbCredentials()">
+                        Save Credentials
+                    </button>
+                    <button class="btn btn-secondary" onclick="triggerUserSync()" id="user-sync-btn">
+                        🔄 Sync Now
+                    </button>
+                </div>
+                <p id="gpb-status" class="help-text" style="margin-top: 1rem; font-weight: 600;"></p>
+            </div>
+
+            <div class="card">
                 <h2>Location Hours</h2>
                 <p class="help-text">Set your business hours to display on your website footer</p>
 

@@ -477,7 +477,7 @@
                 if (data.success) {
                     allUsers = data.users;
 
-                    // Fetch actual inventory count
+                    // Fetch actual inventory counts PER USER
                     try {
                         const invResponse = await fetch('/api/admin/user-inventory-count', {
                             headers: {
@@ -486,16 +486,16 @@
                         });
 
                         const invData = await invResponse.json();
-                        console.log('Inventory count API response:', invData);
-                        const inventoryCount = invData.success ? invData.count : 0;
-                        console.log('Setting inventory count to:', inventoryCount);
+                        console.log('Inventory counts API response:', invData);
 
-                        // Add inventory count to each user
+                        // Add inventory count to each user based on their user_id
+                        const counts = invData.success ? invData.counts : {};
                         allUsers.forEach(user => {
-                            user.inventory_count = inventoryCount;
+                            user.inventory_count = counts[user.id] || 0;
                         });
+                        console.log('User counts assigned:', allUsers.map(u => ({ email: u.email, count: u.inventory_count })));
                     } catch (error) {
-                        console.error('Failed to fetch inventory count:', error);
+                        console.error('Failed to fetch inventory counts:', error);
                         // Set to 0 on error
                         allUsers.forEach(user => {
                             user.inventory_count = 0;

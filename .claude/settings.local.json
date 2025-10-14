@@ -19,7 +19,10 @@
       "Bash(powershell:*)",
       "WebSearch",
       "Bash(npm install pg)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(node check-schema.js)",
+      "Bash(node test-database.js)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

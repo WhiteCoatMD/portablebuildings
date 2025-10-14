@@ -1,12 +1,10 @@
 /**
- * Super Admin - Get User Inventory Count
- * Returns the count of buildings in the main inventory
- * Since inventory is currently shared, this returns the same count for all users
+ * Super Admin - Get User Inventory Counts
+ * Returns the count of buildings PER USER from the database
  */
 
 const { requireAuth } = require('../../lib/auth');
-const fs = require('fs');
-const path = require('path');
+const { getPool } = require('../../lib/db');
 
 async function handler(req, res) {
     // Check if user is admin
@@ -24,43 +22,32 @@ async function handler(req, res) {
         });
     }
 
+    const pool = getPool();
+
     try {
-        // Read the inventory.js file
-        const inventoryPath = path.join(process.cwd(), 'inventory.js');
+        // Get inventory counts for each user
+        const result = await pool.query(`
+            SELECT user_id, COUNT(*) as count
+            FROM user_inventory
+            GROUP BY user_id
+        `);
 
-        if (!fs.existsSync(inventoryPath)) {
-            return res.status(200).json({
-                success: true,
-                count: 0
-            });
-        }
-
-        const inventoryContent = fs.readFileSync(inventoryPath, 'utf-8');
-
-        // Extract the INVENTORY array (not PROCESSED_INVENTORY which is a function call)
-        const match = inventoryContent.match(/const\s+INVENTORY\s*=\s*(\[[\s\S]*?\]);/);
-
-        if (!match) {
-            console.error('Could not find INVENTORY array in inventory.js');
-            return res.status(200).json({
-                success: true,
-                count: 0
-            });
-        }
-
-        // Parse the inventory array
-        const inventory = JSON.parse(match[1]);
+        // Convert to an object with userId => count
+        const counts = {};
+        result.rows.forEach(row => {
+            counts[row.user_id] = parseInt(row.count);
+        });
 
         return res.status(200).json({
             success: true,
-            count: Array.isArray(inventory) ? inventory.length : 0
+            counts // Returns { userId: count, ... }
         });
 
     } catch (error) {
-        console.error('Get inventory count error:', error);
+        console.error('Get inventory counts error:', error);
         return res.status(200).json({
             success: true,
-            count: 0 // Return 0 on error rather than failing
+            counts: {} // Return empty object on error
         });
     }
 }

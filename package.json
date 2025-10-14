@@ -4,6 +4,7 @@
   "description": "Automated inventory sync for portable buildings dealer portal",
   "main": "sync.js",
   "scripts": {
+    "start": "node sync-server.js",
     "sync": "node sync.js",
     "sync:lot": "node sync-other-lot.js",
     "sync:server": "node sync-server.js",

@@ -247,6 +247,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 superAdminLink.style.display = 'inline-block';
             }
         }
+
+        // Store user info for business profile loading
+        window.currentUser = user;
     }
 
     // Load data from database first
@@ -257,7 +260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadWelcomeMessage();
     loadCarousel();
     loadColorScheme();
-    loadBusinessInfo();
+    loadBusinessInfo(); // Now will use window.currentUser
     loadSocialMedia();
     loadFacebookConfig();
     loadButtonColor();
@@ -269,6 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadLots();
     loadBuildings();
     initializeBuildingFilters();
+    loadGpbCredentials();
 });
 
 // Tab Management
@@ -1380,6 +1384,175 @@ async function triggerManualSync() {
     }
 }
 
+// GPB Credentials Management
+async function loadGpbCredentials() {
+    try {
+        const response = await fetch('/api/user/get-gpb-credentials', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.hasCredentials) {
+            const usernameInput = document.getElementById('gpbUsername');
+            const passwordInput = document.getElementById('gpbPassword');
+            const autoSyncInput = document.getElementById('autoSyncEnabled');
+
+            if (usernameInput) usernameInput.value = result.username || '';
+            // Don't show password in UI for security
+            if (passwordInput) passwordInput.placeholder = 'Password saved (leave blank to keep current)';
+            if (autoSyncInput) autoSyncInput.checked = result.autoSync || false;
+        }
+    } catch (error) {
+        console.error('Load GPB credentials error:', error);
+    }
+}
+
+async function saveGpbCredentials() {
+    const username = document.getElementById('gpbUsername')?.value.trim();
+    const password = document.getElementById('gpbPassword')?.value;
+    const autoSync = document.getElementById('autoSyncEnabled')?.checked;
+    const statusEl = document.getElementById('gpb-status');
+
+    if (!username) {
+        if (statusEl) {
+            statusEl.textContent = '❌ Please enter your GPB Sales username/email';
+            statusEl.style.color = 'var(--error-color)';
+        }
+        return;
+    }
+
+    // Only require password if it's not already saved
+    const placeholder = document.getElementById('gpbPassword')?.placeholder || '';
+    if (!password && !placeholder.includes('Password saved')) {
+        if (statusEl) {
+            statusEl.textContent = '❌ Please enter your GPB Sales password';
+            statusEl.style.color = 'var(--error-color)';
+        }
+        return;
+    }
+
+    if (statusEl) {
+        statusEl.textContent = '⏳ Saving credentials...';
+        statusEl.style.color = 'var(--text-light)';
+    }
+
+    try {
+        const body = {
+            username,
+            autoSync: autoSync || false
+        };
+
+        // Only send password if it was entered
+        if (password) {
+            body.password = password;
+        }
+
+        const response = await fetch('/api/user/save-gpb-credentials', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            },
+            body: JSON.stringify(body)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            if (statusEl) {
+                statusEl.textContent = '✅ Credentials saved successfully!';
+                statusEl.style.color = 'var(--success-color)';
+            }
+            showToast('GPB credentials saved successfully!');
+
+            // Update placeholder if password was set
+            if (password) {
+                const passwordInput = document.getElementById('gpbPassword');
+                if (passwordInput) {
+                    passwordInput.value = '';
+                    passwordInput.placeholder = 'Password saved (leave blank to keep current)';
+                }
+            }
+        } else {
+            if (statusEl) {
+                statusEl.textContent = '❌ ' + (result.error || 'Failed to save credentials');
+                statusEl.style.color = 'var(--error-color)';
+            }
+            showToast(result.error || 'Failed to save credentials', true);
+        }
+    } catch (error) {
+        console.error('Save GPB credentials error:', error);
+        if (statusEl) {
+            statusEl.textContent = '❌ Failed to save credentials';
+            statusEl.style.color = 'var(--error-color)';
+        }
+        showToast('Failed to save credentials', true);
+    }
+}
+
+async function triggerUserSync() {
+    const btn = document.getElementById('user-sync-btn');
+    const status = document.getElementById('gpb-status');
+
+    if (btn) btn.disabled = true;
+    if (btn) btn.textContent = '⏳ Syncing...';
+    if (status) {
+        status.textContent = 'Starting inventory sync...';
+        status.style.color = 'var(--text-light)';
+    }
+
+    try {
+        const response = await fetch('/api/user/trigger-sync', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            if (status) {
+                status.textContent = `✅ Success! Synced ${result.count} buildings. Reloading page...`;
+                status.style.color = 'var(--success-color)';
+            }
+            showToast(`Successfully synced ${result.count} buildings!`);
+
+            // Reload page after sync
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            if (status) {
+                status.textContent = '❌ ' + (result.message || result.error || 'Sync failed');
+                status.style.color = 'var(--error-color)';
+            }
+            showToast(result.message || result.error || 'Sync failed', true);
+        }
+    } catch (error) {
+        console.error('Sync trigger error:', error);
+        if (status) {
+            status.textContent = '❌ Could not connect to sync server. Make sure sync server is running.';
+            status.style.color = 'var(--error-color)';
+        }
+        showToast('Could not connect to sync server', true);
+    } finally {
+        // Re-enable button after 10 seconds
+        setTimeout(() => {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🔄 Sync Now';
+            }
+        }, 10000);
+    }
+}
+
 // Color Scheme Management
 function loadColorScheme() {
     const saved = getSetting(STORAGE_KEYS.COLOR_SCHEME, 'rustic-earth');
@@ -1393,29 +1566,32 @@ function loadColorScheme() {
 
 // Business Information Management
 function loadBusinessInfo() {
-    // Load business name
-    const businessName = getSetting(STORAGE_KEYS.BUSINESS_NAME, 'Community Portable Buildings');
+    // Load from user profile first, fallback to settings for backwards compat
+    const user = window.currentUser;
+
+    // Load business name - prefer user profile
+    const businessName = user?.businessName || getSetting(STORAGE_KEYS.BUSINESS_NAME, '');
     const nameInput = document.getElementById('businessName');
     if (nameInput) {
         nameInput.value = businessName;
     }
 
-    // Load phone
-    const businessPhone = getSetting(STORAGE_KEYS.BUSINESS_PHONE, '318-594-5909');
+    // Load phone - prefer user profile
+    const businessPhone = user?.phone || getSetting(STORAGE_KEYS.BUSINESS_PHONE, '');
     const phoneInput = document.getElementById('businessPhone');
     if (phoneInput) {
         phoneInput.value = businessPhone;
     }
 
-    // Load email
-    const businessEmail = getSetting(STORAGE_KEYS.BUSINESS_EMAIL, '');
+    // Load email - prefer user profile best_contact_email
+    const businessEmail = user?.best_contact_email || user?.email || getSetting(STORAGE_KEYS.BUSINESS_EMAIL, '');
     const emailInput = document.getElementById('businessEmail');
     if (emailInput) {
         emailInput.value = businessEmail;
     }
 
-    // Load address
-    const businessAddress = getSetting(STORAGE_KEYS.BUSINESS_ADDRESS, '');
+    // Load address - prefer user profile
+    const businessAddress = user?.address || getSetting(STORAGE_KEYS.BUSINESS_ADDRESS, '');
     const addressInput = document.getElementById('businessAddress');
     if (addressInput) {
         addressInput.value = businessAddress;
@@ -2434,6 +2610,8 @@ window.addLot = addLot;
 window.removeLot = removeLot;
 window.syncLot = syncLot;
 window.triggerManualSync = triggerManualSync;
+window.saveGpbCredentials = saveGpbCredentials;
+window.triggerUserSync = triggerUserSync;
 window.resetButtonColor = resetButtonColor;
 window.checkAndPostToFacebook = checkAndPostToFacebook;
 window.testFacebookPost = testFacebookPost;
