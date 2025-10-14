@@ -78,8 +78,8 @@ async function checkAuth() {
 }
 
 function logout() {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
+    // Clear ALL localStorage to prevent data leaking between users
+    localStorage.clear();
     window.location.href = 'login.html';
 }
 
@@ -196,6 +196,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check authentication and show user info
     const user = await checkAuth();
     if (user) {
+        // Check if this is a different user than last time
+        const lastUser = localStorage.getItem('cpb_last_user');
+        if (lastUser && lastUser !== user.email) {
+            // Different user - clear all localStorage to prevent data leaking
+            console.log('Different user detected, clearing localStorage');
+            const token = localStorage.getItem('auth_token'); // Save token
+            localStorage.clear();
+            localStorage.setItem('auth_token', token); // Restore token
+            localStorage.setItem('cpb_last_user', user.email);
+        } else if (!lastUser) {
+            // First login - store the user
+            localStorage.setItem('cpb_last_user', user.email);
+        }
+
         const userEmailEl = document.getElementById('user-email');
         if (userEmailEl) {
             userEmailEl.textContent = user.email;
