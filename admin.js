@@ -2766,8 +2766,10 @@ async function saveCustomDomain() {
 
             // Show DNS instructions
             const user = window.currentUser;
-            document.getElementById('dns-domain-name').textContent = domain;
-            document.getElementById('dns-subdomain-value').textContent = `${user.subdomain}.shed-sync.com`;
+            const subdomainValueEl = document.getElementById('dns-subdomain-value');
+            if (subdomainValueEl) {
+                subdomainValueEl.textContent = `${user.subdomain}.shed-sync.com`;
+            }
             document.getElementById('dns-instructions').style.display = 'block';
 
             // Update user object
