@@ -107,7 +107,7 @@ async function handler(req, res) {
             [req.user.id]
         );
 
-        // Insert new inventory
+        // Insert new inventory (data is already decoded by sync-server)
         if (result.inventory && result.inventory.length > 0) {
             const insertPromises = result.inventory.map(building => {
                 return pool.query(
@@ -117,6 +117,13 @@ async function handler(req, res) {
                         rto36, rto48, rto60, rto72, is_repo, location, auto_status
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
                     ON CONFLICT (user_id, serial_number) DO UPDATE SET
+                        type_code = EXCLUDED.type_code,
+                        type_name = EXCLUDED.type_name,
+                        title = EXCLUDED.title,
+                        size_display = EXCLUDED.size_display,
+                        width = EXCLUDED.width,
+                        length = EXCLUDED.length,
+                        date_built = EXCLUDED.date_built,
                         price = EXCLUDED.price,
                         rto36 = EXCLUDED.rto36,
                         rto48 = EXCLUDED.rto48,
@@ -128,20 +135,20 @@ async function handler(req, res) {
                     [
                         req.user.id,
                         building.serialNumber,
-                        building.type_code || '',
-                        building.type_name || '',
-                        building.title || '',
-                        building.size_display || '',
-                        building.width || null,
-                        building.length || null,
-                        building.date_built || '',
-                        building.price || 0,
-                        building.rto36 || 0,
-                        building.rto48 || 0,
-                        building.rto60 || 0,
-                        building.rto72 || 0,
-                        building.isRepo || false,
-                        building.location || lotName,
+                        building.type_code,
+                        building.type_name,
+                        building.title,
+                        building.size_display,
+                        building.width,
+                        building.length,
+                        building.date_built,
+                        building.price,
+                        building.rto36,
+                        building.rto48,
+                        building.rto60,
+                        building.rto72,
+                        building.isRepo,
+                        building.location,
                         'available'
                     ]
                 );

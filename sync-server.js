@@ -7,23 +7,56 @@
 const express = require('express');
 const cors = require('cors');
 const GPBScraper = require('./gpb-scraper');
+const { SerialNumberDecoder } = require('./decoder');
 const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
-const PORT = process.env.SYNC_SERVER_PORT || 3001;
+const PORT = process.env.PORT || process.env.SYNC_SERVER_PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
 
+// Webhook secret for security
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || 'change-this-secret';
+
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', message: 'Sync server is running' });
+    res.json({
+        status: 'ok',
+        message: 'Sync server is running',
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+    res.json({
+        service: 'GPB Sales Sync Server',
+        status: 'running',
+        endpoints: {
+            health: 'GET /health',
+            sync: 'POST /sync-lot (requires authentication)'
+        }
+    });
 });
 
 // Sync lot endpoint
 app.post('/sync-lot', async (req, res) => {
-    const { username, password, lotName } = req.body;
+    // Verify webhook secret for security
+    const authHeader = req.headers.authorization;
+    const providedSecret = authHeader?.replace('Bearer ', '');
+
+    if (providedSecret !== WEBHOOK_SECRET) {
+        console.log('Unauthorized sync attempt - invalid webhook secret');
+        return res.status(401).json({
+            success: false,
+            error: 'Unauthorized'
+        });
+    }
+
+    const { username, password, lotName, userId } = req.body;
 
     if (!username || !password || !lotName) {
         return res.status(400).json({
@@ -32,7 +65,7 @@ app.post('/sync-lot', async (req, res) => {
         });
     }
 
-    console.log(`\n[${new Date().toISOString()}] Sync request received for: ${lotName}`);
+    console.log(`\n[${new Date().toISOString()}] Sync request received for: ${lotName} (User ID: ${userId || 'unknown'})`);
 
     try {
         // Create scraper with provided credentials
@@ -49,21 +82,59 @@ app.post('/sync-lot', async (req, res) => {
 
         console.log(`Successfully scraped ${scrapedData.length} buildings`);
 
-        // Return the data - let the client handle the tagging
+        // Decode serial numbers and enrich data
+        const enrichedData = scrapedData.map(item => {
+            const decoder = new SerialNumberDecoder(item.serialNumber);
+            const decoded = decoder.getFullDetails();
+
+            if (decoded.valid) {
+                return {
+                    serialNumber: item.serialNumber,
+                    type_code: decoded.type.code,
+                    type_name: decoded.type.name,
+                    title: decoded.title,
+                    size_display: decoded.size.display,
+                    width: decoded.size.width,
+                    length: decoded.size.length,
+                    date_built: decoded.dateBuilt.display,
+                    price: item.cashPrice || 0,
+                    cashPrice: item.cashPrice || 0,
+                    rto36: item.rto36 || 0,
+                    rto48: item.rto48 || 0,
+                    rto60: item.rto60 || 0,
+                    rto72: item.rto72 || 0,
+                    location: lotName,
+                    isRepo: item.isRepo || decoded.status === 'repo'
+                };
+            } else {
+                // If decoder fails, return raw data with defaults
+                console.warn(`Failed to decode serial: ${item.serialNumber}`);
+                return {
+                    serialNumber: item.serialNumber,
+                    type_code: '',
+                    type_name: 'Unknown',
+                    title: item.serialNumber,
+                    size_display: '',
+                    width: null,
+                    length: null,
+                    date_built: '',
+                    price: item.cashPrice || 0,
+                    cashPrice: item.cashPrice || 0,
+                    rto36: item.rto36 || 0,
+                    rto48: item.rto48 || 0,
+                    rto60: item.rto60 || 0,
+                    rto72: item.rto72 || 0,
+                    location: lotName,
+                    isRepo: item.isRepo || false
+                };
+            }
+        });
+
+        // Return enriched data with decoded serial information
         res.json({
             success: true,
-            inventory: scrapedData.map(item => ({
-                serialNumber: item.serialNumber,
-                cashPrice: item.cashPrice,
-                rto36: item.rto36,
-                rto48: item.rto48,
-                rto60: item.rto60,
-                rto72: item.rto72,
-                price: item.cashPrice,
-                location: lotName,
-                isRepo: item.isRepo
-            })),
-            count: scrapedData.length,
+            inventory: enrichedData,
+            count: enrichedData.length,
             lotName
         });
 
