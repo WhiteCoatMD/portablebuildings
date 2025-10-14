@@ -595,9 +595,17 @@
                                     </small>
                                 </td>
                                 <td>
-                                    <div class="actions">
-                                        <button class="btn btn-secondary" onclick="viewContact(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">📋 Contact</button>
-                                        <button class="btn btn-primary" onclick="editUser(${user.id})">Edit</button>
+                                    <div class="actions" style="flex-direction: column; gap: 0.5rem;">
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn btn-secondary" onclick="viewContact(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">📋 Contact</button>
+                                            <button class="btn btn-primary" onclick="editUser(${user.id})">Edit</button>
+                                        </div>
+                                        ${user.inventory_count > 0 ? `
+                                        <button class="btn" onclick="deleteUserInventory(${user.id})"
+                                                style="background: #dc3545; color: white; font-size: 0.8rem; padding: 0.4rem 0.8rem; width: 100%;">
+                                            🗑️ Delete Inventory (${user.inventory_count})
+                                        </button>
+                                        ` : ''}
                                     </div>
                                 </td>
                             </tr>
@@ -767,6 +775,52 @@
                 showError('Failed to update user');
             }
         });
+
+        async function deleteUserInventory(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            const confirmMsg = `⚠️ WARNING: Delete ALL inventory for ${user.email}?\n\n` +
+                `This will permanently delete:\n` +
+                `- ${user.inventory_count} building(s)\n` +
+                `- ${user.images_count} image(s)\n` +
+                `- ${user.posts_count} Facebook post(s)\n\n` +
+                `This action CANNOT be undone!\n\n` +
+                `Type "DELETE" to confirm:`;
+
+            const confirmation = prompt(confirmMsg);
+
+            if (confirmation !== 'DELETE') {
+                if (confirmation !== null) {
+                    showError('❌ Deletion cancelled - confirmation text did not match.');
+                }
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/delete-user-inventory', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showError(`✅ Successfully deleted ${data.deleted.buildings} building(s), ${data.deleted.images} image(s), and ${data.deleted.posts} post(s) for ${user.email}`);
+                    loadUsers();
+                    loadStats();
+                } else {
+                    showError('❌ ' + (data.error || 'Failed to delete inventory'));
+                }
+            } catch (error) {
+                console.error('Delete inventory error:', error);
+                showError('❌ Failed to delete inventory');
+            }
+        }
 
         function showError(message) {
             const errorDiv = document.getElementById('error-message');
