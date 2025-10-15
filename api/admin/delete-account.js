@@ -62,25 +62,49 @@ module.exports = async (req, res) => {
         const userEmail = userCheck.rows[0].email;
 
         // Delete all associated data in correct order (due to foreign key constraints)
-        // 1. Delete images
-        const imagesResult = await pool.query(
-            'DELETE FROM images WHERE user_id = $1',
+        // 1. Delete building overrides
+        const overridesResult = await pool.query(
+            'DELETE FROM building_overrides WHERE user_id = $1',
             [userId]
         );
 
-        // 2. Delete Facebook posts
+        // 2. Delete image orders
+        const imageOrdersResult = await pool.query(
+            'DELETE FROM image_orders WHERE user_id = $1',
+            [userId]
+        );
+
+        // 3. Delete posted buildings (Facebook posts)
         const postsResult = await pool.query(
-            'DELETE FROM facebook_posts WHERE user_id = $1',
+            'DELETE FROM posted_buildings WHERE user_id = $1',
             [userId]
         );
 
-        // 3. Delete inventory
+        // 4. Delete user inventory
         const inventoryResult = await pool.query(
-            'DELETE FROM inventory WHERE user_id = $1',
+            'DELETE FROM user_inventory WHERE user_id = $1',
             [userId]
         );
 
-        // 4. Delete user account
+        // 5. Delete user settings
+        const settingsResult = await pool.query(
+            'DELETE FROM user_settings WHERE user_id = $1',
+            [userId]
+        );
+
+        // 6. Delete other lots
+        const lotsResult = await pool.query(
+            'DELETE FROM other_lots WHERE user_id = $1',
+            [userId]
+        );
+
+        // 7. Delete sessions
+        const sessionsResult = await pool.query(
+            'DELETE FROM sessions WHERE user_id = $1',
+            [userId]
+        );
+
+        // 8. Delete user account
         const userResult = await pool.query(
             'DELETE FROM users WHERE id = $1',
             [userId]
@@ -88,8 +112,12 @@ module.exports = async (req, res) => {
 
         console.log(`🗑️ Account permanently deleted: ${userEmail}`);
         console.log(`   - ${inventoryResult.rowCount} buildings`);
-        console.log(`   - ${imagesResult.rowCount} images`);
+        console.log(`   - ${overridesResult.rowCount} overrides`);
+        console.log(`   - ${imageOrdersResult.rowCount} image orders`);
         console.log(`   - ${postsResult.rowCount} Facebook posts`);
+        console.log(`   - ${settingsResult.rowCount} settings`);
+        console.log(`   - ${lotsResult.rowCount} other lots`);
+        console.log(`   - ${sessionsResult.rowCount} sessions`);
         console.log(`   - User account removed`);
 
         res.json({
@@ -97,8 +125,12 @@ module.exports = async (req, res) => {
             message: 'Account and all data permanently deleted',
             deleted: {
                 buildings: inventoryResult.rowCount,
-                images: imagesResult.rowCount,
+                overrides: overridesResult.rowCount,
+                imageOrders: imageOrdersResult.rowCount,
                 posts: postsResult.rowCount,
+                settings: settingsResult.rowCount,
+                lots: lotsResult.rowCount,
+                sessions: sessionsResult.rowCount,
                 user: userResult.rowCount
             }
         });
