@@ -324,6 +324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadSocialMedia();
     loadSubscriptionInfo();
     loadFacebookConfig();
+    loadFacebookConnectionStatus(); // Check Facebook OAuth connection status
     loadButtonColor();
     initializeColorInputSync();
     initializeBackgroundColorPicker();
@@ -3095,3 +3096,116 @@ window.copyDnsValue = copyDnsValue;
 window.updatePaymentMethod = updatePaymentMethod;
 window.checkSubdomainAvailability = checkSubdomainAvailability;
 window.saveSubdomain = saveSubdomain;
+
+// Facebook OAuth Functions
+async function connectFacebookOAuth() {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+        showToast('Please log in first', true);
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/auth/facebook-oauth-start', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.authUrl) {
+            // Open Facebook OAuth in a popup
+            const width = 600;
+            const height = 700;
+            const left = (screen.width / 2) - (width / 2);
+            const top = (screen.height / 2) - (height / 2);
+
+            window.open(
+                data.authUrl,
+                'Facebook Login',
+                `width=${width},height=${height},left=${left},top=${top}`
+            );
+
+            // Listen for the popup to close and reload data
+            const checkInterval = setInterval(() => {
+                loadFacebookConnectionStatus();
+            }, 2000);
+
+            // Stop checking after 2 minutes
+            setTimeout(() => clearInterval(checkInterval), 120000);
+        } else {
+            showToast('Failed to start Facebook connection', true);
+        }
+    } catch (error) {
+        console.error('Error starting Facebook OAuth:', error);
+        showToast('Error connecting to Facebook', true);
+    }
+}
+
+async function disconnectFacebook() {
+    if (!confirm('Are you sure you want to disconnect your Facebook page? Auto-posting will stop working.')) {
+        return;
+    }
+
+    const token = localStorage.getItem('auth_token');
+    try {
+        // Remove Facebook settings from database
+        await saveSetting('cpb_facebook_page_id', null);
+        await saveSetting('cpb_facebook_access_token', null);
+        await saveSetting('cpb_facebook_page_name', null);
+
+        showToast('Facebook page disconnected successfully');
+        loadFacebookConnectionStatus();
+    } catch (error) {
+        console.error('Error disconnecting Facebook:', error);
+        showToast('Failed to disconnect Facebook', true);
+    }
+}
+
+async function loadFacebookConnectionStatus() {
+    const settings = await loadAllSettings();
+    const pageName = settings.cpb_facebook_page_name;
+    const pageId = settings.cpb_facebook_page_id;
+
+    const connectedDiv = document.getElementById('facebook-connected');
+    const notConnectedDiv = document.getElementById('facebook-not-connected');
+
+    if (pageName && pageId) {
+        // Show connected status
+        document.getElementById('connected-page-name').textContent = pageName;
+        connectedDiv.style.display = 'block';
+        notConnectedDiv.style.display = 'none';
+    } else {
+        // Show not connected
+        connectedDiv.style.display = 'none';
+        notConnectedDiv.style.display = 'block';
+    }
+}
+
+// Check for OAuth callback success/error on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('fb_success')) {
+        const pageName = urlParams.get('page_name');
+        showToast(`✅ Successfully connected to Facebook page: ${pageName}`);
+        loadFacebookConnectionStatus();
+        
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname + '#customization');
+    }
+    
+    if (urlParams.get('fb_error')) {
+        const error = urlParams.get('fb_error');
+        showToast(`❌ Facebook connection failed: ${error}`, true);
+        
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname + '#customization');
+    }
+});
+
+// Export new functions
+window.connectFacebookOAuth = connectFacebookOAuth;
+window.disconnectFacebook = disconnectFacebook;
+window.loadFacebookConnectionStatus = loadFacebookConnectionStatus;

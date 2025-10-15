@@ -229,9 +229,7 @@
 
             <div class="card">
                 <h2>Facebook Auto-Posting</h2>
-                <p class="help-text">Automatically post new building listings to your Facebook page
-                    <a href="facebook-setup.html" target="_blank" style="margin-left: 0.5rem; color: #2196f3; text-decoration: none; font-weight: 600;">📖 Setup Instructions →</a>
-                </p>
+                <p class="help-text">Automatically post new building listings to your Facebook page</p>
 
                 <div class="info-box" style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem;">
                     <p style="margin: 0; font-weight: 600; color: #856404;">⚠️ Auto-Posting Requirements</p>
@@ -243,30 +241,38 @@
                     </ul>
                 </div>
 
+                <!-- Facebook Connection Status -->
+                <div id="facebook-connected" style="display: none; background: #d4edda; border-left: 4px solid #28a745; padding: 1.25rem; border-radius: 6px; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                        <span style="font-size: 2rem;">✅</span>
+                        <div style="flex: 1;">
+                            <strong style="color: #155724; font-size: 1.05rem;">Facebook Page Connected</strong>
+                            <p style="margin: 0.25rem 0 0 0; color: #155724; font-size: 0.9rem;">
+                                Connected to: <strong id="connected-page-name"></strong>
+                            </p>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="disconnectFacebook()">Disconnect</button>
+                    </div>
+                </div>
+
+                <div id="facebook-not-connected" style="background: #f8f9fa; border: 2px dashed #dee2e6; padding: 2rem; border-radius: 8px; text-align: center; margin-bottom: 1.5rem;">
+                    <h3 style="color: #495057; margin-bottom: 1rem;">Connect Your Facebook Page</h3>
+                    <p style="color: #6c757d; margin-bottom: 1.5rem;">Click the button below to securely connect your Facebook page. No manual setup required!</p>
+                    <button class="btn btn-primary" onclick="connectFacebookOAuth()" style="background: #1877f2; padding: 0.875rem 2rem; font-size: 1.05rem;">
+                        <svg style="width: 20px; height: 20px; margin-right: 0.5rem; vertical-align: middle;" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        Connect with Facebook
+                    </button>
+                    <p style="color: #6c757d; font-size: 0.85rem; margin-top: 1rem;">
+                        Need help? <a href="facebook-setup.html" target="_blank" style="color: #2196f3; text-decoration: none;">View manual setup instructions →</a>
+                    </p>
+                </div>
+
                 <div class="setting-group">
                     <label class="toggle-label">
                         <input type="checkbox" id="enableAutoPost">
                         <span class="toggle-slider"></span>
                         <span class="toggle-text">Enable Auto-Posting to Facebook</span>
                     </label>
-                </div>
-
-                <div class="form-group" style="margin-top: 1.5rem;">
-                    <label for="facebookPageId">Facebook Page ID
-                        <a href="facebook-setup.html#step-5-find-your-facebook-page-id" target="_blank" style="margin-left: 0.5rem; font-size: 0.875rem; color: #2196f3; text-decoration: none;">How to find?</a>
-                    </label>
-                    <input type="text" id="facebookPageId" class="form-control"
-                           placeholder="e.g., 123456789012345">
-                    <p class="help-text">Your Facebook Page ID (found in page settings)</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="facebookAccessToken">Facebook Page Access Token
-                        <a href="facebook-setup.html#step-4-get-your-page-access-token" target="_blank" style="margin-left: 0.5rem; font-size: 0.875rem; color: #2196f3; text-decoration: none;">How to get?</a>
-                    </label>
-                    <input type="password" id="facebookAccessToken" class="form-control"
-                           placeholder="Enter your Facebook Page Access Token">
-                    <p class="help-text">Long-lived page access token from Facebook Developer Console</p>
                 </div>
 
                 <div class="form-group">
