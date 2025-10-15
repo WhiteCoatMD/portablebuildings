@@ -2124,6 +2124,7 @@ async function testFacebookPost() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
             },
             body: JSON.stringify({
                 building: testBuilding,
@@ -2138,6 +2139,10 @@ async function testFacebookPost() {
             status.textContent = `✅ Test post successful! Posted "${testBuilding.title}" to your Facebook page.`;
             status.style.color = 'var(--success-color)';
             showToast('✅ Test post sent to Facebook!');
+        } else if (result.requiresUpgrade) {
+            status.innerHTML = `⚠️ ${result.message} <button onclick="upgradeToPremium()" class="btn btn-warning btn-sm" style="margin-left: 0.5rem;">Upgrade Now</button>`;
+            status.style.color = 'var(--warning-color)';
+            showToast('⚠️ Facebook posting requires premium subscription', true);
         } else {
             status.textContent = `❌ Failed: ${result.error || 'Unknown error'}`;
             status.style.color = 'var(--danger-color)';

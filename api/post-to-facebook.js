@@ -3,13 +3,58 @@
  * Posts building listings to Facebook Business Page
  */
 
-export default async function handler(req, res) {
+const { getPool } = require('../lib/db');
+const { verifyToken } = require('../lib/auth');
+
+const pool = getPool();
+
+module.exports = async function handler(req, res) {
     // Only allow POST requests
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Method not allowed' });
     }
 
     try {
+        // Verify authentication
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({
+                success: false,
+                error: 'Authentication required'
+            });
+        }
+
+        const token = authHeader.substring(7);
+        const decoded = verifyToken(token);
+        if (!decoded) {
+            return res.status(401).json({
+                success: false,
+                error: 'Invalid or expired token'
+            });
+        }
+
+        // Check if user is on trial - Facebook posting not allowed
+        const userResult = await pool.query(
+            'SELECT subscription_status FROM users WHERE id = $1',
+            [decoded.userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        if (userResult.rows[0].subscription_status === 'trial') {
+            return res.status(403).json({
+                success: false,
+                error: 'Facebook posting not available on trial plan',
+                message: 'Upgrade to premium to unlock Facebook auto-posting',
+                requiresUpgrade: true
+            });
+        }
+
         const { building, config, businessPhone } = req.body;
 
         // Validate required fields
