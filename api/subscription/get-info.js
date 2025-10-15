@@ -1,13 +1,12 @@
 /**
  * Get Subscription Information
  * Returns subscription status, payment method, and billing history
+ * Now supports PayPal subscriptions only (Stripe removed)
  */
 const { getPool } = require('../../lib/db');
 const { verifyToken } = require('../../lib/auth');
-const stripe = require('stripe');
 
 const pool = getPool();
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY?.trim();
 
 async function handler(req, res) {
     if (req.method !== 'GET') {
@@ -72,61 +71,16 @@ async function handler(req, res) {
             provider: user.paypal_subscription_id ? 'paypal' : (user.stripe_customer_id ? 'stripe' : null)
         };
 
-        let paymentMethodInfo = null;
-        let invoicesList = [];
+        // For PayPal subscriptions, payment method info is managed through PayPal portal
+        // Users can update payment methods at paypal.com
+        const paymentMethodInfo = user.paypal_subscription_id ? {
+            provider: 'PayPal',
+            note: 'Manage payment method at paypal.com'
+        } : null;
 
-        // Fetch additional data from Stripe if available
-        if (user.subscription_id && STRIPE_SECRET_KEY) {
-            try {
-                const stripeClient = stripe(STRIPE_SECRET_KEY);
-
-                // Fetch subscription details to get amount
-                const subscription = await stripeClient.subscriptions.retrieve(user.subscription_id);
-
-                if (subscription && subscription.items && subscription.items.data.length > 0) {
-                    const price = subscription.items.data[0].price;
-                    subscriptionInfo.amount = (price.unit_amount / 100).toFixed(2);
-                    subscriptionInfo.interval = price.recurring?.interval || 'month';
-                    subscriptionInfo.currency = price.currency.toUpperCase();
-                }
-
-                // Fetch payment method if customer exists
-                if (user.stripe_customer_id) {
-                    const paymentMethods = await stripeClient.paymentMethods.list({
-                        customer: user.stripe_customer_id,
-                        type: 'card',
-                        limit: 1
-                    });
-
-                    if (paymentMethods.data.length > 0) {
-                        const pm = paymentMethods.data[0];
-                        paymentMethodInfo = {
-                            brand: pm.card.brand.charAt(0).toUpperCase() + pm.card.brand.slice(1),
-                            last4: pm.card.last4,
-                            expMonth: pm.card.exp_month,
-                            expYear: pm.card.exp_year
-                        };
-                    }
-
-                    // Fetch recent invoices
-                    const invoices = await stripeClient.invoices.list({
-                        customer: user.stripe_customer_id,
-                        limit: 10
-                    });
-
-                    invoicesList = invoices.data.map(inv => ({
-                        date: inv.created * 1000, // Convert to milliseconds
-                        description: inv.description || `Subscription for ${new Date(inv.created * 1000).toLocaleDateString()}`,
-                        amount: inv.amount_paid,
-                        status: inv.status === 'paid' ? 'paid' : 'failed',
-                        receiptUrl: inv.hosted_invoice_url
-                    }));
-                }
-            } catch (stripeError) {
-                console.error('[Get Info] Stripe API error:', stripeError.message);
-                // Continue with database data only
-            }
-        }
+        // No billing history available through PayPal API in this implementation
+        // Users can view invoices in their PayPal account
+        const invoicesList = [];
 
         const response = {
             success: true,
