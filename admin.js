@@ -3206,31 +3206,69 @@ function renderPayPalButton() {
     }).render('#paypal-button-container-P-5PJ478448J561845UNDX7TCY');
 }
 
-// Update payment method via Stripe Billing Portal
+// Update payment method - PayPal subscriptions are managed through PayPal
 async function updatePaymentMethod() {
     const token = localStorage.getItem('auth_token');
     try {
-        showToast('Opening billing portal...');
-
-        const response = await fetch('/api/subscription/create-billing-portal-session', {
-            method: 'POST',
+        // Get current subscription status
+        const response = await fetch('/api/user/settings', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
 
         const data = await response.json();
-        if (data.success && data.url) {
-            window.location.href = data.url; // Redirect to Stripe Billing Portal
-        } else {
-            // User doesn't have payment method yet - send to upgrade flow
-            if (confirm('No payment method on file. Would you like to upgrade to premium now?')) {
-                upgradeToPremium();
+
+        if (data.success && data.subscription) {
+            const sub = data.subscription;
+
+            // Check if user is on trial
+            if (sub.status === 'trial') {
+                // Trial user - offer upgrade
+                if (confirm('You are currently on a free trial. Would you like to upgrade to the paid plan ($99/month)?')) {
+                    upgradeToPremium();
+                }
+            } else if (sub.status === 'active' && sub.paypalSubscriptionId) {
+                // Active PayPal subscriber - show PayPal management instructions
+                const modal = document.createElement('div');
+                modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+                modal.innerHTML = `
+                    <div style="background: white; padding: 2rem; border-radius: 12px; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                        <h3 style="margin: 0 0 1rem 0; color: #1a1a2e;">Manage PayPal Subscription</h3>
+                        <p style="margin: 0 0 1.5rem 0; color: #666; line-height: 1.6;">
+                            Your subscription is managed through PayPal. To update your payment method or cancel your subscription:
+                        </p>
+                        <ol style="margin: 0 0 1.5rem 0; color: #666; line-height: 1.8; padding-left: 1.5rem;">
+                            <li>Log in to your PayPal account</li>
+                            <li>Click on <strong>Settings</strong> (gear icon)</li>
+                            <li>Click <strong>Payments</strong></li>
+                            <li>Click <strong>Manage automatic payments</strong></li>
+                            <li>Find <strong>Shed-Sync Premium</strong></li>
+                            <li>Update payment method or cancel</li>
+                        </ol>
+                        <div style="display: flex; gap: 1rem;">
+                            <a href="https://www.paypal.com/myaccount/autopay/" target="_blank" class="btn" style="flex: 1; text-align: center; background: linear-gradient(135deg, #0070ba 0%, #1546a0 100%); color: white; text-decoration: none; display: block; padding: 0.75rem;">
+                                Open PayPal Settings
+                            </a>
+                            <button onclick="this.closest('div[style*=\\'position: fixed\\']').remove()" class="btn" style="flex: 1; background: #e0e0e0; color: #333;">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } else {
+                // No active subscription
+                if (confirm('No active subscription found. Would you like to upgrade to premium now?')) {
+                    upgradeToPremium();
+                }
             }
+        } else {
+            showToast('Unable to load subscription information', true);
         }
     } catch (error) {
-        console.error('Billing portal error:', error);
-        showToast('Failed to open billing portal', true);
+        console.error('Subscription check error:', error);
+        showToast('Failed to check subscription status', true);
     }
 }
 
