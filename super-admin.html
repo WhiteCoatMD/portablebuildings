@@ -628,6 +628,9 @@
                                             <button class="btn btn-secondary" onclick="viewContact(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">📋 Contact</button>
                                             <button class="btn btn-primary" onclick="editUser(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Edit</button>
                                         </div>
+                                        <button class="btn btn-secondary" onclick="resetUserPassword(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; width: 100%;">
+                                            🔑 Reset Password
+                                        </button>
                                         ${user.inventory_count > 0 ? `
                                         <button class="btn btn-danger" onclick="deleteUserInventory(${user.id})"
                                                 style="font-size: 0.8rem; padding: 0.4rem 0.8rem; width: 100%;">
@@ -946,6 +949,44 @@
             } catch (error) {
                 console.error('Delete account error:', error);
                 showError('❌ Failed to delete account');
+            }
+        }
+
+        async function resetUserPassword(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            const newPassword = prompt(`🔑 Reset password for ${user.email}\n\nEnter a new password (min 8 characters):`);
+
+            if (!newPassword) {
+                return; // Cancelled
+            }
+
+            if (newPassword.length < 8) {
+                showError('❌ Password must be at least 8 characters long');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/reset-user-password', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId, newPassword })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showError(`✅ Password reset successfully for ${user.email}\n\nNew password: ${newPassword}\n\nMake sure to share this with the user securely.`);
+                } else {
+                    showError('❌ ' + (data.error || 'Failed to reset password'));
+                }
+            } catch (error) {
+                console.error('Reset password error:', error);
+                showError('❌ Failed to reset password');
             }
         }
 
