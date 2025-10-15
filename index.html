@@ -43,6 +43,55 @@
             color: #333;
         }
 
+        .header {
+            background: #1a1a2e;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #2a2a3e;
+        }
+
+        .header-logo {
+            color: #ffd60a;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .header-link {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .header-link:hover {
+            color: #ffd60a;
+        }
+
+        .signup-btn {
+            background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%);
+            color: #1a1a2e;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(255, 214, 10, 0.3);
+        }
+
+        .signup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 214, 10, 0.5);
+        }
+
         .hero {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
@@ -247,10 +296,23 @@
                 gap: 1rem;
                 text-align: center;
             }
+
+            .header-nav {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
         }
     </style>
 </head>
 <body>
+    <header class="header">
+        <a href="/" class="header-logo">🏡 ShedSync</a>
+        <nav class="header-nav">
+            <a href="login.html" class="header-link">Login</a>
+            <a href="signup.html" class="signup-btn">Start Free Trial</a>
+        </nav>
+    </header>
+
     <div class="hero">
         <h1>🏡 ShedSync</h1>
         <p>The modern multi-dealer inventory management platform for portable building dealers. Manage your inventory, customize your website, and grow your business.</p>
@@ -264,7 +326,7 @@
         <div class="features">
             <div class="feature-card">
                 <h3>🔄 Automated Sync</h3>
-                <p>Connect your GPB Sales account and automatically sync your inventory daily. No manual updates needed.</p>
+                <p>Connect your inventory management system and automatically sync your inventory daily. No manual updates needed.</p>
             </div>
 
             <div class="feature-card">

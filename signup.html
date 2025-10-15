@@ -72,6 +72,30 @@
             border-color: #667eea;
         }
 
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #666;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle:hover {
+            color: #333;
+        }
+
         .help-text {
             font-size: 0.85rem;
             color: #666;
@@ -207,13 +231,19 @@
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required autocomplete="new-password" minlength="8">
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" required autocomplete="new-password" minlength="8">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password', this)">👁️</button>
+                </div>
                 <p class="help-text">Minimum 8 characters</p>
             </div>
 
             <div class="form-group">
                 <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password">
+                <div class="password-wrapper">
+                    <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', this)">👁️</button>
+                </div>
             </div>
 
             <button type="submit" class="btn" id="signup-btn">
@@ -247,6 +277,18 @@
         function hideMessages() {
             errorDiv.classList.remove('show');
             successDiv.classList.remove('show');
+        }
+
+        function togglePassword(inputId, toggleBtn) {
+            const passwordInput = document.getElementById(inputId);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
         }
 
         form.addEventListener('submit', async (e) => {
