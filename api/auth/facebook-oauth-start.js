@@ -39,12 +39,13 @@ module.exports = async (req, res) => {
         })).toString('base64');
 
         // Facebook OAuth URL with required permissions
-        // Updated to current Facebook API v19.0 permissions
+        // Updated to current Facebook API v19.0 permissions (2025)
+        // pages_show_list is deprecated - using new permission model
         const facebookAuthUrl = `https://www.facebook.com/v19.0/dialog/oauth?` +
             `client_id=${FACEBOOK_APP_ID}` +
             `&redirect_uri=${encodeURIComponent(FACEBOOK_REDIRECT_URI)}` +
             `&state=${state}` +
-            `&scope=pages_read_engagement,pages_manage_posts` +
+            `&scope=pages_manage_posts,pages_read_engagement,pages_read_user_content` +
             `&response_type=code`;
 
         console.log('[FB OAuth] Redirecting user to Facebook authorization');
