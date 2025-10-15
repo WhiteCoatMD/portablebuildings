@@ -5,19 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShedSync - Multi-Dealer Inventory Management Platform</title>
 
-    <!-- Domain Router: Redirect subdomains to site.html -->
+    <!-- Domain Router: Redirect subdomains and custom domains to site.html -->
     <script>
         (function() {
             const hostname = window.location.hostname;
 
-            // Check if this is a subdomain (not www, not bare domain, not localhost)
-            if (hostname.endsWith('.shed-sync.com') &&
+            // Check if this is a shed-sync subdomain
+            const isShedSyncSubdomain = hostname.endsWith('.shed-sync.com') &&
                 hostname !== 'shed-sync.com' &&
                 hostname !== 'www.shed-sync.com' &&
-                !hostname.startsWith('www.')) {
+                !hostname.startsWith('www.');
 
-                // This is a dealer subdomain - redirect to site.html
-                console.log('[Router] Subdomain detected:', hostname, '- Redirecting to site.html');
+            // Check if this is a custom domain (not shed-sync.com and not localhost/vercel)
+            const isCustomDomain = !hostname.includes('shed-sync.com') &&
+                !hostname.includes('localhost') &&
+                !hostname.includes('vercel.app');
+
+            if (isShedSyncSubdomain || isCustomDomain) {
+                // This is a dealer site - redirect to site.html
+                console.log('[Router] Dealer domain detected:', hostname, '- Redirecting to site.html');
                 window.location.replace('/site.html' + window.location.search + window.location.hash);
             }
             // Otherwise, continue loading the SaaS landing page
