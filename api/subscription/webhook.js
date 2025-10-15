@@ -81,6 +81,11 @@ async function handler(req, res) {
 async function handleCheckoutCompleted(session) {
     try {
         console.log('[Stripe Webhook] Checkout completed:', session.id);
+        console.log('[Stripe Webhook] Session data:', {
+            subscription: session.subscription,
+            customer: session.customer,
+            metadata: session.metadata
+        });
 
         const userId = session.metadata?.user_id;
         if (!userId) {
@@ -88,20 +93,31 @@ async function handleCheckoutCompleted(session) {
             return;
         }
 
+        console.log('[Stripe Webhook] Updating user:', userId, 'with subscription:', session.subscription);
+
         // Update user with subscription info
-        await pool.query(
+        const result = await pool.query(
             `UPDATE users
              SET subscription_status = 'active',
                  subscription_id = $1,
                  stripe_customer_id = $2
-             WHERE id = $3`,
+             WHERE id = $3
+             RETURNING id, email, subscription_status, subscription_id`,
             [session.subscription, session.customer, userId]
         );
 
-        console.log('[Stripe Webhook] User subscription activated:', userId);
+        console.log('[Stripe Webhook] Update result:', result.rows);
+        console.log('[Stripe Webhook] Rows affected:', result.rowCount);
+
+        if (result.rowCount === 0) {
+            console.warn('[Stripe Webhook] No rows updated! User might not exist.');
+        } else {
+            console.log('[Stripe Webhook] User subscription activated:', userId);
+        }
 
     } catch (error) {
         console.error('[Stripe Webhook] Error handling checkout:', error);
+        console.error('[Stripe Webhook] Error stack:', error.stack);
     }
 }
 
