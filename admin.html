@@ -905,8 +905,8 @@ Call us at {{phone}} or visit our website to learn more!
                     <div class="dns-record" style="margin: 1.5rem 0;">
                         <strong>Type:</strong> <code>CNAME</code><br>
                         <strong>Name:</strong> <code>www</code><br>
-                        <strong>Value/Points to:</strong> <code id="dns-subdomain-value">your-subdomain.shed-sync.com</code>
-                        <button class="copy-btn" onclick="copyDnsValue()">📋 Copy Value</button><br>
+                        <strong>Value/Points to:</strong> <code>cname.vercel-dns.com</code>
+                        <button class="copy-btn" onclick="navigator.clipboard.writeText('cname.vercel-dns.com').then(() => alert('✓ Copied to clipboard!'))">📋 Copy Value</button><br>
                         <strong style="margin-top: 0.5rem; display: inline-block;">TTL:</strong> <code>1 Hour</code> <span style="color: #a8a8b8; font-size: 0.85rem; font-weight: normal;"> (or leave as default)</span>
                     </div>
 
