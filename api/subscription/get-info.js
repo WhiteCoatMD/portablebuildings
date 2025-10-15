@@ -39,7 +39,8 @@ async function handler(req, res) {
         // Get user subscription information
         const userResult = await pool.query(
             `SELECT subscription_status, subscription_id, stripe_customer_id,
-                    subscription_current_period_end, trial_ends_at
+                    subscription_current_period_end, trial_ends_at, paypal_subscription_id,
+                    subscription_plan
              FROM users
              WHERE id = $1`,
             [decoded.userId]
@@ -65,9 +66,10 @@ async function handler(req, res) {
             nextBillingDate: user.subscription_current_period_end
                 ? new Date(user.subscription_current_period_end).toLocaleDateString()
                 : null,
-            amount: null,
-            interval: null,
-            currency: 'USD'
+            amount: user.paypal_subscription_id ? '99.00' : null, // PayPal subscriptions are $99/month
+            interval: user.paypal_subscription_id ? 'month' : null,
+            currency: 'USD',
+            provider: user.paypal_subscription_id ? 'paypal' : (user.stripe_customer_id ? 'stripe' : null)
         };
 
         let paymentMethodInfo = null;
