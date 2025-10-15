@@ -47,7 +47,9 @@ async function handler(req, res) {
 
         // Handle different event types
         switch (event.event_type) {
+            // Subscription lifecycle events
             case 'BILLING.SUBSCRIPTION.ACTIVATED':
+            case 'BILLING.SUBSCRIPTION.RE-ACTIVATED':
                 await handleSubscriptionActivated(event.resource);
                 break;
 
@@ -56,6 +58,7 @@ async function handler(req, res) {
                 break;
 
             case 'BILLING.SUBSCRIPTION.SUSPENDED':
+            case 'BILLING.SUBSCRIPTION.PAYMENT.FAILED':
                 await handleSubscriptionSuspended(event.resource);
                 break;
 
@@ -63,12 +66,21 @@ async function handler(req, res) {
                 await handleSubscriptionExpired(event.resource);
                 break;
 
+            // Payment events
             case 'PAYMENT.SALE.COMPLETED':
+            case 'PAYMENT.CAPTURE.COMPLETED':
                 await handlePaymentCompleted(event.resource);
                 break;
 
             case 'PAYMENT.SALE.REFUNDED':
+            case 'PAYMENT.CAPTURE.REFUNDED':
                 await handlePaymentRefunded(event.resource);
+                break;
+
+            case 'PAYMENT.SALE.DENIED':
+            case 'PAYMENT.CAPTURE.DENIED':
+            case 'PAYMENT.CAPTURE.DECLINED':
+                await handlePaymentFailed(event.resource);
                 break;
 
             default:
@@ -231,6 +243,32 @@ async function handlePaymentRefunded(payment) {
 
     } catch (error) {
         console.error('[PayPal Webhook] Error handling payment refunded:', error);
+    }
+}
+
+// Handle payment failure
+async function handlePaymentFailed(payment) {
+    try {
+        console.log('[PayPal Webhook] Payment failed:', payment.id);
+
+        const subscriptionId = payment.billing_agreement_id;
+
+        if (subscriptionId) {
+            const result = await pool.query(
+                `UPDATE users
+                 SET subscription_status = 'past_due'
+                 WHERE paypal_subscription_id = $1
+                 RETURNING id, email`,
+                [subscriptionId]
+            );
+
+            if (result.rowCount > 0) {
+                console.log('[PayPal Webhook] User marked as past_due due to payment failure:', result.rows[0]);
+            }
+        }
+
+    } catch (error) {
+        console.error('[PayPal Webhook] Error handling payment failed:', error);
     }
 }
 
