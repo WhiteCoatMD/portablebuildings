@@ -237,6 +237,24 @@
             background: #5a6268;
         }
 
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
         .loading {
             text-align: center;
             padding: 3rem;
@@ -608,14 +626,24 @@
                                     <div class="actions" style="flex-direction: column; gap: 0.5rem;">
                                         <div style="display: flex; gap: 0.5rem;">
                                             <button class="btn btn-secondary" onclick="viewContact(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">📋 Contact</button>
-                                            <button class="btn btn-primary" onclick="editUser(${user.id})">Edit</button>
+                                            <button class="btn btn-primary" onclick="editUser(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Edit</button>
                                         </div>
                                         ${user.inventory_count > 0 ? `
-                                        <button class="btn" onclick="deleteUserInventory(${user.id})"
-                                                style="background: #dc3545; color: white; font-size: 0.8rem; padding: 0.4rem 0.8rem; width: 100%;">
+                                        <button class="btn btn-danger" onclick="deleteUserInventory(${user.id})"
+                                                style="font-size: 0.8rem; padding: 0.4rem 0.8rem; width: 100%;">
                                             🗑️ Delete Inventory (${user.inventory_count})
                                         </button>
                                         ` : ''}
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn btn-warning" onclick="archiveAccount(${user.id})"
+                                                    style="font-size: 0.8rem; padding: 0.4rem 0.8rem; flex: 1;">
+                                                📦 Archive
+                                            </button>
+                                            <button class="btn btn-danger" onclick="deleteAccount(${user.id})"
+                                                    style="font-size: 0.8rem; padding: 0.4rem 0.8rem; flex: 1;">
+                                                🗑️ Delete
+                                            </button>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -829,6 +857,95 @@
             } catch (error) {
                 console.error('Delete inventory error:', error);
                 showError('❌ Failed to delete inventory');
+            }
+        }
+
+        async function archiveAccount(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            const confirmMsg = `📦 Archive account for ${user.email}?\n\n` +
+                `This will:\n` +
+                `- Mark the account as archived (inactive)\n` +
+                `- Keep all data (${user.inventory_count} buildings, ${user.images_count} images)\n` +
+                `- Disable login access\n` +
+                `- Can be unarchived later\n\n` +
+                `Continue?`;
+
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/archive-account', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showError(`✅ Successfully archived account for ${user.email}`);
+                    loadUsers();
+                    loadStats();
+                } else {
+                    showError('❌ ' + (data.error || 'Failed to archive account'));
+                }
+            } catch (error) {
+                console.error('Archive account error:', error);
+                showError('❌ Failed to archive account');
+            }
+        }
+
+        async function deleteAccount(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            const confirmMsg = `⚠️ DANGER: Permanently DELETE account for ${user.email}?\n\n` +
+                `This will PERMANENTLY delete:\n` +
+                `- User account and all settings\n` +
+                `- ${user.inventory_count} building(s)\n` +
+                `- ${user.images_count} image(s)\n` +
+                `- ${user.posts_count} Facebook post(s)\n` +
+                `- ALL associated data\n\n` +
+                `This action CANNOT be undone!\n\n` +
+                `Type "DELETE ACCOUNT" to confirm:`;
+
+            const confirmation = prompt(confirmMsg);
+
+            if (confirmation !== 'DELETE ACCOUNT') {
+                if (confirmation !== null) {
+                    showError('❌ Deletion cancelled - confirmation text did not match.');
+                }
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/delete-account', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showError(`✅ Successfully deleted account for ${user.email} and all associated data`);
+                    loadUsers();
+                    loadStats();
+                } else {
+                    showError('❌ ' + (data.error || 'Failed to delete account'));
+                }
+            } catch (error) {
+                console.error('Delete account error:', error);
+                showError('❌ Failed to delete account');
             }
         }
 
