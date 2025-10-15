@@ -2990,10 +2990,27 @@ async function loadSubscriptionInfo() {
         if (data.success) {
             // Update subscription info
             if (data.subscription) {
+                // Update status with proper color
+                const statusColors = {
+                    'active': '#4caf50',
+                    'trial': '#ff9800',
+                    'past_due': '#f44336',
+                    'canceled': '#999'
+                };
+                const statusColor = statusColors[data.subscription.status] || '#666';
+                const statusText = data.subscription.status.charAt(0).toUpperCase() + data.subscription.status.slice(1);
+
                 document.getElementById('subscription-status').innerHTML =
-                    `<span style="color: #4caf50;">● ${data.subscription.status}</span>`;
+                    `<span style="color: ${statusColor};">● ${statusText}</span>`;
+
                 document.getElementById('subscription-next-billing').textContent =
                     data.subscription.nextBillingDate || '—';
+
+                // Update amount if available
+                if (data.subscription.amount && data.subscription.interval) {
+                    document.getElementById('subscription-amount').textContent =
+                        `$${data.subscription.amount}/${data.subscription.interval}`;
+                }
             }
 
             // Update payment method info

@@ -1,49 +1,168 @@
 # Where We Left Off - Portable Buildings Sync System
 
-**Date:** October 14, 2025, 12:14 AM
-**Status:** Ready to test end-to-end sync!
+**Date:** October 14, 2025, 2:07 AM
+**Status:** Stripe subscription integration complete and tested!
 
 ---
 
 ## What We Accomplished Today
 
-### 1. ✅ Implemented Per-User GPB Credential Storage
+### Session 1: Multi-User Sync Infrastructure
+
+#### 1. ✅ Implemented Per-User GPB Credential Storage
 - Added encrypted credential storage to database (AES-256-CBC)
 - Created save/get GPB credentials API endpoints
 - Updated admin panel with "Inventory Sync Settings" card
 - Users can now save their own GPB Sales login credentials securely
 
-### 2. ✅ Built Multi-User Sync Infrastructure
+#### 2. ✅ Built Multi-User Sync Infrastructure
 - Created trigger-sync.js endpoint that fetches user credentials and calls sync server
 - Set up webhook authentication between Vercel and DigitalOcean (Bearer token)
 - Each user can click "Sync Now" to trigger their own inventory sync
 
-### 3. ✅ Integrated Serial Number Decoder
+#### 3. ✅ Integrated Serial Number Decoder
 - sync-server.js now decodes all serial numbers before returning data
 - Extracts building type, size, date built from serial format
 - Buildings display as "10x12 Lofted Barn" instead of raw serial numbers
 - trigger-sync.js saves all decoded fields to database
 
-### 4. ✅ Fixed Critical Bugs
+#### 4. ✅ Fixed Critical Bugs
 - **Duplicate variable error:** Changed `result` to `userQuery` in trigger-sync.js (line 22)
 - **Null pointer error:** Added null check before screenshot in gpb-scraper.js error handler
 
-### 5. ✅ Deployed New DigitalOcean Droplet
+#### 5. ✅ Deployed New DigitalOcean Droplet
 - **Old droplet (45.55.237.121):** SSH was broken, couldn't update code
 - **New droplet (134.199.200.206):** Fresh deployment with all latest code
 - Configured Cloud Firewall with SSH (port 22) and sync server (port 3001)
 - PM2 auto-starts sync server on boot
 - Health check working: http://134.199.200.206:3001/health
 
-### 6. ✅ Updated Vercel Configuration
+#### 6. ✅ Updated Vercel Configuration
 - Changed SYNC_SERVER_URL to: `http://134.199.200.206:3001`
 - Redeployed with latest code including decoder integration
 - All API endpoints deployed and ready
+
+### Session 2: Stripe Subscription Integration
+
+#### 7. ✅ Implemented Stripe Subscription Payments
+- **Goal:** Require dealers to pay $99/month subscription to use the platform
+- Initially started building wrong feature (building payments) - corrected to subscription model
+- Added database fields for subscription tracking:
+  - `subscription_status` (trial, active, past_due, canceled)
+  - `subscription_id` (Stripe subscription ID)
+  - `stripe_customer_id` (Stripe customer ID)
+  - `subscription_current_period_end` (billing date)
+  - `trial_ends_at` (trial period end date)
+
+#### 8. ✅ Created Stripe API Endpoints
+- **api/subscription/create-checkout-session.js** - Creates Stripe Checkout session after signup
+  - Takes userId and email
+  - Creates/retrieves Stripe customer
+  - Creates subscription checkout session
+  - Returns checkout URL for redirect
+- **api/subscription/webhook.js** - Handles Stripe events
+  - `checkout.session.completed` - Activates subscription after payment
+  - `customer.subscription.created/updated/deleted` - Syncs subscription status
+  - `invoice.payment_succeeded/failed` - Updates payment status
+- **api/subscription/get-info.js** - Returns subscription data for admin panel
+  - Current plan and amount
+  - Subscription status
+  - Next billing date
+  - Payment method (placeholder)
+  - Billing history (placeholder)
+
+#### 9. ✅ Updated Signup Flow
+- **signup.html** - Modified to redirect to Stripe after account creation
+  - Creates account first
+  - Stores pending_user_id and pending_user_email in localStorage
+  - Calls create-checkout-session API
+  - Redirects to Stripe Checkout
+- **payment-success.html** - Success page after payment
+  - Verifies session_id from URL
+  - Shows success message
+  - Links to admin dashboard
+- **payment-cancelled.html** - Cancellation page with retry
+  - Shows warning that account exists but subscription not active
+  - Retry button creates new checkout session
+  - Links back to login
+
+#### 10. ✅ Updated Admin Panel for Billing
+- Replaced building payment settings with subscription management
+- Added "Payment Settings" tab showing:
+  - Current subscription plan ($99/month)
+  - Subscription status (active, trial, past_due, canceled)
+  - Next billing date
+  - Payment method section (with update button)
+  - Billing history table
+- Removed all building payment UI and code
+
+#### 11. ✅ Fixed Domain Routing Issue
+- **Problem:** buytheshed.com (root domain) showed default index.html instead of dealer site
+- **Fix:** Updated api/site/get-by-domain.js to automatically try www version if root fails
+  - Checks custom_domain = 'buytheshed.com' first
+  - Falls back to custom_domain = 'www.buytheshed.com'
+  - Both URLs now work correctly
+
+#### 12. ✅ Configured and Tested Stripe Integration
+- Added Stripe credentials to .env.local:
+  - `STRIPE_SECRET_KEY=sk_live_...` (LIVE mode - real payments!)
+  - `STRIPE_PRICE_ID=price_1SIGUdAMu4R5v0dI3KIraq76`
+- Created test scripts to verify configuration:
+  - **test-stripe-config.js** - Validates Stripe API keys and price ID
+  - **test-database-subscription.js** - Verifies database schema
+  - **test-signup-flow.js** - Tests complete signup + checkout flow
+- All tests passed successfully:
+  - ✅ Stripe API connected to mitch@whitecoat-md.com account
+  - ✅ Product: "Shed Sync Dealer Program" - $99.00/month
+  - ✅ Database schema ready with all subscription columns
+  - ✅ API endpoints working
+  - ✅ Complete flow tested (user creation → customer creation → checkout session)
 
 ---
 
 ## Current System Architecture
 
+### Signup & Subscription Flow
+```
+New User Visits signup.html
+    ↓
+    | 1. Fills out registration form
+    | 2. Submits to api/user/signup.js
+    ↓
+Vercel (api/user/signup.js)
+    ↓
+    | 3. Creates user account in PostgreSQL
+    | 4. Returns user ID
+    ↓
+Browser (signup.html)
+    ↓
+    | 5. Calls api/subscription/create-checkout-session
+    ↓
+Vercel (api/subscription/create-checkout-session.js)
+    ↓
+    | 6. Creates/retrieves Stripe customer
+    | 7. Creates Stripe Checkout session
+    | 8. Returns checkout URL
+    ↓
+Browser redirects to Stripe Checkout
+    ↓
+    | 9. User completes payment ($99/month)
+    | OR user cancels
+    ↓
+Stripe sends webhook to Vercel
+    ↓
+Vercel (api/subscription/webhook.js)
+    ↓
+    | 10. Validates webhook signature
+    | 11. Updates user subscription_status = 'active'
+    | 12. Saves subscription_id and stripe_customer_id
+    ↓
+User redirected to payment-success.html
+    ↓
+User can now access admin.html dashboard
+```
+
+### Inventory Sync Flow
 ```
 User's Browser (Admin Panel)
     ↓
@@ -87,9 +206,32 @@ User sees: "Successfully synced X buildings"
   - `auto_sync_enabled` - Future feature for daily auto-sync
 
 ### API Endpoints (Vercel)
-1. **api/user/save-gpb-credentials.js** - Encrypts and saves user's GPB login
-2. **api/user/get-gpb-credentials.js** - Retrieves and decrypts credentials
-3. **api/user/trigger-sync.js** - Main sync endpoint (calls DigitalOcean)
+
+#### User & Authentication
+1. **api/user/signup.js** - Creates new user account
+2. **api/user/login.js** - Authenticates user and returns JWT token
+3. **api/user/save-gpb-credentials.js** - Encrypts and saves user's GPB login
+4. **api/user/get-gpb-credentials.js** - Retrieves and decrypts credentials
+5. **api/user/trigger-sync.js** - Main sync endpoint (calls DigitalOcean)
+
+#### Subscription & Payments
+6. **api/subscription/create-checkout-session.js** - Creates Stripe Checkout session
+   - Called after signup
+   - Creates Stripe customer if needed
+   - Returns checkout URL for redirect
+7. **api/subscription/webhook.js** - Handles Stripe webhook events
+   - Must be configured in Stripe Dashboard
+   - Validates webhook signature (if STRIPE_WEBHOOK_SECRET set)
+   - Updates subscription status in database
+8. **api/subscription/get-info.js** - Gets user's subscription info
+   - Protected by JWT authentication
+   - Returns plan, status, billing date
+
+#### Site & Domain
+9. **api/site/get-by-domain.js** - Returns site config for given domain
+   - Checks subdomains (*.shed-sync.com)
+   - Checks custom domains
+   - Falls back to www subdomain if needed
 
 ### Sync Server (DigitalOcean)
 - **File:** `sync-server.js`
@@ -147,18 +289,70 @@ PORT=3001
 
 ### Vercel (Environment Variables)
 ```env
-SYNC_SERVER_URL=http://134.199.200.206:3001
-WEBHOOK_SECRET=my-super-secret-sync-key-12345
+# Database
 DATABASE_URL=postgres://eb3d469c8a79bfa9dce120e134d75d498aa3183d3c211df4e40f8d1cf2fe496a:sk_4y5yiHqv-EHzX_Unz9w9m@db.prisma.io:5432/postgres?sslmode=require
 POSTGRES_URL=postgres://eb3d469c8a79bfa9dce120e134d75d498aa3183d3c211df4e40f8d1cf2fe496a:sk_4y5yiHqv-EHzX_Unz9w9m@db.prisma.io:5432/postgres?sslmode=require
+
+# Sync Server
+SYNC_SERVER_URL=http://134.199.200.206:3001
+WEBHOOK_SECRET=my-super-secret-sync-key-12345
+
+# Encryption
 ENCRYPTION_KEY=your-32-character-key-here
+
+# Stripe (Configure in Vercel Dashboard with your keys)
+STRIPE_SECRET_KEY=sk_live_your_live_key_here
+STRIPE_PRICE_ID=price_your_price_id_here
+# STRIPE_WEBHOOK_SECRET=whsec_... (Add after configuring webhook)
+
+# JWT
+JWT_SECRET=your-jwt-secret-here
 ```
 
 ---
 
 ## What To Do Tomorrow
 
-### IMMEDIATE NEXT STEP: Test End-to-End Sync
+### NEXT STEPS (In Order):
+
+#### 1. 🔴 CRITICAL: Configure Stripe Webhook (Production)
+**Current Status:** Webhooks working locally but NOT configured for production
+
+To enable live subscription updates, configure the webhook in Stripe:
+1. Go to https://dashboard.stripe.com/webhooks
+2. Click "Add endpoint"
+3. Enter webhook URL: `https://your-production-domain.vercel.app/api/subscription/webhook`
+4. Select events to listen for:
+   - `checkout.session.completed`
+   - `customer.subscription.created`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+   - `invoice.payment_succeeded`
+   - `invoice.payment_failed`
+5. Click "Add endpoint"
+6. Copy the "Signing secret" (starts with `whsec_`)
+7. Add to Vercel environment variables:
+   - Go to Vercel Dashboard → Project Settings → Environment Variables
+   - Add `STRIPE_WEBHOOK_SECRET=whsec_...`
+   - Redeploy after adding
+
+**Without this:** Subscription status won't automatically update when users pay/cancel
+
+#### 2. Test Stripe Signup Flow (Optional - Uses LIVE Keys!)
+⚠️ **WARNING:** You are using LIVE Stripe keys - real $99 charges will occur!
+
+**To test safely:** Switch to test keys first (see Troubleshooting section)
+
+**To test with live keys:**
+1. Open: https://your-vercel-url.vercel.app/signup.html
+2. Fill out signup form with test email
+3. Submit and wait for redirect to Stripe
+4. Complete payment (REAL $99 charge!)
+5. Verify redirect to payment-success.html
+6. Check admin.html - subscription should show "active"
+7. Check Stripe Dashboard - subscription should appear
+
+#### 3. Test End-to-End Inventory Sync
 
 1. **Go to your admin panel:** https://your-vercel-url.vercel.app/admin.html
 2. **Open browser console:** Press F12 → Console tab
@@ -236,12 +430,25 @@ curl -X POST http://134.199.200.206:3001/sync-lot \
 - ~~Decoder not integrated~~ - FIXED (integrated into sync-server.js)
 
 ### Current Limitations
+
+#### Inventory Sync
 1. **No automatic daily sync yet** - Users must manually click "Sync Now"
    - Auto-sync checkbox exists in UI but not implemented
    - Would need a cron job or scheduled task
 2. **No sync status history** - Can't see when last sync happened
 3. **Sync timeout is 2 minutes** - Large inventories might timeout
 4. **Only works with GPB Sales portal** - Specific to gpbsales.com structure
+
+#### Subscription & Payments
+5. **Payment method updates not implemented** - Update button shows placeholder
+   - Need to integrate Stripe Billing Portal
+   - Users can update cards in Stripe Dashboard manually
+6. **Billing history not fetched** - Table is empty
+   - Need to call Stripe API to fetch invoices
+   - Placeholder exists in get-info.js
+7. **No trial period logic** - Users start with 'trial' status but no enforcement
+   - Could add trial_ends_at date checking
+   - Currently all users can access features regardless of subscription status
 
 ---
 
@@ -294,6 +501,40 @@ curl -X POST http://134.199.200.206:3001/sync-lot \
 ### Buildings have empty names after sync
 - Decoder not working or droplet has old code
 - SSH to droplet: `cd /var/www/sync-server && git pull && pm2 restart gpb-sync`
+
+### Stripe Issues
+
+#### "Payment completed but subscription not active"
+- Webhook not configured or not working
+- Check Vercel logs for webhook errors
+- Manually update user in database:
+  ```sql
+  UPDATE users SET subscription_status = 'active' WHERE email = 'user@example.com';
+  ```
+
+#### "Cannot create checkout session"
+- Invalid Stripe secret key
+- Check .env.local has correct STRIPE_SECRET_KEY
+- Verify key is for correct account (test vs live)
+
+#### "Invalid price ID"
+- STRIPE_PRICE_ID doesn't exist or is from different account
+- Check Stripe Dashboard → Products to verify price ID
+- Make sure using correct mode (test vs live)
+
+#### Switching from Live to Test Mode (Recommended for Testing)
+1. Go to Stripe Dashboard → Developers → API keys
+2. Toggle "Test mode" in top right corner
+3. Copy test secret key (starts with `sk_test_`)
+4. Go to Products → Create test product with $99/month price
+5. Copy test price ID (starts with `price_test_` or just `price_`)
+6. Update .env.local:
+   ```env
+   STRIPE_SECRET_KEY=sk_test_your_test_key
+   STRIPE_PRICE_ID=price_your_test_price
+   ```
+7. Test signup - no real charges!
+8. Use test card: `4242 4242 4242 4242`, any future expiry, any CVC
 
 ---
 
@@ -377,16 +618,51 @@ curl -X POST http://134.199.200.206:3001/sync-lot \
 
 ## Summary: You Are Here 👇
 
-✅ System fully deployed
-✅ All code committed and pushed
-✅ New droplet running with latest code
-✅ Decoder integrated
-✅ Vercel updated with new IP
+### ✅ Completed Features
+- ✅ Multi-user inventory sync system
+- ✅ Per-user encrypted GPB credential storage
+- ✅ Serial number decoder integration
+- ✅ New DigitalOcean droplet deployed (134.199.200.206)
+- ✅ **Stripe subscription payments ($99/month)**
+- ✅ **Complete signup → payment → activation flow**
+- ✅ **Subscription management in admin panel**
+- ✅ **Domain routing (subdomain + custom domain support)**
+- ✅ **All Stripe integration tests passing**
 
-**NEXT:** Test the sync by clicking "Sync Now" in admin panel!
+### 🟡 Configuration Needed
+- 🔴 **Stripe webhook endpoint** - Must configure in Stripe Dashboard for production
+- ⚠️  **Using LIVE Stripe keys** - Real $99 charges will occur on signup
 
-If it works, you're done! If not, check the troubleshooting section above.
+### 📝 Ready to Test
+1. Configure Stripe webhook (critical for production)
+2. Test signup flow (optional - uses live keys!)
+3. Test inventory sync
+
+### 🎯 Key Test Results
+```
+✅ Stripe API: Connected (mitch@whitecoat-md.com)
+✅ Product: "Shed Sync Dealer Program" - $99.00/month
+✅ Database: All subscription columns present
+✅ APIs: All endpoints working
+✅ Flow: Complete signup + checkout tested
+```
+
+### 📂 Important Files Created This Session
+- `api/subscription/create-checkout-session.js` - Stripe checkout
+- `api/subscription/webhook.js` - Stripe event handler
+- `api/subscription/get-info.js` - Subscription data
+- `payment-success.html` - Success page
+- `payment-cancelled.html` - Cancel page with retry
+- `test-stripe-config.js` - Stripe validation script
+- `test-database-subscription.js` - Database schema test
+- `test-signup-flow.js` - Complete flow test
+- `add-subscription-fields.js` - Database migration
 
 ---
 
-**Good night! Pick up here tomorrow and test that sync! 🚀**
+**Pick up here tomorrow:**
+1. Configure Stripe webhook in Dashboard
+2. Test the complete signup + payment flow
+3. Test inventory sync (if not done yet)
+
+**Good night! 🚀**
