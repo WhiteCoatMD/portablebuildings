@@ -75,6 +75,17 @@ async function handler(req, res) {
                 );
             }
 
+            // If no exact match and this starts with www, try non-www version
+            if (result.rows.length === 0 && domain.startsWith('www.')) {
+                const rootDomain = domain.replace('www.', '');
+                console.log(`[Site] No exact match, trying non-www version: ${rootDomain}`);
+
+                result = await pool.query(
+                    'SELECT * FROM users WHERE custom_domain = $1 AND domain_verified = true',
+                    [rootDomain]
+                );
+            }
+
             if (result.rows.length > 0) {
                 user = result.rows[0];
             }
