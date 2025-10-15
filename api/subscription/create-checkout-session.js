@@ -9,8 +9,8 @@ const stripe = require('stripe');
 const pool = getPool();
 
 // You'll need to set this in your .env file
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const STRIPE_PRICE_ID = process.env.STRIPE_PRICE_ID; // Your monthly subscription price ID
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY?.trim();
+const STRIPE_PRICE_ID = process.env.STRIPE_PRICE_ID?.trim(); // Your monthly subscription price ID
 
 async function handler(req, res) {
     if (req.method !== 'POST') {

@@ -6,8 +6,8 @@ const { getPool } = require('../../lib/db');
 const stripe = require('stripe');
 
 const pool = getPool();
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY?.trim();
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET?.trim();
 
 async function handler(req, res) {
     if (req.method !== 'POST') {

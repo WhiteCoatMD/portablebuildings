@@ -7,7 +7,7 @@ const { requireAuth } = require('../../lib/auth');
 const stripe = require('stripe');
 
 const pool = getPool();
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY?.trim();
 
 async function handler(req, res) {
     if (req.method !== 'POST') {
