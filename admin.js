@@ -3136,7 +3136,8 @@ function showPayPalModal() {
     // Load PayPal SDK if not already loaded
     if (!window.paypal) {
         const script = document.createElement('script');
-        script.src = 'https://www.paypal.com/sdk/js?client-id=AWJVJojcl_q3T5vJCd7XwtJxQSzabwzxXjrjZeA38lYG909dlrB9A3dcd-ww3oSf1MkiN5VHuLnEYT_d&vault=true&intent=subscription';
+        // Use SANDBOX client ID for testing - switch to live ID for production
+        script.src = 'https://www.paypal.com/sdk/js?client-id=AQrxr0jj7_pJyW_Lf__auoXgWU6YWeAedR6NYfgtk51RX1wHFwiVxKm4dqMB-MBpLZK2VvkJmLNdG6h7&vault=true&intent=subscription';
         script.setAttribute('data-sdk-integration-source', 'button-factory');
         script.onload = () => renderPayPalButton();
         document.head.appendChild(script);
