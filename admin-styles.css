@@ -6,16 +6,16 @@
 }
 
 :root {
-    --primary-color: #dc143c;
-    --secondary-color: #b8112e;
+    --primary-color: #ffd60a;
+    --secondary-color: #ffea00;
     --success-color: #27ae60;
-    --danger-color: #ff0000;
-    --warning-color: #f39c12;
-    --text-dark: #000000;
-    --text-light: #555;
-    --background: #f5f5f5;
+    --danger-color: #f44336;
+    --warning-color: #ff9800;
+    --text-dark: #1a1a2e;
+    --text-light: #666;
+    --background: #f8f9fa;
     --white: #ffffff;
-    --border: #d0d0d0;
+    --border: #e0e0e0;
 }
 
 body {
@@ -33,11 +33,12 @@ body {
 
 /* Header */
 .admin-header {
-    background: linear-gradient(135deg, #000000 0%, #2a2a2a 100%);
+    background: #1a1a2e;
     color: var(--white);
-    padding: 0.75rem 0;
+    padding: 1rem 0;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     margin-bottom: 1rem;
+    border-bottom: 2px solid #2a2a3e;
 }
 
 .admin-header .container {
@@ -225,14 +226,14 @@ textarea.form-control {
 }
 
 .btn-primary {
-    background: var(--primary-color);
-    color: var(--white);
+    background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%);
+    color: #1a1a2e;
+    box-shadow: 0 4px 12px rgba(255, 214, 10, 0.3);
 }
 
 .btn-primary:hover {
-    background: var(--secondary-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(26, 84, 144, 0.3);
+    box-shadow: 0 6px 20px rgba(255, 214, 10, 0.5);
 }
 
 .btn-secondary {
@@ -642,19 +643,19 @@ textarea.form-control {
 .upload-btn {
     display: inline-block;
     padding: 1rem 2rem;
-    background: var(--primary-color);
-    color: var(--white);
+    background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%);
+    color: #1a1a2e;
     border-radius: 8px;
     cursor: pointer;
     font-size: 1.1rem;
     font-weight: 600;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 214, 10, 0.3);
 }
 
 .upload-btn:hover {
-    background: var(--secondary-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(26, 84, 144, 0.3);
+    box-shadow: 0 6px 20px rgba(255, 214, 10, 0.5);
 }
 
 .upload-btn span {
