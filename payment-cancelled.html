@@ -128,42 +128,11 @@
     </div>
 
     <script>
-        // Retry payment button - creates new checkout session for existing user
-        document.getElementById('retry-btn').addEventListener('click', async (e) => {
+        // Retry payment button - redirect to signup to start PayPal flow
+        document.getElementById('retry-btn').addEventListener('click', (e) => {
             e.preventDefault();
-
-            const userId = localStorage.getItem('pending_user_id');
-            const email = localStorage.getItem('pending_user_email');
-
-            if (!userId || !email) {
-                // If no pending user info, go to signup
-                window.location.href = 'signup.html';
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/subscription/create-checkout-session', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userId: parseInt(userId),
-                        email: email
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success && data.url) {
-                    window.location.href = data.url;
-                } else {
-                    alert('Failed to create payment session. Please try again or contact support.');
-                }
-            } catch (error) {
-                console.error('Retry error:', error);
-                alert('Failed to create payment session. Please try again or contact support.');
-            }
+            // Redirect to signup to restart the PayPal subscription flow
+            window.location.href = 'signup.html';
         });
     </script>
 </body>
