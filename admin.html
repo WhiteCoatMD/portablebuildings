@@ -17,9 +17,12 @@
 
     <header class="admin-header">
         <div class="container">
-            <h1>Admin Panel</h1>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <img src="logo.png" alt="ShedSync Logo" style="height: 50px; width: auto;">
+                <h1>Admin Panel</h1>
+            </div>
             <div class="header-actions">
-                <span id="user-email" style="margin-right: 1rem; color: #666;"></span>
+                <span id="user-email" style="margin-right: 1rem; color: #e0e0e0;"></span>
                 <a href="super-admin.html" class="btn btn-secondary" id="super-admin-link" style="display: none; margin-right: 0.5rem;">Super Admin</a>
                 <a href="#" id="view-site-link" target="_blank" class="btn btn-secondary" onclick="viewSiteFromHeader(event)">View Site</a>
                 <button class="btn btn-secondary" onclick="logout()" style="margin-left: 0.5rem;">Logout</button>
