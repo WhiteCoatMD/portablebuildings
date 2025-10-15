@@ -48,10 +48,14 @@
         }
 
         .header-logo {
-            color: #ffd60a;
-            font-size: 1.5rem;
-            font-weight: 700;
+            display: flex;
+            align-items: center;
             text-decoration: none;
+        }
+
+        .header-logo img {
+            height: 50px;
+            width: auto;
         }
 
         .header-nav {
@@ -110,6 +114,18 @@
             bottom: 0;
             background: radial-gradient(circle at 50% 50%, rgba(255, 214, 10, 0.1) 0%, transparent 50%);
             pointer-events: none;
+        }
+
+        .hero-logo {
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-logo img {
+            height: 120px;
+            width: auto;
+            filter: drop-shadow(0 8px 24px rgba(255, 214, 10, 0.4));
         }
 
         .hero h1 {
@@ -274,6 +290,14 @@
         }
 
         @media (max-width: 768px) {
+            .header-logo img {
+                height: 40px;
+            }
+
+            .hero-logo img {
+                height: 80px;
+            }
+
             .hero h1 {
                 font-size: 2rem;
             }
@@ -301,7 +325,9 @@
 </head>
 <body>
     <header class="header">
-        <a href="/" class="header-logo">🏡 ShedSync</a>
+        <a href="/" class="header-logo">
+            <img src="logo.png" alt="ShedSync Logo">
+        </a>
         <nav class="header-nav">
             <a href="login.html" class="header-link">Login</a>
             <a href="signup.html" class="signup-btn">Start Free Trial</a>
@@ -309,7 +335,9 @@
     </header>
 
     <div class="hero">
-        <h1>🏡 ShedSync</h1>
+        <div class="hero-logo">
+            <img src="logo.png" alt="ShedSync Logo">
+        </div>
         <p>The modern multi-dealer inventory management platform for portable building dealers. Manage your inventory, customize your website, and grow your business.</p>
         <a href="login.html" class="cta-button">Dealer Login →</a>
     </div>
