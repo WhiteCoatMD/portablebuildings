@@ -84,20 +84,23 @@ Call us at {{phone}} or visit our website to learn more!
 #PortableBuildings #{{type}} #ForSale`;
 
         // Format RTO options (matching tooltip format for each term)
-        // Safely convert to number and format
+        // Safely convert to number and format - check for NaN
         const safeRto36 = building.rto36 ? parseFloat(building.rto36) : null;
         const safeRto48 = building.rto48 ? parseFloat(building.rto48) : null;
         const safeRto60 = building.rto60 ? parseFloat(building.rto60) : null;
         const safeRto72 = building.rto72 ? parseFloat(building.rto72) : null;
 
-        const rto36 = safeRto36 ? `36 months: $${safeRto36.toFixed(2)}/mo` : 'N/A';
-        const rto48 = safeRto48 ? `48 months: $${safeRto48.toFixed(2)}/mo` : 'N/A';
-        const rto60 = safeRto60 ? `60 months: $${safeRto60.toFixed(2)}/mo` : 'N/A';
-        const rto72 = safeRto72 ? `72 months: $${safeRto72.toFixed(2)}/mo` : 'N/A';
+        // Check for valid numbers (not NaN or null)
+        const isValidNumber = (val) => val !== null && !isNaN(val) && isFinite(val);
+
+        const rto36 = isValidNumber(safeRto36) ? `36 months: $${safeRto36.toFixed(2)}/mo` : 'N/A';
+        const rto48 = isValidNumber(safeRto48) ? `48 months: $${safeRto48.toFixed(2)}/mo` : 'N/A';
+        const rto60 = isValidNumber(safeRto60) ? `60 months: $${safeRto60.toFixed(2)}/mo` : 'N/A';
+        const rto72 = isValidNumber(safeRto72) ? `72 months: $${safeRto72.toFixed(2)}/mo` : 'N/A';
 
         // Format all RTO options together (matching the tooltip format)
         let rtoAll = '';
-        if (safeRto36) {
+        if (isValidNumber(safeRto36) && isValidNumber(safeRto48) && isValidNumber(safeRto60) && isValidNumber(safeRto72)) {
             rtoAll = `Rent-to-Own Options:
 • 36 months: $${safeRto36.toFixed(2)}/mo
 • 48 months: $${safeRto48.toFixed(2)}/mo
