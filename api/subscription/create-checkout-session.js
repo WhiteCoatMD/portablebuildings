@@ -29,10 +29,22 @@ async function handler(req, res) {
             });
         }
 
-        if (!STRIPE_SECRET_KEY) {
-            return res.status(500).json({
-                success: false,
-                error: 'Stripe not configured'
+        if (!STRIPE_SECRET_KEY || !STRIPE_PRICE_ID) {
+            console.warn('[Stripe Checkout] Stripe not configured - skipping payment');
+            // For development/testing: mark user as active without payment
+            await pool.query(
+                `UPDATE users
+                 SET subscription_status = 'active',
+                     subscription_plan = 'monthly',
+                     trial_ends_at = NOW() + INTERVAL '30 days'
+                 WHERE id = $1`,
+                [userId]
+            );
+
+            return res.status(200).json({
+                success: true,
+                skipPayment: true,
+                message: 'Stripe not configured - user activated for testing'
             });
         }
 

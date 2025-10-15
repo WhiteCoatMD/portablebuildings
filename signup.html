@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -22,12 +22,13 @@
         }
 
         .signup-container {
-            background: white;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             padding: 3rem;
             border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             max-width: 450px;
             width: 100%;
+            border: 1px solid #2a2a3e;
         }
 
         .logo {
@@ -36,13 +37,14 @@
         }
 
         .logo h1 {
-            color: #1a5490;
+            color: #ffd60a;
             font-size: 2rem;
             margin-bottom: 0.5rem;
+            font-weight: 700;
         }
 
         .logo p {
-            color: #666;
+            color: #a8a8b8;
             font-size: 0.95rem;
         }
 
@@ -53,7 +55,7 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #333;
+            color: #ffd60a;
             font-weight: 600;
             font-size: 0.95rem;
         }
@@ -61,15 +63,22 @@
         input {
             width: 100%;
             padding: 0.875rem;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #2a2a3e;
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: #0f1419;
+            color: #fff;
         }
 
         input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #ffd60a;
+            box-shadow: 0 0 0 3px rgba(255, 214, 10, 0.1);
+        }
+
+        input::placeholder {
+            color: #5a5a6a;
         }
 
         .password-wrapper {
@@ -85,7 +94,7 @@
             border: none;
             cursor: pointer;
             font-size: 1.2rem;
-            color: #666;
+            color: #a8a8b8;
             padding: 4px;
             display: flex;
             align-items: center;
@@ -93,32 +102,33 @@
         }
 
         .password-toggle:hover {
-            color: #333;
+            color: #ffd60a;
         }
 
         .help-text {
             font-size: 0.85rem;
-            color: #666;
+            color: #a8a8b8;
             margin-top: 0.5rem;
         }
 
         .btn {
             width: 100%;
             padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%);
+            color: #1a1a2e;
             border: none;
             border-radius: 8px;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             margin-top: 1rem;
+            box-shadow: 0 4px 12px rgba(255, 214, 10, 0.3);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(255, 214, 10, 0.5);
         }
 
         .btn:disabled {
@@ -155,17 +165,18 @@
         .login-link {
             text-align: center;
             margin-top: 1.5rem;
-            color: #666;
+            color: #a8a8b8;
             font-size: 0.95rem;
         }
 
         .login-link a {
-            color: #667eea;
+            color: #ffd60a;
             text-decoration: none;
             font-weight: 600;
         }
 
         .login-link a:hover {
+            color: #ffea00;
             text-decoration: underline;
         }
 
@@ -189,7 +200,7 @@
 <body>
     <div class="signup-container">
         <div class="logo">
-            <h1>🏠 Portable Buildings</h1>
+            <h1>🏡 ShedSync</h1>
             <p>Create Your Account</p>
         </div>
 
@@ -355,9 +366,17 @@
 
                         const checkoutData = await checkoutResponse.json();
 
-                        if (checkoutData.success && checkoutData.url) {
-                            // Redirect to Stripe Checkout
-                            window.location.href = checkoutData.url;
+                        if (checkoutData.success) {
+                            if (checkoutData.skipPayment) {
+                                // Stripe not configured - redirect directly to login
+                                showSuccess('Account created! Redirecting to login...');
+                                setTimeout(() => {
+                                    window.location.href = 'login.html';
+                                }, 1500);
+                            } else if (checkoutData.url) {
+                                // Redirect to Stripe Checkout
+                                window.location.href = checkoutData.url;
+                            }
                         } else {
                             showError('Payment setup failed. Please contact support.');
                             btn.disabled = false;
