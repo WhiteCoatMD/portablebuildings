@@ -39,18 +39,15 @@ module.exports = async (req, res) => {
         })).toString('base64');
 
         // Facebook OAuth URL with required permissions
-        // Using public_profile (automatically approved) to get user authentication
-        // The /me/accounts endpoint will return page tokens with manage and post permissions
-        // if the user is an admin of the page - no additional permissions needed
-        // Note: To request pages_manage_posts and pages_read_engagement, you need to:
-        // 1. Search for them in your App Dashboard under "Permissions and Features"
-        // 2. Add them to your app
-        // 3. Request Advanced Access through App Review
+        // Using pages_manage_posts and pages_read_engagement
+        // With Standard Access: Works for app developers/testers only
+        // With Advanced Access: Works for all users (requires App Review)
+        // Test this flow to make "Request Advanced Access" button available in Facebook App Dashboard
         const facebookAuthUrl = `https://www.facebook.com/v21.0/dialog/oauth?` +
             `client_id=${FACEBOOK_APP_ID}` +
             `&redirect_uri=${encodeURIComponent(FACEBOOK_REDIRECT_URI)}` +
             `&state=${state}` +
-            `&scope=public_profile` +
+            `&scope=pages_manage_posts,pages_read_engagement` +
             `&response_type=code`;
 
         console.log('[FB OAuth] Redirecting user to Facebook authorization');
