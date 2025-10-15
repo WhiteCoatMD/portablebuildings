@@ -125,4 +125,28 @@ async function handler(req, res) {
     }
 }
 
-module.exports = handler;
+// Allow both authenticated and unauthenticated access (for signup flow)
+// Authentication is optional - if authenticated, req.user will be populated
+module.exports = async (req, res) => {
+    // Try to authenticate, but don't require it
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        try {
+            const { verifyToken } = require('../../lib/auth');
+            const token = authHeader.substring(7);
+            const decoded = verifyToken(token);
+            if (decoded) {
+                // Populate req.user if token is valid
+                const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [decoded.userId]);
+                if (userResult.rows.length > 0) {
+                    req.user = userResult.rows[0];
+                }
+            }
+        } catch (err) {
+            // Token invalid, but that's okay - continue without auth
+            console.log('[Checkout] Token validation failed, continuing without auth');
+        }
+    }
+
+    return handler(req, res);
+};

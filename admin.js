@@ -3259,9 +3259,8 @@ async function disconnectFacebook() {
 }
 
 async function loadFacebookConnectionStatus() {
-    const settings = await loadAllSettings();
-    const pageName = settings.cpb_facebook_page_name;
-    const pageId = settings.cpb_facebook_page_id;
+    const pageName = getSetting('cpb_facebook_page_name', null);
+    const pageId = getSetting('cpb_facebook_page_id', null);
 
     const connectedDiv = document.getElementById('facebook-connected');
     const notConnectedDiv = document.getElementById('facebook-not-connected');
