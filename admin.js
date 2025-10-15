@@ -3100,31 +3100,107 @@ async function loadSubscriptionInfo() {
     }
 }
 
-// Upgrade to premium subscription
+// Upgrade to premium subscription with PayPal
 async function upgradeToPremium() {
-    const token = localStorage.getItem('auth_token');
-    try {
-        showToast('Redirecting to checkout...');
+    // Show PayPal modal
+    showPayPalModal();
+}
 
-        const response = await fetch('/api/subscription/create-checkout-session', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({}) // userId and email come from authenticated token
-        });
+// Show PayPal subscription modal
+function showPayPalModal() {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
 
-        const data = await response.json();
-        if (data.success && data.url) {
-            window.location.href = data.url; // Redirect to Stripe Checkout
-        } else {
-            showToast('Failed to create checkout session: ' + (data.error || 'Unknown error'), true);
-        }
-    } catch (error) {
-        console.error('Upgrade error:', error);
-        showToast('Failed to start upgrade process', true);
+    modal.innerHTML = `
+        <div style="background: white; padding: 2rem; border-radius: 12px; max-width: 500px; width: 90%; position: relative;">
+            <button onclick="this.closest('div').parentElement.remove()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666;">&times;</button>
+            <h2 style="margin: 0 0 1rem 0; color: #333;">Upgrade to Premium</h2>
+            <p style="color: #666; margin-bottom: 1.5rem;">Subscribe for $99/month to unlock all features and keep your website online.</p>
+            <div id="paypal-button-container-P-4RF99845JE904724ANDX4CNQ"></div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Load PayPal SDK if not already loaded
+    if (!window.paypal) {
+        const script = document.createElement('script');
+        script.src = 'https://www.paypal.com/sdk/js?client-id=AWJVJojcl_q3T5vJCd7XwtJxQSzabwzxXjrjZeA38lYG909dlrB9A3dcd-ww3oSf1MkiN5VHuLnEYT_d&vault=true&intent=subscription';
+        script.setAttribute('data-sdk-integration-source', 'button-factory');
+        script.onload = () => renderPayPalButton();
+        document.head.appendChild(script);
+    } else {
+        renderPayPalButton();
     }
+}
+
+// Render PayPal subscription button
+function renderPayPalButton() {
+    const token = localStorage.getItem('auth_token');
+
+    paypal.Buttons({
+        style: {
+            shape: 'pill',
+            color: 'gold',
+            layout: 'horizontal',
+            label: 'subscribe'
+        },
+        createSubscription: function(data, actions) {
+            return actions.subscription.create({
+                plan_id: 'P-4RF99845JE904724ANDX4CNQ'
+            });
+        },
+        onApprove: async function(data, actions) {
+            console.log('PayPal subscription approved:', data.subscriptionID);
+
+            // Send subscription ID to backend to activate user
+            try {
+                const response = await fetch('/api/subscription/paypal-activate', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        subscriptionId: data.subscriptionID
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Subscription activated successfully!');
+                    // Close modal
+                    document.querySelectorAll('div[style*="position: fixed"]').forEach(el => el.remove());
+                    // Reload subscription info
+                    loadSubscriptionInfo();
+                } else {
+                    showToast('Subscription created but activation failed: ' + result.error, true);
+                }
+            } catch (error) {
+                console.error('Activation error:', error);
+                showToast('Subscription created but activation failed', true);
+            }
+        },
+        onError: function(err) {
+            console.error('PayPal error:', err);
+            showToast('Payment failed. Please try again.', true);
+        },
+        onCancel: function(data) {
+            console.log('PayPal subscription cancelled');
+            showToast('Subscription cancelled');
+        }
+    }).render('#paypal-button-container-P-4RF99845JE904724ANDX4CNQ');
 }
 
 // Update payment method via Stripe Billing Portal
