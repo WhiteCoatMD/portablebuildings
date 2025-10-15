@@ -39,14 +39,18 @@ module.exports = async (req, res) => {
         })).toString('base64');
 
         // Facebook OAuth URL with required permissions
-        // App has been reviewed and approved by Facebook
-        // Using pages_manage_posts for posting to pages (replaces deprecated publish_pages)
-        // Using pages_read_engagement (required dependency of pages_manage_posts)
+        // Using public_profile (automatically approved) to get user authentication
+        // The /me/accounts endpoint will return page tokens with manage and post permissions
+        // if the user is an admin of the page - no additional permissions needed
+        // Note: To request pages_manage_posts and pages_read_engagement, you need to:
+        // 1. Search for them in your App Dashboard under "Permissions and Features"
+        // 2. Add them to your app
+        // 3. Request Advanced Access through App Review
         const facebookAuthUrl = `https://www.facebook.com/v21.0/dialog/oauth?` +
             `client_id=${FACEBOOK_APP_ID}` +
             `&redirect_uri=${encodeURIComponent(FACEBOOK_REDIRECT_URI)}` +
             `&state=${state}` +
-            `&scope=pages_manage_posts,pages_read_engagement` +
+            `&scope=public_profile` +
             `&response_type=code`;
 
         console.log('[FB OAuth] Redirecting user to Facebook authorization');
