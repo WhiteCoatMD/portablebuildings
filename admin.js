@@ -2991,26 +2991,65 @@ async function loadSubscriptionInfo() {
         if (data.success) {
             // Update subscription info
             if (data.subscription) {
-                // Update status with proper color
-                const statusColors = {
-                    'active': '#4caf50',
-                    'trial': '#ff9800',
-                    'past_due': '#f44336',
-                    'canceled': '#999'
-                };
-                const statusColor = statusColors[data.subscription.status] || '#666';
-                const statusText = data.subscription.status.charAt(0).toUpperCase() + data.subscription.status.slice(1);
+                const sub = data.subscription;
 
-                document.getElementById('subscription-status').innerHTML =
-                    `<span style="color: ${statusColor};">● ${statusText}</span>`;
+                // Check if user is on trial
+                if (sub.status === 'trial') {
+                    if (sub.isTrialExpired) {
+                        // TRIAL EXPIRED - Show urgent upgrade message
+                        document.getElementById('subscription-plan').innerHTML = '<span style="color: #f44336; font-weight: bold;">⚠️ Trial Expired</span>';
+                        document.getElementById('subscription-amount').innerHTML = '<span style="color: #f44336; font-weight: bold;">Upgrade Required</span>';
+                        document.getElementById('subscription-status').innerHTML = '<span style="color: #f44336;">● Expired</span>';
+                        document.getElementById('subscription-next-billing').textContent = '—';
 
-                document.getElementById('subscription-next-billing').textContent =
-                    data.subscription.nextBillingDate || '—';
+                        // Add urgent upgrade banner
+                        const upgradeHTML = `
+                            <div style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); color: white; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; text-align: center;">
+                                <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">🚨 Your Trial Has Ended</h3>
+                                <p style="margin: 0 0 1rem 0; font-size: 0.95rem; opacity: 0.95;">Your public website is currently offline. Upgrade now to reactivate your site and unlock all features.</p>
+                                <button class="btn" onclick="upgradeToPremium()" style="background: white; color: #f44336; font-weight: bold; padding: 1rem 2rem; font-size: 1.1rem;">
+                                    💳 Upgrade to Premium - $99/month
+                                </button>
+                            </div>
+                        `;
+                        document.getElementById('subscription-info').insertAdjacentHTML('beforeend', upgradeHTML);
 
-                // Update amount if available
-                if (data.subscription.amount && data.subscription.interval) {
-                    document.getElementById('subscription-amount').textContent =
-                        `$${data.subscription.amount}/${data.subscription.interval}`;
+                    } else {
+                        // TRIAL ACTIVE - Show countdown
+                        document.getElementById('subscription-plan').textContent = 'Free Trial';
+                        document.getElementById('subscription-amount').innerHTML = '<span style="color: #4caf50; font-weight: bold;">$0 (Trial)</span>';
+                        document.getElementById('subscription-status').innerHTML = `<span style="color: #ff9800;">🕐 ${sub.hoursRemaining} hours remaining</span>`;
+                        document.getElementById('subscription-next-billing').innerHTML = `<span style="color: #666; font-size: 0.9rem;">Trial ends: ${new Date(sub.trialEndsAt).toLocaleString()}</span>`;
+
+                        // Add upgrade button
+                        const upgradeHTML = `
+                            <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffe5b4 100%); border-left: 4px solid #ff9800; padding: 1.25rem; border-radius: 8px; margin-top: 1.5rem;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div style="font-size: 2rem;">⏰</div>
+                                    <div style="flex: 1;">
+                                        <strong style="color: #856404; font-size: 1.05rem; display: block; margin-bottom: 0.25rem;">Trial Period Active</strong>
+                                        <p style="margin: 0; color: #856404; font-size: 0.9rem;">You have ${sub.hoursRemaining} hours remaining. Upgrade anytime to keep your site running after the trial ends.</p>
+                                    </div>
+                                    <button class="btn btn-warning" onclick="upgradeToPremium()" style="padding: 0.75rem 1.5rem; white-space: nowrap;">
+                                        ⬆️ Upgrade Now
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('subscription-info').insertAdjacentHTML('beforeend', upgradeHTML);
+                    }
+                } else {
+                    // PAID SUBSCRIPTION - Show normal info
+                    document.getElementById('subscription-plan').textContent = 'Monthly Subscription';
+                    document.getElementById('subscription-status').innerHTML = '<span style="color: #4caf50;">● Active</span>';
+                    document.getElementById('subscription-next-billing').textContent = sub.nextBillingDate || '—';
+
+                    // Update amount if available
+                    if (sub.amount && sub.interval) {
+                        document.getElementById('subscription-amount').textContent = `$${sub.amount}/${sub.interval}`;
+                    } else {
+                        document.getElementById('subscription-amount').textContent = '$99/month';
+                    }
                 }
             }
 
@@ -3056,8 +3095,59 @@ async function loadSubscriptionInfo() {
     }
 }
 
+// Upgrade to premium subscription
+async function upgradeToPremium() {
+    const token = localStorage.getItem('auth_token');
+    try {
+        showToast('Redirecting to checkout...');
+
+        const response = await fetch('/api/subscription/create-checkout-session', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({}) // userId and email come from authenticated token
+        });
+
+        const data = await response.json();
+        if (data.success && data.url) {
+            window.location.href = data.url; // Redirect to Stripe Checkout
+        } else {
+            showToast('Failed to create checkout session: ' + (data.error || 'Unknown error'), true);
+        }
+    } catch (error) {
+        console.error('Upgrade error:', error);
+        showToast('Failed to start upgrade process', true);
+    }
+}
+
+// Update payment method via Stripe Billing Portal
 async function updatePaymentMethod() {
-    showToast('Payment method update coming soon - contact billing@shed-sync.com');
+    const token = localStorage.getItem('auth_token');
+    try {
+        showToast('Opening billing portal...');
+
+        const response = await fetch('/api/subscription/create-billing-portal-session', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+        if (data.success && data.url) {
+            window.location.href = data.url; // Redirect to Stripe Billing Portal
+        } else {
+            // User doesn't have payment method yet - send to upgrade flow
+            if (confirm('No payment method on file. Would you like to upgrade to premium now?')) {
+                upgradeToPremium();
+            }
+        }
+    } catch (error) {
+        console.error('Billing portal error:', error);
+        showToast('Failed to open billing portal', true);
+    }
 }
 
 // Export functions to global scope

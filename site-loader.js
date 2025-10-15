@@ -20,6 +20,30 @@ window.PROCESSED_INVENTORY = [];
         const data = await response.json();
 
         if (!data.success) {
+            // Check if trial has expired
+            if (data.trialExpired) {
+                console.warn('[Site Loader] Trial period expired');
+                document.body.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+                        <div style="max-width: 600px; text-align: center; background: rgba(255,255,255,0.05); padding: 3rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">⏰</div>
+                            <h1 style="color: #ffd60a; font-size: 2.5rem; margin: 0 0 1rem 0; font-weight: 700;">Trial Period Ended</h1>
+                            <p style="color: #e0e0e0; font-size: 1.25rem; margin-bottom: 2rem; line-height: 1.6;">
+                                This dealer's trial period has ended. The public website is temporarily offline until the subscription is activated.
+                            </p>
+                            <div style="background: rgba(255,214,10,0.1); border-left: 4px solid #ffd60a; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                                <p style="color: #ffd60a; margin: 0; font-weight: 600;">🏡 Site Owner?</p>
+                                <p style="color: #a8a8b8; margin: 0.5rem 0 0 0; font-size: 0.95rem;">Log in to your admin panel to upgrade and reactivate your site instantly.</p>
+                            </div>
+                            <a href="/login.html" style="display: inline-block; padding: 1rem 2.5rem; background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%); color: #1a1a2e; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 1.1rem; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(255,214,10,0.3);">
+                                🔐 Login to Upgrade
+                            </a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
             // If this is the main site, redirect to the SaaS landing page
             if (data.isMainSite) {
                 console.log('[Site Loader] Main site detected, using default configuration');

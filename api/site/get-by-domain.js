@@ -99,6 +99,20 @@ async function handler(req, res) {
             });
         }
 
+        // CHECK TRIAL STATUS - Block access if trial expired
+        if (user.subscription_status === 'trial' && user.trial_ends_at) {
+            const trialExpired = new Date(user.trial_ends_at) < new Date();
+            if (trialExpired) {
+                console.log(`[Site] Trial expired for user ${user.id} (${user.email})`);
+                return res.status(403).json({
+                    success: false,
+                    error: 'Trial expired',
+                    message: 'This dealer\'s trial period has ended. Site access is suspended until subscription is activated.',
+                    trialExpired: true
+                });
+            }
+        }
+
         // Load user's settings from database
         let settings = {};
         try {
