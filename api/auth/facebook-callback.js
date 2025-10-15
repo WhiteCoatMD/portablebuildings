@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
         console.log('[FB OAuth] Processing callback for user:', userId);
 
         // Exchange code for access token
-        const tokenResponse = await axios.get('https://graph.facebook.com/v19.0/oauth/access_token', {
+        const tokenResponse = await axios.get('https://graph.facebook.com/v21.0/oauth/access_token', {
             params: {
                 client_id: FACEBOOK_APP_ID,
                 client_secret: FACEBOOK_APP_SECRET,
@@ -50,8 +50,8 @@ module.exports = async (req, res) => {
 
         const userAccessToken = tokenResponse.data.access_token;
 
-        // Get user's pages
-        const pagesResponse = await axios.get('https://graph.facebook.com/v19.0/me/accounts', {
+        // Get user's pages (returns page tokens with posting permissions)
+        const pagesResponse = await axios.get('https://graph.facebook.com/v21.0/me/accounts', {
             params: {
                 access_token: userAccessToken
             }
@@ -73,7 +73,7 @@ module.exports = async (req, res) => {
         console.log('[FB OAuth] Found page:', pageName, 'ID:', pageId);
 
         // Exchange for long-lived token (60 days)
-        const longLivedTokenResponse = await axios.get('https://graph.facebook.com/v19.0/oauth/access_token', {
+        const longLivedTokenResponse = await axios.get('https://graph.facebook.com/v21.0/oauth/access_token', {
             params: {
                 grant_type: 'fb_exchange_token',
                 client_id: FACEBOOK_APP_ID,

@@ -39,13 +39,16 @@ module.exports = async (req, res) => {
         })).toString('base64');
 
         // Facebook OAuth URL with required permissions
-        // Updated to current Facebook API v21.0 permissions (2025)
-        // Using only the core permissions that are approved for the app
+        // For Facebook Apps in Development Mode (no App Review required):
+        // - Use basic public_profile to authenticate
+        // - Get page access through /me/accounts endpoint
+        // - Page tokens from /me/accounts include posting permissions automatically
+        // Note: In Dev Mode, posts only visible to app developers/page admins
         const facebookAuthUrl = `https://www.facebook.com/v21.0/dialog/oauth?` +
             `client_id=${FACEBOOK_APP_ID}` +
             `&redirect_uri=${encodeURIComponent(FACEBOOK_REDIRECT_URI)}` +
             `&state=${state}` +
-            `&scope=pages_manage_posts` +
+            `&scope=public_profile` +
             `&response_type=code`;
 
         console.log('[FB OAuth] Redirecting user to Facebook authorization');
