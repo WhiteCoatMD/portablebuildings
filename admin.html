@@ -862,20 +862,37 @@ Call us at {{phone}} or visit our website to learn more!
                 <div class="domain-section">
                     <h3>Custom Domain</h3>
 
-                    <div id="custom-domain-display" style="display: none;">
-                        <div class="domain-url-display" style="border-color: #4caf50;">
-                            <span id="current-custom-domain"></span>
-                            <span class="verification-status verified" id="domain-verification-status">
-                                ✓ Verified
-                            </span>
+                    <!-- Domain Status Display (always visible when domain exists) -->
+                    <div id="custom-domain-status" style="display: none; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 1.25rem; border: 2px solid #ffd60a;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                                <div style="flex: 1;">
+                                    <div style="color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">Current Domain:</div>
+                                    <div style="font-size: 1.25rem; color: #fff; font-weight: 600;" id="current-custom-domain-text"></div>
+                                </div>
+                                <div>
+                                    <span class="verification-status" id="domain-verification-badge">
+                                        ⏳ Pending Verification
+                                    </span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <button class="domain-action-btn" onclick="checkDomainVerification()" id="check-verification-btn" style="background: #2196f3;">
+                                    🔄 Check Status
+                                </button>
+                                <button class="domain-action-btn" onclick="removeCustomDomain()" style="background: #f44336;">
+                                    🗑️ Remove Domain
+                                </button>
+                            </div>
                         </div>
-                        <button class="domain-action-btn" onclick="removeCustomDomain()">
-                            🗑️ Remove Custom Domain
-                        </button>
                     </div>
 
+                    <!-- Domain Input Form -->
                     <div id="custom-domain-form">
                         <div class="form-group">
+                            <label style="color: #ffd60a; font-weight: 600; display: block; margin-bottom: 0.75rem;">
+                                Enter Your Domain
+                            </label>
                             <input type="text"
                                    id="custom-domain-input"
                                    class="domain-input"

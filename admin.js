@@ -2675,10 +2675,35 @@ async function loadDomainInfo() {
     }
 
     // Load custom domain if exists
-    if (user.custom_domain && user.domain_verified) {
-        document.getElementById('custom-domain-display').style.display = 'block';
-        document.getElementById('custom-domain-form').style.display = 'none';
-        document.getElementById('current-custom-domain').textContent = user.custom_domain;
+    if (user.custom_domain) {
+        const statusDiv = document.getElementById('custom-domain-status');
+        const formDiv = document.getElementById('custom-domain-form');
+        const domainText = document.getElementById('current-custom-domain-text');
+        const badge = document.getElementById('domain-verification-badge');
+        const inputField = document.getElementById('custom-domain-input');
+
+        // Show status box
+        if (statusDiv) statusDiv.style.display = 'block';
+        if (domainText) domainText.textContent = user.custom_domain;
+
+        // Update input field to show current domain
+        if (inputField) inputField.value = user.custom_domain;
+
+        // Update verification badge
+        if (badge) {
+            if (user.domain_verified) {
+                badge.className = 'verification-status verified';
+                badge.textContent = '✓ Verified';
+            } else {
+                badge.className = 'verification-status pending';
+                badge.textContent = '⏳ Pending Verification';
+            }
+        }
+
+        // Show DNS instructions if not verified
+        if (!user.domain_verified) {
+            document.getElementById('dns-instructions').style.display = 'block';
+        }
     }
 
     // Load building stats
@@ -2771,15 +2796,23 @@ async function saveCustomDomain() {
         if (result.success) {
             showToast('Custom domain saved! Please configure DNS.');
 
-            // Show DNS instructions
-            const user = window.currentUser;
-            const subdomainValueEl = document.getElementById('dns-subdomain-value');
-            if (subdomainValueEl) {
-                subdomainValueEl.textContent = `${user.subdomain}.shed-sync.com`;
+            // Show domain status box
+            const statusDiv = document.getElementById('custom-domain-status');
+            const domainText = document.getElementById('current-custom-domain-text');
+            const badge = document.getElementById('domain-verification-badge');
+
+            if (statusDiv) statusDiv.style.display = 'block';
+            if (domainText) domainText.textContent = domain;
+            if (badge) {
+                badge.className = 'verification-status pending';
+                badge.textContent = '⏳ Pending Verification';
             }
+
+            // Show DNS instructions
             document.getElementById('dns-instructions').style.display = 'block';
 
             // Update user object
+            const user = window.currentUser;
             user.custom_domain = domain;
             user.domain_verified = false;
         } else {
@@ -2788,6 +2821,75 @@ async function saveCustomDomain() {
     } catch (error) {
         console.error('Save custom domain error:', error);
         showToast('Failed to save custom domain', true);
+    }
+}
+
+async function checkDomainVerification() {
+    const btn = document.getElementById('check-verification-btn');
+    const originalText = btn ? btn.textContent : '';
+
+    if (btn) {
+        btn.textContent = '🔄 Checking...';
+        btn.disabled = true;
+    }
+
+    try {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('/api/user/check-domain-status', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.hasDomain) {
+            const badge = document.getElementById('domain-verification-badge');
+            const user = window.currentUser;
+
+            if (result.verified) {
+                // Domain is verified!
+                if (badge) {
+                    badge.className = 'verification-status verified';
+                    badge.textContent = '✓ Verified';
+                }
+
+                // Hide DNS instructions
+                document.getElementById('dns-instructions').style.display = 'none';
+
+                // Update user object
+                user.domain_verified = true;
+
+                if (result.autoVerified) {
+                    showToast('✓ Domain verified successfully!');
+                } else {
+                    showToast('✓ Domain is verified and active!');
+                }
+            } else {
+                // Still pending
+                if (badge) {
+                    badge.className = 'verification-status pending';
+                    badge.textContent = '⏳ Pending Verification';
+                }
+
+                showToast(result.message || 'Domain not verified yet. Please check DNS configuration.', true);
+
+                // Show helpful message
+                if (result.helpText) {
+                    setTimeout(() => showToast(result.helpText, true), 2000);
+                }
+            }
+        } else {
+            showToast('Unable to check domain status', true);
+        }
+    } catch (error) {
+        console.error('Check domain verification error:', error);
+        showToast('Failed to check domain status', true);
+    } finally {
+        if (btn) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
     }
 }
 
@@ -2813,9 +2915,8 @@ async function removeCustomDomain() {
         if (result.success) {
             showToast('Custom domain removed!');
 
-            // Hide custom domain display, show form
-            document.getElementById('custom-domain-display').style.display = 'none';
-            document.getElementById('custom-domain-form').style.display = 'block';
+            // Hide custom domain status, show form
+            document.getElementById('custom-domain-status').style.display = 'none';
             document.getElementById('custom-domain-input').value = '';
             document.getElementById('dns-instructions').style.display = 'none';
 
@@ -3304,6 +3405,7 @@ window.viewLiveSite = viewLiveSite;
 window.copySubdomainUrl = copySubdomainUrl;
 window.saveCustomDomain = saveCustomDomain;
 window.removeCustomDomain = removeCustomDomain;
+window.checkDomainVerification = checkDomainVerification;
 window.copyDnsValue = copyDnsValue;
 window.updatePaymentMethod = updatePaymentMethod;
 window.checkSubdomainAvailability = checkSubdomainAvailability;
