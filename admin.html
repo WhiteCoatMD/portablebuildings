@@ -896,47 +896,62 @@ Call us at {{phone}} or visit our website to learn more!
                 <div class="dns-instructions" id="dns-instructions" style="display: none;">
                     <h4>⚙️ DNS Configuration Required</h4>
                     <p style="color: #a8a8b8; margin-bottom: 1.5rem;">
-                        Follow these steps to connect your custom domain:
+                        Follow these steps to connect your custom domain. You'll need to add <strong>TWO</strong> DNS records:
                     </p>
 
                     <div style="background: rgba(255, 214, 10, 0.08); border-left: 3px solid #ffd60a; padding: 1.25rem; margin: 1rem 0; border-radius: 4px;">
-                        <strong style="color: #ffd60a; display: block; margin-bottom: 1rem;">📋 Step-by-Step Guide for GoDaddy (and most other registrars):</strong>
+                        <strong style="color: #ffd60a; display: block; margin-bottom: 1rem;">📋 Step-by-Step Guide:</strong>
 
                         <ol style="color: #a8a8b8; margin: 0; padding-left: 1.5rem; line-height: 1.8;">
-                            <li><strong style="color: #fff;">Log in to your GoDaddy account</strong> and go to "My Products"</li>
+                            <li><strong style="color: #fff;">Log in to your domain registrar</strong> (GoDaddy, Namecheap, etc.) and go to DNS settings</li>
                             <li><strong style="color: #fff;">Find your domain</strong> (e.g., yourdomain.com) and click "DNS" or "Manage DNS"</li>
-                            <li><strong style="color: #fff;">Add a CNAME record</strong> with these exact settings:</li>
+                            <li><strong style="color: #fff;">Add the following two records:</strong></li>
                         </ol>
+                    </div>
+
+                    <div style="background: rgba(33, 150, 243, 0.1); border-left: 3px solid #2196f3; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                        <strong style="color: #2196f3; display: block; margin-bottom: 0.75rem;">Record 1: A Record (for root domain)</strong>
+                        <p style="color: #a8a8b8; margin: 0 0 1rem 0; font-size: 0.9rem;">This makes yourdomain.com work</p>
+                    </div>
+
+                    <div class="dns-record" style="margin: 1.5rem 0;">
+                        <strong>Type:</strong> <code>A</code><br>
+                        <strong>Name:</strong> <code>@</code> <span style="color: #a8a8b8; font-size: 0.85rem; font-weight: normal;">(this means root domain)</span><br>
+                        <strong>Value/Points to:</strong> <code>76.76.21.93</code>
+                        <button class="copy-btn" onclick="navigator.clipboard.writeText('76.76.21.93').then(() => alert('✓ Copied to clipboard!'))">📋 Copy</button><br>
+                        <strong style="margin-top: 0.5rem; display: inline-block;">TTL:</strong> <code>1 Hour</code> <span style="color: #a8a8b8; font-size: 0.85rem; font-weight: normal;"> (or leave as default)</span>
+                    </div>
+
+                    <div style="background: rgba(33, 150, 243, 0.1); border-left: 3px solid #2196f3; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                        <strong style="color: #2196f3; display: block; margin-bottom: 0.75rem;">Record 2: CNAME Record (for www subdomain)</strong>
+                        <p style="color: #a8a8b8; margin: 0 0 1rem 0; font-size: 0.9rem;">This makes www.yourdomain.com work</p>
                     </div>
 
                     <div class="dns-record" style="margin: 1.5rem 0;">
                         <strong>Type:</strong> <code>CNAME</code><br>
                         <strong>Name:</strong> <code>www</code><br>
                         <strong>Value/Points to:</strong> <code>cname.vercel-dns.com</code>
-                        <button class="copy-btn" onclick="navigator.clipboard.writeText('cname.vercel-dns.com').then(() => alert('✓ Copied to clipboard!'))">📋 Copy Value</button><br>
+                        <button class="copy-btn" onclick="navigator.clipboard.writeText('cname.vercel-dns.com').then(() => alert('✓ Copied to clipboard!'))">📋 Copy</button><br>
                         <strong style="margin-top: 0.5rem; display: inline-block;">TTL:</strong> <code>1 Hour</code> <span style="color: #a8a8b8; font-size: 0.85rem; font-weight: normal;"> (or leave as default)</span>
+                    </div>
+
+                    <div style="background: rgba(76, 175, 80, 0.1); border-left: 3px solid #4caf50; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                        <strong style="color: #4caf50; display: block; margin-bottom: 0.75rem;">✓ After Adding Both Records:</strong>
+                        <p style="color: #a8a8b8; margin: 0; font-size: 0.9rem; line-height: 1.6;">
+                            Both <code>yourdomain.com</code> AND <code>www.yourdomain.com</code> will work!<br><br>
+                            The A record makes your root domain work, and the CNAME makes the www subdomain work. This is the standard setup used by professional websites.
+                        </p>
                     </div>
 
                     <div style="background: rgba(255, 255, 255, 0.05); border-left: 3px solid #a8a8b8; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
                         <strong style="color: #a8a8b8; font-size: 0.9rem;">⚠️ Common Issues:</strong>
                         <ul style="color: #a8a8b8; margin: 0.5rem 0 0 1.5rem; font-size: 0.85rem; line-height: 1.6;">
-                            <li>If you see an existing "A" record for "www", <strong>delete it first</strong> before adding the CNAME</li>
-                            <li>Make sure you're adding the record for <strong>"www"</strong> not "@" (root)</li>
-                            <li>Don't include "http://" or "https://" in the Value field</li>
+                            <li>If you see an existing "A" record for "www", <strong>delete it</strong> before adding the CNAME record</li>
+                            <li>Make sure the A record uses <strong>"@"</strong> (or leave Name blank for root domain)</li>
+                            <li>Make sure the CNAME record uses <strong>"www"</strong> not "@"</li>
+                            <li>Don't include "http://" or "https://" in any Value field</li>
+                            <li>Some registrars automatically add the domain to the end - use their help docs if confused</li>
                         </ul>
-                    </div>
-
-                    <div style="background: rgba(76, 175, 80, 0.1); border-left: 3px solid #4caf50; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
-                        <strong style="color: #4caf50; display: block; margin-bottom: 0.75rem;">✓ Step 4: Forward Your Root Domain (Recommended)</strong>
-                        <p style="color: #a8a8b8; margin: 0; font-size: 0.9rem; line-height: 1.6;">
-                            So visitors can reach your site at both <code>yourdomain.com</code> AND <code>www.yourdomain.com</code>:<br><br>
-                            • In GoDaddy, go to <strong>Domain Settings → Forwarding</strong><br>
-                            • Click "Add Forwarding"<br>
-                            • Forward <code>yourdomain.com</code> → <code>www.yourdomain.com</code><br>
-                            • Type: <strong>Permanent (301)</strong><br>
-                            • Forward only: <strong>Yes</strong><br><br>
-                            <em style="color: #4caf50;">This ensures both URLs work perfectly!</em>
-                        </p>
                     </div>
 
                     <p class="help-note" style="margin-top: 1rem; font-size: 0.9rem;">
@@ -944,7 +959,7 @@ Call us at {{phone}} or visit our website to learn more!
                     </p>
 
                     <p class="help-note" style="background: rgba(33, 150, 243, 0.1); padding: 0.75rem; border-radius: 4px; border-left: 3px solid #2196f3;">
-                        💡 <strong>Why "www"?</strong> Technical limitation: DNS standards don't allow CNAME records for root domains (like yourdomain.com without www). Using <code>www</code> with domain forwarding is the standard industry solution that all major sites use.
+                        💡 <strong>Why both records?</strong> The A record points your root domain (yourdomain.com) to our server, and the CNAME points the www subdomain to our Vercel hosting. Both records together ensure your site works with or without www.
                     </p>
                 </div>
             </div>
