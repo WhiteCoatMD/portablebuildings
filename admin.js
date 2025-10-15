@@ -3127,7 +3127,7 @@ function showPayPalModal() {
             <button onclick="this.closest('div').parentElement.remove()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666;">&times;</button>
             <h2 style="margin: 0 0 1rem 0; color: #333;">Upgrade to Premium</h2>
             <p style="color: #666; margin-bottom: 1.5rem;">Subscribe for $99/month to unlock all features and keep your website online.</p>
-            <div id="paypal-button-container-P-50X33105GE839004KNDX6SVA"></div>
+            <div id="paypal-button-container-P-5PJ478448J561845UNDX7TCY"></div>
         </div>
     `;
 
@@ -3136,8 +3136,8 @@ function showPayPalModal() {
     // Load PayPal SDK if not already loaded
     if (!window.paypal) {
         const script = document.createElement('script');
-        // SANDBOX mode - Using sandbox client ID for testing
-        script.src = 'https://www.paypal.com/sdk/js?client-id=AQrxr0jj7_pJyW_Lf__auoXgWU6YWeAedR6NYfgtk51RX1wHFwiVxKm4dqMB-MBpLZK2VvkJmLNdG6h7&vault=true&intent=subscription';
+        // PRODUCTION mode - Using live client ID for real payments
+        script.src = 'https://www.paypal.com/sdk/js?client-id=ASrPuLELj3KGaVCXey5vpevgIvF7UFkXTQfQM0MHw1_hlk9MZy0Wq2jt9S0xrpNWb80ZEyzu0K_x5KKG&vault=true&intent=subscription';
         script.setAttribute('data-sdk-integration-source', 'button-factory');
         script.onload = () => renderPayPalButton();
         document.head.appendChild(script);
@@ -3159,7 +3159,7 @@ function renderPayPalButton() {
         },
         createSubscription: function(data, actions) {
             return actions.subscription.create({
-                plan_id: 'P-50X33105GE839004KNDX6SVA'
+                plan_id: 'P-5PJ478448J561845UNDX7TCY'
             });
         },
         onApprove: async function(data, actions) {
@@ -3180,11 +3180,13 @@ function renderPayPalButton() {
 
                 const result = await response.json();
                 if (result.success) {
-                    showToast('Subscription activated successfully!');
+                    showToast('Subscription activated successfully! Refreshing page...');
                     // Close modal
                     document.querySelectorAll('div[style*="position: fixed"]').forEach(el => el.remove());
-                    // Reload subscription info
-                    loadSubscriptionInfo();
+                    // Reload page after 2 seconds to show updated status
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
                 } else {
                     showToast('Subscription created but activation failed: ' + result.error, true);
                 }
@@ -3201,7 +3203,7 @@ function renderPayPalButton() {
             console.log('PayPal subscription cancelled');
             showToast('Subscription cancelled');
         }
-    }).render('#paypal-button-container-P-50X33105GE839004KNDX6SVA');
+    }).render('#paypal-button-container-P-5PJ478448J561845UNDX7TCY');
 }
 
 // Update payment method via Stripe Billing Portal
