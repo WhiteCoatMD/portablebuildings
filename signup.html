@@ -345,49 +345,13 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showSuccess('Account created! Redirecting to payment...');
+                    showSuccess('Account created! You have a 72-hour free trial. Redirecting to login...');
 
-                    // Store user info for payment flow
-                    localStorage.setItem('pending_user_id', data.user.id);
-                    localStorage.setItem('pending_user_email', email);
-
-                    // Create Stripe Checkout session
-                    try {
-                        const checkoutResponse = await fetch('/api/subscription/create-checkout-session', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                userId: data.user.id,
-                                email: email
-                            })
-                        });
-
-                        const checkoutData = await checkoutResponse.json();
-
-                        if (checkoutData.success) {
-                            if (checkoutData.skipPayment) {
-                                // Stripe not configured - redirect directly to login
-                                showSuccess('Account created! Redirecting to login...');
-                                setTimeout(() => {
-                                    window.location.href = 'login.html';
-                                }, 1500);
-                            } else if (checkoutData.url) {
-                                // Redirect to Stripe Checkout
-                                window.location.href = checkoutData.url;
-                            }
-                        } else {
-                            showError('Payment setup failed. Please contact support.');
-                            btn.disabled = false;
-                            btn.textContent = 'Create Account';
-                        }
-                    } catch (checkoutError) {
-                        console.error('Checkout error:', checkoutError);
-                        showError('Payment setup failed. Please contact support.');
-                        btn.disabled = false;
-                        btn.textContent = 'Create Account';
-                    }
+                    // No payment required - user gets 72-hour trial
+                    // Redirect to login after brief delay
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
                 } else {
                     showError(data.error || 'Sign up failed');
                     btn.disabled = false;

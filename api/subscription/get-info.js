@@ -39,7 +39,7 @@ async function handler(req, res) {
         // Get user subscription information
         const userResult = await pool.query(
             `SELECT subscription_status, subscription_id, stripe_customer_id,
-                    subscription_current_period_end
+                    subscription_current_period_end, trial_ends_at
              FROM users
              WHERE id = $1`,
             [decoded.userId]
@@ -57,6 +57,11 @@ async function handler(req, res) {
         // Initialize response data
         let subscriptionInfo = {
             status: user.subscription_status || 'trial',
+            trialEndsAt: user.trial_ends_at ? new Date(user.trial_ends_at) : null,
+            isTrialExpired: user.trial_ends_at ? new Date(user.trial_ends_at) < new Date() : false,
+            hoursRemaining: user.trial_ends_at
+                ? Math.max(0, Math.floor((new Date(user.trial_ends_at) - new Date()) / (1000 * 60 * 60)))
+                : null,
             nextBillingDate: user.subscription_current_period_end
                 ? new Date(user.subscription_current_period_end).toLocaleDateString()
                 : null,

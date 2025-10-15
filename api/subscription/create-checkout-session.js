@@ -1,8 +1,9 @@
 /**
  * Create Stripe Checkout Session
- * Creates a Stripe Checkout session for new user subscription
+ * Creates a Stripe Checkout session for trial-to-paid upgrade
  */
 const { getPool } = require('../../lib/db');
+const { requireAuth } = require('../../lib/auth');
 const stripe = require('stripe');
 
 const pool = getPool();
@@ -20,7 +21,9 @@ async function handler(req, res) {
     }
 
     try {
-        const { userId, email } = req.body;
+        // userId and email can come from authenticated user or request body (for signup flow)
+        const userId = req.user?.id || req.body.userId;
+        const email = req.user?.email || req.body.email;
 
         if (!userId || !email) {
             return res.status(400).json({
@@ -36,7 +39,8 @@ async function handler(req, res) {
                 `UPDATE users
                  SET subscription_status = 'active',
                      subscription_plan = 'monthly',
-                     trial_ends_at = NOW() + INTERVAL '30 days'
+                     trial_ends_at = NULL,
+                     subscription_current_period_end = NOW() + INTERVAL '30 days'
                  WHERE id = $1`,
                 [userId]
             );
@@ -97,7 +101,7 @@ async function handler(req, res) {
             ],
             mode: 'subscription',
             success_url: `${req.headers.origin || 'http://localhost:3000'}/payment-success.html?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${req.headers.origin || 'http://localhost:3000'}/payment-cancelled.html`,
+            cancel_url: `${req.headers.origin || 'http://localhost:3000'}/admin.html`,
             metadata: {
                 user_id: userId.toString()
             }

@@ -1,199 +1,444 @@
-# Portable Buildings Inventory System
+# ShedSync - Portable Buildings SaaS Platform
 
-Automated inventory management system that syncs your dealer portal with your website.
+**Multi-tenant inventory management and website builder for portable building dealers**
 
-## Features
+Live at: https://shed-sync.com
 
-- **Serial Number Decoder**: Automatically decodes building details from serial numbers
-- **Auto-Sync**: Logs into dealer portal daily and updates inventory
-- **Backup System**: Automatic backups before each sync
-- **Error Recovery**: Restores from backup if sync fails
-- **Logging**: Tracks all sync operations
+---
 
-## Setup Instructions
+## 🚀 What is ShedSync?
 
-### 1. Install Node.js
+ShedSync is a B2B SaaS platform that helps portable building dealers:
+- ✅ Manage their building inventory
+- ✅ Create beautiful dealer websites automatically
+- ✅ Sync inventory from Great Portable Buildings (GPB) dealer portal
+- ✅ Auto-post new buildings to Facebook
+- ✅ Use custom domains for their dealer sites
+- ✅ Decode serial numbers to extract building details
+- ✅ Upload and manage building photos
 
-Download and install Node.js from https://nodejs.org (v18 or newer)
+---
 
-### 2. Install Dependencies
+## 📋 Project Status (Ready for Launch!)
 
-Open Command Prompt in this folder and run:
+### ✅ Completed Features
 
-```bash
-npm install
-```
+#### Core Platform
+- [x] User authentication (JWT-based, bcrypt password hashing)
+- [x] PostgreSQL database (deployed on DigitalOcean)
+- [x] Multi-user inventory management
+- [x] Admin panel with tabs (Manage Buildings, Site Customization, Settings, Domain)
+- [x] Responsive dark theme UI with yellow accents
 
-This installs:
-- Playwright (browser automation)
-- dotenv (secure credential management)
-- node-cron (task scheduling)
+#### Inventory Management
+- [x] Add/edit/delete buildings manually
+- [x] Serial number decoder (GPB format)
+- [x] Auto-sync from GPB dealer portal (with credentials)
+- [x] Bulk import/export (CSV)
+- [x] Image upload and management
+- [x] Multiple lot locations
+- [x] Auto-status (available/sold/repo)
+- [x] RTO pricing calculations
 
-### 3. Configure Credentials
+#### Dealer Websites
+- [x] Auto-generated public dealer sites
+- [x] Subdomain routing (e.g., patriot-buildings.shed-sync.com)
+- [x] Custom domain support (e.g., www.buytheshed.com)
+- [x] Customizable colors, logos, business info
+- [x] Building gallery with filters
+- [x] Contact forms
+- [x] Mobile-responsive design
 
-Copy `.env.example` to `.env`:
+#### Facebook Integration
+- [x] OAuth 2.0 "Connect with Facebook" button
+- [x] Auto-posting to Facebook business pages
+- [x] Long-lived access tokens (60-day)
+- [x] Customizable post templates
+- [x] Manual test posting
 
-```bash
-copy .env.example .env
-```
+#### Payments & Subscriptions
+- [x] Stripe integration ($99/month)
+- [x] Free trial support (90 days)
+- [x] Subscription management
+- [x] Payment fallback for testing (when Stripe not configured)
 
-Edit `.env` with your dealer portal credentials:
+#### Legal & Compliance
+- [x] Privacy Policy (GDPR/CCPA compliant)
+- [x] Terms of Service
+- [x] Data Deletion instructions
+- [x] Facebook App Review materials
+- [x] Test account for Facebook reviewers
 
-```env
-PORTAL_URL=https://your-dealer-portal.com/login
-PORTAL_USERNAME=your_username
-PORTAL_PASSWORD=your_password
-INVENTORY_URL=https://your-dealer-portal.com/inventory
+#### Deployment
+- [x] Deployed on Vercel
+- [x] PostgreSQL on DigitalOcean
+- [x] Environment variables configured
+- [x] Custom domain DNS setup
 
-# Sync at 2 AM daily (minute hour day month weekday)
-CRON_SCHEDULE=0 2 * * *
+---
 
-# Run in headless mode (no visible browser)
-HEADLESS_MODE=true
+## 🔧 Technology Stack
 
-# Run immediately on startup
-RUN_ON_STARTUP=false
-```
+**Frontend:**
+- HTML5, CSS3, JavaScript (vanilla)
+- Dark theme with gradient backgrounds
+- Responsive design
 
-**IMPORTANT**: Never share or commit your `.env` file!
+**Backend:**
+- Node.js 22.x
+- Serverless functions (Vercel API routes)
+- PostgreSQL database
+- JWT authentication
+- bcrypt password hashing
 
-### 4. Customize Portal Scraper
+**Integrations:**
+- Facebook Graph API v18.0
+- Stripe Payments API
+- Playwright (GPB portal automation)
+- Great Portable Buildings API
 
-The `portal-scraper.js` file needs to be customized for your specific dealer portal.
+**Hosting:**
+- Vercel (frontend + API)
+- DigitalOcean PostgreSQL (database)
+- Vercel DNS (multi-tenant routing)
 
-**First, run a test to see your portal's structure:**
+---
 
-```bash
-# This will take screenshots and show you what selectors to use
-node portal-scraper.js
-```
-
-Check the `screenshots/` folder to see:
-- `01-login-page.png` - Your login form
-- `02-credentials-filled.png` - Form with credentials
-- `03-after-login.png` - Dashboard after login
-- `04-inventory-page.png` - Your inventory page
-- `raw-inventory-data.json` - Raw scraped data
-
-**Then, customize the selectors in `portal-scraper.js`:**
-
-1. Find the login form selectors (username, password, submit button)
-2. Update the `scrapeInventory()` method to extract your data
-3. Update the `parseInventoryData()` method to extract prices, locations, etc.
-
-### 5. Test the Sync
-
-Run a manual sync to make sure everything works:
-
-```bash
-npm run sync
-```
-
-This will:
-1. Log into your portal
-2. Scrape inventory data
-3. Update `inventory.js`
-4. Create a backup
-5. Show you the results
-
-### 6. Start the Scheduler
-
-Once testing works, start the automated daily sync:
-
-```bash
-npm run schedule
-```
-
-The scheduler will:
-- Run every day at 2 AM (or your configured time)
-- Keep running in the background
-- Log all sync operations to `logs/sync-log.json`
-
-## Running Automatically on Windows Startup
-
-### Option 1: Windows Task Scheduler
-
-1. Open Task Scheduler
-2. Create Basic Task
-3. Name: "Portable Buildings Sync"
-4. Trigger: "When the computer starts"
-5. Action: "Start a program"
-6. Program: `C:\Program Files\nodejs\node.exe`
-7. Arguments: `C:\Users\13183\portable_buildings\scheduler.js`
-8. Start in: `C:\Users\13183\portable_buildings`
-
-### Option 2: Startup Folder (Simpler)
-
-1. Create a file `start-scheduler.bat`:
-```bat
-@echo off
-cd C:\Users\13183\portable_buildings
-node scheduler.js
-```
-
-2. Press `Win+R`, type `shell:startup`
-3. Copy `start-scheduler.bat` into the Startup folder
-
-## File Structure
+## 📁 Project Structure
 
 ```
 portable_buildings/
-├── index.html           # Public website
-├── styles.css           # Website styling
-├── decoder.js           # Serial number decoder
-├── inventory.js         # Inventory data (auto-updated)
-├── app.js              # Website logic
-├── portal-scraper.js   # Portal automation (CUSTOMIZE THIS)
-├── sync.js             # Sync orchestration
-├── scheduler.js        # Daily scheduler
-├── package.json        # Node dependencies
-├── .env                # Your credentials (DO NOT COMMIT)
-├── .gitignore          # Protects sensitive files
-├── screenshots/        # Debug screenshots
-├── backups/           # Inventory backups
-└── logs/              # Sync logs
+├── index.html                          # Landing page
+├── signup.html                         # User registration
+├── login.html                          # User login
+├── admin.html                          # Admin panel
+├── dealer-site.html                    # Public dealer site template
+├── privacy-policy.html                 # Privacy policy
+├── terms-of-service.html              # Terms of service
+├── data-deletion.html                 # Data deletion instructions
+│
+├── api/
+│   ├── auth/
+│   │   ├── signup.js                  # User registration
+│   │   ├── login.js                   # User authentication
+│   │   ├── facebook-oauth-start.js    # Facebook OAuth initiation
+│   │   └── facebook-callback.js       # Facebook OAuth callback
+│   ├── inventory/
+│   │   ├── list.js                    # Get user's inventory
+│   │   ├── add.js                     # Add building
+│   │   ├── update.js                  # Update building
+│   │   ├── delete.js                  # Delete building
+│   │   ├── upload-photo.js           # Upload building photo
+│   │   └── sync-gpb.js               # Sync from GPB portal
+│   ├── site/
+│   │   ├── get-by-subdomain.js       # Get dealer site by subdomain
+│   │   ├── get-by-domain.js          # Get dealer site by custom domain
+│   │   └── list-dealers.js           # List all dealer sites
+│   ├── user/
+│   │   ├── settings.js               # Get/update user settings
+│   │   ├── save-custom-domain.js     # Save custom domain
+│   │   ├── remove-custom-domain.js   # Remove custom domain
+│   │   └── delete-account.js         # Delete user account
+│   ├── subscription/
+│   │   ├── create-checkout-session.js # Stripe checkout
+│   │   └── webhook.js                # Stripe webhooks
+│   └── facebook/
+│       ├── post.js                   # Post to Facebook
+│       └── test-post.js              # Test Facebook posting
+│
+├── lib/
+│   ├── auth.js                        # JWT authentication utilities
+│   ├── db.js                         # Database connection pool
+│   └── decoder.js                    # Serial number decoder
+│
+├── migrations/
+│   ├── create-tables.sql             # Database schema
+│   └── add-domain-fields.sql         # Custom domain fields
+│
+├── gpb-scraper.js                    # GPB portal automation
+├── sync.js                           # Inventory sync orchestrator
+├── decoder.js                        # Standalone decoder
+├── create-facebook-test-account.js   # Facebook test account setup
+├── verify-patriot-domain.js          # Domain verification script
+│
+├── .env                              # Environment variables (DO NOT COMMIT)
+├── .gitignore                        # Git ignore rules
+├── package.json                      # Dependencies
+├── vercel.json                       # Vercel configuration
+└── README.md                         # This file
 ```
 
-## Troubleshooting
+---
 
-### Login Fails
+## ⚙️ Environment Variables
 
-1. Check screenshots in `screenshots/ERROR-login-failed.png`
-2. Update selectors in `portal-scraper.js`
-3. Check if portal requires 2FA (will need manual intervention)
-4. Try with `HEADLESS_MODE=false` to see what's happening
+Required in Vercel (or `.env` for local):
 
-### No Inventory Data
+```env
+# Database
+DATABASE_URL=postgres://user:pass@host:port/database
+POSTGRES_URL=postgres://user:pass@host:port/database
 
-1. Check `screenshots/04-inventory-page.png`
-2. Check `screenshots/raw-inventory-data.json`
-3. Customize the `scrapeInventory()` method in `portal-scraper.js`
+# Authentication
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
 
-### Portal Blocks Automation
+# Stripe (Optional - payment will be skipped if not configured)
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_PRICE_ID=price_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 
-Some portals detect automation. Try:
-- Adding `slowMo: 500` in browser launch options
-- Adding random delays between actions
-- Using a stable IP address
-- Contacting your dealer portal support for API access
+# Facebook (Optional - for Facebook integration)
+FACEBOOK_APP_ID=your-facebook-app-id
+FACEBOOK_APP_SECRET=your-facebook-app-secret
+FACEBOOK_REDIRECT_URI=https://shed-sync.com/api/auth/facebook-callback
 
-### Sync Fails
+# GPB Portal Sync (Optional - for inventory sync)
+GPB_PORTAL_URL=https://dealer-portal-url.com
+GPB_USERNAME=dealer-username
+GPB_PASSWORD=dealer-password
+```
 
-- Check `logs/sync-log.json` for error details
-- Inventory automatically restores from latest backup
-- Fix the issue and run `npm run sync` manually to test
+---
 
-## Security Notes
+## 🚀 Getting Started
 
-- All credentials are stored locally in `.env`
-- Never commit `.env` to version control
-- Screenshots may contain sensitive data - don't share them
-- Consider using environment variables or a secrets manager for production
+### Local Development
 
-## Support
+1. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
 
-For issues with:
-- **The website**: Edit HTML/CSS/JS files directly
-- **The decoder**: Edit `decoder.js`
-- **Portal automation**: Edit `portal-scraper.js` and check screenshots
-- **Scheduling**: Edit `scheduler.js` or CRON_SCHEDULE in `.env`
+2. **Configure Environment:**
+   ```bash
+   copy .env.example .env
+   # Edit .env with your credentials
+   ```
+
+3. **Run Database Migrations:**
+   ```bash
+   node run-migration.js
+   ```
+
+4. **Start Development Server:**
+   ```bash
+   vercel dev --listen 3000
+   ```
+
+5. **Open in Browser:**
+   ```
+   http://localhost:3000
+   ```
+
+### Production Deployment
+
+Already deployed on Vercel! The platform is live at:
+- Main site: https://shed-sync.com
+- API: https://shed-sync.com/api/*
+- Dealer sites: https://*.shed-sync.com
+
+---
+
+## 🎯 Pre-Launch Checklist
+
+### Before Going Live:
+
+- [ ] **Test Facebook OAuth** - Verify "Connect with Facebook" works
+- [ ] **Test Stripe Payments** - Create test subscription
+- [ ] **Test Custom Domains** - Verify DNS routing works
+- [ ] **Test GPB Sync** - Sync inventory from dealer portal
+- [ ] **Load Test** - Test with multiple concurrent users
+- [ ] **Security Audit** - Review authentication, SQL injection protection
+- [ ] **Backup Strategy** - Set up automated database backups
+- [ ] **Monitoring** - Set up error tracking (Sentry, LogRocket, etc.)
+- [ ] **SSL/HTTPS** - Verify all pages use HTTPS
+- [ ] **SEO** - Add meta tags, sitemap, robots.txt
+- [ ] **Email Setup** - Configure transactional emails (SendGrid, Mailgun)
+- [ ] **Support System** - Set up support email (support@shed-sync.com)
+- [ ] **Analytics** - Add Google Analytics or similar
+- [ ] **Terms & Privacy** - Review legal pages with lawyer (if needed)
+- [ ] **Facebook App Review** - Submit for Advanced Access
+- [ ] **Documentation** - Create user guide for dealers
+- [ ] **Pricing Page** - Add pricing info to landing page
+- [ ] **Demo Video** - Create walkthrough video for dealers
+- [ ] **Beta Testing** - Get 2-3 dealers to test before launch
+
+---
+
+## 📝 Custom Domain Setup (for Dealers)
+
+### DNS Configuration
+
+Dealers need to add **3 DNS records** at their registrar:
+
+#### For Root Domain (patriot-buildings.us):
+```
+Type: A
+Name: @
+Value: 76.76.21.123
+TTL: 600 seconds
+
+Type: A
+Name: @
+Value: 76.76.21.93
+TTL: 600 seconds
+```
+
+#### For WWW Subdomain:
+```
+Type: CNAME
+Name: www
+Value: cname.vercel-dns.com
+TTL: 600 seconds
+```
+
+**Note:** If the registrar has locked A records (like GoDaddy domain forwarding), just use the CNAME for www and update the database to use `www.domain.com`.
+
+### Verification
+
+After DNS is configured (5-60 minutes), run:
+```bash
+node verify-[dealer]-domain.js
+```
+
+This marks the domain as verified in the database.
+
+---
+
+## 🔐 Facebook App Review
+
+### Required Materials (Already Created):
+
+1. ✅ Privacy Policy: https://shed-sync.com/privacy-policy.html
+2. ✅ Terms of Service: https://shed-sync.com/terms-of-service.html
+3. ✅ Data Deletion: https://shed-sync.com/data-deletion.html
+4. ✅ Test Account: test@facebook.com / TestApp
+5. ✅ Testing Instructions: FACEBOOK_TEST_CREDENTIALS.md
+
+### Permissions Requested:
+
+- `pages_show_list` - See user's Facebook Pages
+- `pages_read_engagement` - Read page information
+- `pages_manage_posts` - Post to user's Facebook Page
+
+### Submission Process:
+
+1. Go to Facebook App Dashboard → App Review
+2. Request Advanced Access for the 3 permissions above
+3. Provide test credentials and instructions
+4. Submit for review (usually 1-3 days)
+
+---
+
+## 🧪 Testing
+
+### Test Accounts:
+
+**Facebook Test Account:**
+- Email: test@facebook.com
+- Password: TestApp
+- Business: Test Portable Buildings
+- Subdomain: facebook-test.shed-sync.com
+
+**Patriot Buildings:**
+- Email: sales@patriotbuildingsales.com
+- Subdomain: patriot-buildings.shed-sync.com
+- Custom Domain: www.patriot-buildings.us
+
+**Buy The Shed:**
+- Email: sales@buytheshed.com
+- Subdomain: buytheshed.shed-sync.com
+- Custom Domain: www.buytheshed.com (verified, working)
+
+### Test Scenarios:
+
+1. **User Signup:** Create account → Stripe checkout → Login
+2. **Add Inventory:** Add building manually → Upload photo → View on site
+3. **GPB Sync:** Enter GPB credentials → Sync inventory → Verify buildings appear
+4. **Facebook OAuth:** Connect Facebook → Auto-post → Check Facebook page
+5. **Custom Domain:** Add custom domain → Configure DNS → Verify
+6. **Serial Decoder:** Enter GPB serial → Verify details extracted
+7. **Site Customization:** Change colors → Update logo → Save → View site
+8. **Delete Account:** Delete account → Verify all data removed
+
+---
+
+## 🐛 Known Issues / TODO
+
+### High Priority:
+- [ ] Add email notifications (welcome email, sync failures, etc.)
+- [ ] Add "Forgot Password" functionality
+- [ ] Add image resizing/optimization (currently stores full-size)
+- [ ] Add rate limiting to API endpoints
+- [ ] Add CAPTCHA to signup form (prevent spam)
+
+### Medium Priority:
+- [ ] Add inventory import from CSV
+- [ ] Add analytics dashboard (page views, building views)
+- [ ] Add dealer referral program
+- [ ] Add multi-language support
+- [ ] Add building comparison feature
+
+### Low Priority:
+- [ ] Add dark mode toggle for dealer sites
+- [ ] Add dealer blog/news section
+- [ ] Add customer reviews/testimonials
+- [ ] Add financing calculator
+- [ ] Add inventory alerts (low stock, etc.)
+
+---
+
+## 📞 Support & Contact
+
+**For Developers:**
+- Documentation: This README
+- Environment: `.env` file (see Environment Variables section)
+- Database Schema: `migrations/create-tables.sql`
+
+**For Dealers:**
+- Login: https://shed-sync.com/login.html
+- Support Email: support@shed-sync.com
+- Privacy: privacy@shed-sync.com
+
+**For Facebook Review:**
+- Test Account: test@facebook.com / TestApp
+- Instructions: FACEBOOK_TEST_CREDENTIALS.md
+- Data Deletion: https://shed-sync.com/data-deletion.html
+
+---
+
+## 🎉 Launch Plan
+
+### Day Before Launch:
+1. Final security audit
+2. Database backup
+3. Test all critical flows
+4. Prepare marketing materials
+5. Set up monitoring/alerts
+
+### Launch Day:
+1. Announce on social media
+2. Email existing beta testers
+3. Monitor error logs closely
+4. Be ready for support requests
+5. Track signups and conversions
+
+### Week After Launch:
+1. Gather user feedback
+2. Fix any bugs reported
+3. Monitor performance metrics
+4. Reach out to early users for testimonials
+5. Iterate based on feedback
+
+---
+
+## 📜 License
+
+Proprietary - All rights reserved
+
+---
+
+**Built with ❤️ for portable building dealers**
+
+Last Updated: January 2025
+Version: 1.0 (Pre-Launch)
