@@ -6,8 +6,19 @@
     <title>Portable Buildings - Current Inventory</title>
     <link rel="stylesheet" href="color-schemes.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Hide content until site configuration loads */
+        body.loading {
+            opacity: 0;
+        }
+
+        body.loaded {
+            opacity: 1;
+            transition: opacity 0.2s ease-in;
+        }
+    </style>
 </head>
-<body>
+<body class="loading">
     <header>
         <div class="container header-content">
             <div class="header-left">

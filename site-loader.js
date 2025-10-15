@@ -144,6 +144,10 @@ function applySiteConfiguration() {
         updateLocationHours(config.locationHours);
     }
 
+    // Show the page now that configuration is loaded
+    document.body.classList.remove('loading');
+    document.body.classList.add('loaded');
+
     console.log('[Site Loader] Site configuration applied successfully');
 }
 
