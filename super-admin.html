@@ -13,15 +13,16 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f5f5f5;
+            background: #f8f9fa;
             min-height: 100vh;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1a1a2e;
             color: white;
             padding: 2rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-bottom: 2px solid #2a2a3e;
         }
 
         .header h1 {
@@ -89,7 +90,7 @@
         .stat-card .value {
             font-size: 2.5rem;
             font-weight: 700;
-            color: #667eea;
+            color: #ffd60a;
         }
 
         .users-table-container {
@@ -198,7 +199,7 @@
         }
 
         input:checked + .slider {
-            background-color: #667eea;
+            background-color: #ffd60a;
         }
 
         input:checked + .slider:before {
@@ -220,12 +221,15 @@
         }
 
         .btn-primary {
-            background: #667eea;
-            color: white;
+            background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%);
+            color: #1a1a2e;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(255, 214, 10, 0.3);
         }
 
         .btn-primary:hover {
-            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 214, 10, 0.5);
         }
 
         .btn-secondary {
@@ -343,8 +347,8 @@
         .admin-badge {
             display: inline-block;
             padding: 0.25rem 0.5rem;
-            background: #764ba2;
-            color: white;
+            background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%);
+            color: #1a1a2e;
             border-radius: 4px;
             font-size: 0.75rem;
             font-weight: 600;
@@ -354,7 +358,10 @@
 </head>
 <body>
     <div class="header">
-        <h1>🔐 Super Admin Dashboard</h1>
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+            <img src="logo.png" alt="ShedSync Logo" style="height: 60px; width: auto;">
+            <h1>🔐 Super Admin Dashboard</h1>
+        </div>
         <p>Manage all user accounts and system settings</p>
         <div class="header-actions">
             <a href="admin.html" class="admin-link-btn">My Dealer Site</a>
