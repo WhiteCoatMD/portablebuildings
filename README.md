@@ -57,10 +57,11 @@ ShedSync is a B2B SaaS platform that helps portable building dealers:
 - [x] Manual test posting
 
 #### Payments & Subscriptions
-- [x] Stripe integration ($99/month)
+- [x] PayPal integration ($99/month) - CURRENTLY ACTIVE
+- [x] Stripe integration (legacy, can be reactivated)
 - [x] Free trial support (90 days)
 - [x] Subscription management
-- [x] Payment fallback for testing (when Stripe not configured)
+- [x] Sandbox mode for testing (PayPal sandbox)
 
 #### Legal & Compliance
 - [x] Privacy Policy (GDPR/CCPA compliant)
@@ -182,7 +183,12 @@ POSTGRES_URL=postgres://user:pass@host:port/database
 # Authentication
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
 
-# Stripe (Optional - payment will be skipped if not configured)
+# PayPal (CURRENTLY ACTIVE)
+PAYPAL_CLIENT_ID=your-paypal-client-id
+PAYPAL_CLIENT_SECRET=your-paypal-client-secret
+PAYPAL_MODE=sandbox  # or "production"
+
+# Stripe (Legacy - can be reactivated if needed)
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_PRICE_ID=price_...
 STRIPE_WEBHOOK_SECRET=whsec_...
@@ -435,6 +441,78 @@ This marks the domain as verified in the database.
 ## 📜 License
 
 Proprietary - All rights reserved
+
+---
+
+## 💳 PayPal Subscription Setup
+
+### Current Configuration (Sandbox Mode)
+
+**PayPal Sandbox Credentials:**
+- Client ID: `AQrxr0jj7_pJyW_Lf__auoXgWU6YWeAedR6NYfgtk51RX1wHFwiVxKm4dqMB-MBpLZK2VvkJmLNdG6h7`
+- Client Secret: `EJceCcwDab3kB5APsMk7EEqKDHkVDinOwxO5mX07cr9y5iDHZlKLHF_PETPVQRxmITv5nb4bZi4fYfD1`
+
+**Active Subscription Plan (Sandbox):**
+- Plan ID: `P-50X33105GE839004KNDX6SVA`
+- Product ID: `PROD-75Y424379E085324V`
+- Price: $99/month (recurring)
+- Environment: PayPal Sandbox (test mode)
+
+### Files Updated:
+- `admin.js` (lines 3130, 3162, 3204) - Updated plan ID
+- `create-paypal-sandbox-plan.js` - Script to create sandbox plans
+
+### Creating a New Plan
+
+If you need to create a new sandbox or production plan:
+
+```bash
+# For sandbox (testing):
+node create-paypal-sandbox-plan.js
+
+# The script will output a new Plan ID
+# Update admin.js with the new Plan ID in 3 places:
+# - Line 3130: Container ID
+# - Line 3162: plan_id in createSubscription
+# - Line 3204: render() target
+```
+
+### Switching to Production
+
+When ready to go live with real payments:
+
+1. Get production PayPal credentials from https://www.paypal.com
+2. Create a production plan (modify script to use production API)
+3. Update `admin.js` line 3140:
+   ```javascript
+   // Change from sandbox to production URL
+   script.src = 'https://www.paypal.com/sdk/js?client-id=YOUR_PRODUCTION_CLIENT_ID&vault=true&intent=subscription';
+   ```
+4. Update plan ID in admin.js (3 locations)
+5. Test with a real PayPal account
+
+### Testing Sandbox Subscriptions
+
+To test the PayPal flow in sandbox mode:
+1. Go to https://developer.paypal.com/dashboard/accounts
+2. Create a sandbox buyer account (personal account)
+3. Use those credentials when testing checkout
+4. Sandbox payments are fake - no real money is charged
+
+### Troubleshooting
+
+**Error: "RESOURCE_NOT_FOUND"**
+- Means the plan ID doesn't exist in that environment
+- Solution: Run `create-paypal-sandbox-plan.js` to create a new plan
+
+**Error: "SSL certificate error"**
+- Local Windows certificate issue
+- Solution: Script already includes `NODE_TLS_REJECT_UNAUTHORIZED = '0'` for development
+
+**PayPal button not loading**
+- Check browser console for errors
+- Verify plan ID matches in all 3 locations in admin.js
+- Hard refresh browser (Ctrl+Shift+R)
 
 ---
 
