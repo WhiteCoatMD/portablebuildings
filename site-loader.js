@@ -77,8 +77,8 @@ function applySiteConfiguration() {
     const config = window.SITE_CONFIG;
     if (!config) return;
 
-    // Use email as fallback if businessName is not set
-    const displayName = config.businessName || config.email || 'Portable Buildings';
+    // Use placeholder text if businessName is not set
+    const displayName = config.businessName || '[Your Business Name]';
 
     // Update page title
     document.title = `${displayName} - Current Inventory`;
@@ -90,7 +90,7 @@ function applySiteConfiguration() {
     }
 
     // Update phone number
-    const phone = config.phone || '318-594-5909';
+    const phone = config.phone || '(555) 123-4567';
     const headerPhoneLink = document.getElementById('header-phone-link');
     if (headerPhoneLink) {
         headerPhoneLink.textContent = phone;
