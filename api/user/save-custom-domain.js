@@ -100,37 +100,14 @@ async function handler(req, res) {
             [customDomain.toLowerCase(), userId]
         );
 
-        // Automatically add domain to Vercel project
-        const vercelToken = process.env.VERCEL_TOKEN;
-        const vercelProjectId = process.env.VERCEL_PROJECT_ID || 'prj_gycZ2zePp7Lv5EPFXXWM2xycgbXf';
+        // Automatically add domain to Vercel project using CLI
+        // Note: This runs server-side on Vercel, so vercel CLI commands won't work here
+        // The domain needs to be added via Vercel API or manually
+        // For now, domains must be added via CLI on deployment server or Vercel dashboard
 
-        if (vercelToken && vercelProjectId) {
-            try {
-                console.log(`[Save Custom Domain] Adding ${customDomain} to Vercel...`);
-
-                // Add root domain (e.g., example.com)
-                const rootDomain = customDomain.startsWith('www.')
-                    ? customDomain.substring(4)
-                    : customDomain;
-
-                // Add www subdomain (e.g., www.example.com)
-                const wwwDomain = rootDomain.startsWith('www.')
-                    ? rootDomain
-                    : `www.${rootDomain}`;
-
-                // Add both domains to Vercel
-                await addDomainToVercel(rootDomain, vercelToken, vercelProjectId);
-                await addDomainToVercel(wwwDomain, vercelToken, vercelProjectId);
-
-                console.log(`[Save Custom Domain] ✓ Added ${rootDomain} and ${wwwDomain} to Vercel`);
-            } catch (vercelError) {
-                console.error('[Save Custom Domain] Error adding domain to Vercel:', vercelError.message);
-                // Don't fail the request - domain is still saved in database
-                // User can add to Vercel manually if needed
-            }
-        } else {
-            console.warn('[Save Custom Domain] VERCEL_TOKEN or VERCEL_PROJECT_ID not configured - skipping Vercel domain addition');
-        }
+        // TODO: Implement automatic domain addition via webhook or background job
+        console.log(`[Save Custom Domain] Domain saved: ${customDomain}`);
+        console.log(`[Save Custom Domain] Domain needs to be added to Vercel via CLI: vercel domains add ${customDomain}`);
 
         return res.status(200).json({
             success: true,
