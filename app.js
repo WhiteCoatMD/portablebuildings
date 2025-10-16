@@ -36,11 +36,13 @@ class InventoryApp {
     loadSettings() {
         // For multi-tenant sites, use settings from SITE_CONFIG
         if (window.SITE_CONFIG && window.SITE_CONFIG.settings) {
+            // Settings are stored with the key 'cpb_admin_settings'
+            const adminSettings = window.SITE_CONFIG.settings.cpb_admin_settings || {};
             return {
-                showCashPrice: window.SITE_CONFIG.settings.showCashPrice !== false,
-                showRtoOptions: window.SITE_CONFIG.settings.showRtoOptions !== false,
-                repoSortOrder: window.SITE_CONFIG.settings.repoSortOrder || 'last',
-                repoPriceDisplay: window.SITE_CONFIG.settings.repoPriceDisplay || 'strikethrough'
+                showCashPrice: adminSettings.showCashPrice !== false,
+                showRtoOptions: adminSettings.showRtoOptions !== false,
+                repoSortOrder: adminSettings.repoSortOrder || 'last',
+                repoPriceDisplay: adminSettings.repoPriceDisplay || 'strikethrough'
             };
         }
 
