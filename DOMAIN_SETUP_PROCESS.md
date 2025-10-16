@@ -1,11 +1,11 @@
 # Domain Setup Process - Complete Guide
 
-## How Custom Domains Work
+## How Custom Domains Work (FULLY AUTOMATIC)
 
-When a dealer saves a custom domain in the admin panel, **two things need to happen**:
+When a dealer saves a custom domain in the admin panel, **two things happen automatically**:
 
 1. **Domain is saved in database** with `domain_verified = false` ✅ (automatic)
-2. **Domain is added to Vercel** so it can serve traffic ⚠️ (requires manual step)
+2. **Domain is added to Vercel via API** so it can serve traffic ✅ (automatic)
 
 ---
 
@@ -23,37 +23,37 @@ This adds the domain to Vercel's project configuration, allowing it to serve tra
 
 ---
 
-## Process for Future Domains
+## Process for Future Domains (AUTOMATIC)
 
-When a dealer adds a new custom domain:
+When a dealer adds a new custom domain through the admin panel:
 
-### Option 1: Run the Automatic Script (Recommended)
+### ✨ **IT HAPPENS AUTOMATICALLY!**
 
+The system automatically:
+1. Saves domain to database
+2. Calls Vercel API to add both root domain AND www subdomain
+3. Sets up SSL certificates
+4. Shows DNS instructions to dealer
+
+**You don't need to do anything!**
+
+### Fallback Options (if automatic fails)
+
+If for some reason the automatic addition doesn't work:
+
+**Option 1: Run the Sync Script**
 ```bash
 node add-pending-domains.js
 ```
 
-This script:
-- Checks database for all custom domains
-- Adds each domain to Vercel using `vercel domains add`
-- Adds both root (example.com) and www (www.example.com) versions
-- Shows success/error status for each
-
-**Run this after dealers save new domains.**
-
-### Option 2: Manual Addition via CLI
-
+**Option 2: Manual CLI**
 ```bash
 vercel domains add example.com
 vercel domains add www.example.com
 ```
 
-### Option 3: Vercel Dashboard
-
-1. Go to https://vercel.com/mitch-brattons-projects/portablebuildings/settings/domains
-2. Click "Add Domain"
-3. Enter `example.com` → Click Add
-4. Enter `www.example.com` → Click Add
+**Option 3: Vercel Dashboard**
+Add manually via https://vercel.com/mitch-brattons-projects/portablebuildings/settings/domains
 
 ---
 
@@ -151,15 +151,17 @@ node check-user-by-id.js 12
 
 ## Summary
 
-**For each new custom domain:**
+**For each new custom domain - FULLY AUTOMATIC:**
 
 1. Dealer saves domain in admin panel
-2. **YOU run:** `node add-pending-domains.js`
+2. **System automatically adds to Vercel** (both root and www)
 3. Dealer configures DNS at their registrar
 4. System auto-verifies when DNS propagates
 5. Site goes live
 
-**That's it!** The script handles adding both root and www versions to Vercel automatically.
+**You don't do anything!** It's completely automatic.
+
+The `add-pending-domains.js` script is only needed as a fallback if the API fails.
 
 ---
 

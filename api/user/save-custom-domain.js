@@ -100,14 +100,34 @@ async function handler(req, res) {
             [customDomain.toLowerCase(), userId]
         );
 
-        // Automatically add domain to Vercel project using CLI
-        // Note: This runs server-side on Vercel, so vercel CLI commands won't work here
-        // The domain needs to be added via Vercel API or manually
-        // For now, domains must be added via CLI on deployment server or Vercel dashboard
+        // Automatically add domain to Vercel project via API
+        const vercelToken = process.env.VERCEL_TOKEN;
+        const vercelProjectId = process.env.VERCEL_PROJECT_ID || 'prj_gycZ2zePp7Lv5EPFXXWM2xycgbXf';
 
-        // TODO: Implement automatic domain addition via webhook or background job
-        console.log(`[Save Custom Domain] Domain saved: ${customDomain}`);
-        console.log(`[Save Custom Domain] Domain needs to be added to Vercel via CLI: vercel domains add ${customDomain}`);
+        if (vercelToken && vercelProjectId) {
+            try {
+                console.log(`[Save Custom Domain] Adding ${customDomain} to Vercel...`);
+
+                // Determine root and www domains
+                const rootDomain = customDomain.startsWith('www.')
+                    ? customDomain.substring(4)
+                    : customDomain;
+                const wwwDomain = `www.${rootDomain}`;
+
+                // Add both domains to Vercel
+                await addDomainToVercel(rootDomain, vercelToken, vercelProjectId);
+                await addDomainToVercel(wwwDomain, vercelToken, vercelProjectId);
+
+                console.log(`[Save Custom Domain] ✓ Added ${rootDomain} and ${wwwDomain} to Vercel`);
+            } catch (vercelError) {
+                console.error('[Save Custom Domain] Error adding domain to Vercel:', vercelError.message);
+                // Don't fail the request - domain is still saved in database
+                // Domains can be added manually if API fails
+            }
+        } else {
+            console.warn('[Save Custom Domain] VERCEL_TOKEN not configured - domain will need to be added to Vercel manually');
+            console.warn('[Save Custom Domain] Run: node add-pending-domains.js');
+        }
 
         return res.status(200).json({
             success: true,
