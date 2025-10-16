@@ -34,9 +34,10 @@
     <main class="container">
         <div class="admin-tabs">
             <button class="tab-btn active" data-tab="customization">Site Customization</button>
+            <button class="tab-btn" data-tab="inventory">Inventory Settings</button>
             <button class="tab-btn" data-tab="domain">Domain & Website</button>
             <button class="tab-btn" data-tab="payments">Payment Settings</button>
-            <button class="tab-btn" data-tab="settings">Display Settings</button>
+            <button class="tab-btn" data-tab="settings">Account Settings</button>
             <button class="tab-btn" data-tab="lots">Other Lots</button>
             <button class="tab-btn" data-tab="buildings">Manage Buildings</button>
         </div>
@@ -98,50 +99,6 @@
                     <input type="url" id="twitterUrl" class="form-control"
                            placeholder="e.g., https://twitter.com/yourprofile">
                     <p class="help-text" style="color: #bc9c22;">Link to your business Twitter/X profile (optional)</p>
-                </div>
-            </div>
-
-            <div class="card" style="background: #1a1a2e; color: #bc9c22;">
-                <h2 style="color: #bc9c22;">Inventory Sync Settings</h2>
-                <p class="help-text" style="color: #bc9c22;">Configure your GPB Sales credentials to automatically sync your inventory. Your credentials are encrypted and stored securely.</p>
-
-                <div class="form-group">
-                    <label for="gpbUsername" style="color: #bc9c22;">GPB Sales Username/Email</label>
-                    <input type="email" id="gpbUsername" class="form-control"
-                           placeholder="Enter your GPB Sales email">
-                    <p class="help-text" style="color: #bc9c22;">Your login email for GPB Sales portal</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="gpbPassword" style="color: #bc9c22;">GPB Sales Password</label>
-                    <input type="password" id="gpbPassword" class="form-control"
-                           placeholder="Enter your GPB Sales password">
-                    <p class="help-text" style="color: #bc9c22;">Your password will be encrypted before storage</p>
-                </div>
-
-                <div class="setting-group">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="autoSyncEnabled">
-                        <span class="toggle-slider"></span>
-                        <span class="toggle-text" style="color: #bc9c22;">Enable Automatic Daily Sync at 2 AM</span>
-                    </label>
-                </div>
-
-                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                    <button class="btn btn-primary" onclick="saveGpbCredentials()">
-                        Save Credentials
-                    </button>
-                    <button class="btn btn-secondary" onclick="triggerUserSync()" id="user-sync-btn">
-                        🔄 Sync Now
-                    </button>
-                </div>
-                <p id="gpb-status" class="help-text" style="margin-top: 1rem; font-weight: 600; color: #bc9c22;"></p>
-
-                <div style="background: rgba(33, 150, 243, 0.1); border-left: 4px solid #2196f3; padding: 1.25rem; margin-top: 1.5rem; border-radius: 6px;">
-                    <p style="margin: 0; color: #2196f3; font-weight: 600; font-size: 1rem;">📱 Manage on the Go!</p>
-                    <p style="margin: 0.75rem 0 0 0; color: #a8a8b8; line-height: 1.6;">
-                        You can log in to your admin panel from your phone and access the <strong style="color: #fff;">Manage Buildings</strong> tab to upload photos directly to your listings from your mobile device. Perfect for adding photos while you're at the lot!
-                    </p>
                 </div>
             </div>
 
@@ -605,6 +562,125 @@ Call us at {{phone}} or visit our website to learn more!
             </div>
 
             <button class="btn btn-primary btn-lg" onclick="saveCustomization()">💾 Save All Customization</button>
+        </div>
+
+        <!-- Inventory Settings Tab -->
+        <div class="tab-content" id="inventory-tab">
+            <style>
+                .btn-radio {
+                    display: block;
+                    cursor: pointer;
+                }
+                .btn-radio-label {
+                    display: block;
+                    padding: 0.75rem 1rem;
+                    background: rgba(255,255,255,0.05);
+                    border: 2px solid #5a5a6a;
+                    border-radius: 8px;
+                    text-align: center;
+                    font-weight: 600;
+                    color: #bc9c22;
+                    transition: all 0.2s;
+                }
+                .btn-radio input:checked + .btn-radio-label {
+                    background: linear-gradient(135deg, #bc9c22 0%, #d4af37 100%);
+                    border-color: #bc9c22;
+                    color: #1a1a2e;
+                    box-shadow: 0 4px 12px rgba(188, 156, 34, 0.3);
+                }
+                .btn-radio:hover .btn-radio-label {
+                    border-color: #bc9c22;
+                }
+            </style>
+
+            <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 1.25rem; border-radius: 8px; margin-bottom: 2rem;">
+                <h3 style="margin: 0 0 0.5rem 0; color: #1976d2; font-size: 1.1rem;">Inventory Settings</h3>
+                <p style="margin: 0; color: #1565c0; line-height: 1.6;">Configure your inventory sync with GPB Sales and customize how repo/pre-owned buildings display on your website. Set up automatic daily syncing and control the appearance and sorting of pre-owned inventory.</p>
+            </div>
+
+            <div class="card" style="background: #1a1a2e; color: #bc9c22;">
+                <h2 style="color: #bc9c22;">GPB Sync Settings</h2>
+                <p class="help-text" style="color: #bc9c22;">Configure your GPB Sales credentials to automatically sync your inventory. Your credentials are encrypted and stored securely.</p>
+
+                <div class="form-group">
+                    <label for="gpbUsername" style="color: #bc9c22;">GPB Sales Username/Email</label>
+                    <input type="email" id="gpbUsername" class="form-control"
+                           placeholder="Enter your GPB Sales email">
+                    <p class="help-text" style="color: #bc9c22;">Your login email for GPB Sales portal</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="gpbPassword" style="color: #bc9c22;">GPB Sales Password</label>
+                    <input type="password" id="gpbPassword" class="form-control"
+                           placeholder="Enter your GPB Sales password">
+                    <p class="help-text" style="color: #bc9c22;">Your password will be encrypted before storage</p>
+                </div>
+
+                <div class="setting-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="autoSyncEnabled">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text" style="color: #bc9c22;">Enable Automatic Daily Sync at 2 AM</span>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button class="btn btn-primary" onclick="saveGpbCredentials()">
+                        Save Credentials
+                    </button>
+                    <button class="btn btn-secondary" onclick="triggerUserSync()" id="user-sync-btn">
+                        🔄 Sync Now
+                    </button>
+                </div>
+                <p id="gpb-status" class="help-text" style="margin-top: 1rem; font-weight: 600; color: #bc9c22;"></p>
+
+                <div style="background: rgba(33, 150, 243, 0.1); border-left: 4px solid #2196f3; padding: 1.25rem; margin-top: 1.5rem; border-radius: 6px;">
+                    <p style="margin: 0; color: #2196f3; font-weight: 600; font-size: 1rem;">📱 Manage on the Go!</p>
+                    <p style="margin: 0.75rem 0 0 0; color: #a8a8b8; line-height: 1.6;">
+                        You can log in to your admin panel from your phone and access the <strong style="color: #fff;">Manage Buildings</strong> tab to upload photos directly to your listings from your mobile device. Perfect for adding photos while you're at the lot!
+                    </p>
+                </div>
+            </div>
+
+            <div class="card" style="background: #1a1a2e; color: #bc9c22;">
+                <h2 style="color: #bc9c22;">Repo/Pre-Owned Display Options</h2>
+                <p class="help-text" style="color: #bc9c22; margin-bottom: 1.5rem;">Customize how repo and pre-owned buildings appear on your website</p>
+
+                <div class="form-group">
+                    <label style="color: #bc9c22; font-weight: 600; display: block; margin-bottom: 0.75rem;">Building Sort Order</label>
+                    <div class="button-group" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <label class="btn-radio" style="flex: 1;">
+                            <input type="radio" name="repoSortOrder" id="repoSortOrder-last" value="last" checked style="display: none;">
+                            <span class="btn-radio-label">Show Repos Last</span>
+                        </label>
+                        <label class="btn-radio" style="flex: 1;">
+                            <input type="radio" name="repoSortOrder" id="repoSortOrder-first" value="first" style="display: none;">
+                            <span class="btn-radio-label">Show Repos First</span>
+                        </label>
+                    </div>
+                    <p class="help-text" style="color: #bc9c22;">Control whether repo buildings appear at the beginning or end of your inventory list</p>
+                </div>
+
+                <div class="form-group">
+                    <label style="color: #bc9c22; font-weight: 600; display: block; margin-bottom: 0.75rem;">Price Display Style</label>
+                    <div class="button-group" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <label class="btn-radio" style="flex: 1;">
+                            <input type="radio" name="repoPriceDisplay" id="repoPriceDisplay-strikethrough" value="strikethrough" checked style="display: none;">
+                            <span class="btn-radio-label">Strikethrough</span>
+                        </label>
+                        <label class="btn-radio" style="flex: 1;">
+                            <input type="radio" name="repoPriceDisplay" id="repoPriceDisplay-discounted" value="discounted" style="display: none;">
+                            <span class="btn-radio-label">Discounted Price</span>
+                        </label>
+                    </div>
+                    <p class="help-text" style="color: #bc9c22;">
+                        <strong>Strikethrough:</strong> Shows original price crossed out with "Call for Pre-Owned Price"<br>
+                        <strong>Discounted:</strong> Auto-calculates discount: 2024 = 5% off, 2023 = 10% off, 2022 = 15% off, 2021+ = 20% off
+                    </p>
+                </div>
+
+                <button class="btn btn-primary" onclick="saveInventorySettings()">Save Inventory Settings</button>
+            </div>
         </div>
 
         <!-- Domain & Website Tab -->
@@ -1096,10 +1172,10 @@ Call us at {{phone}} or visit our website to learn more!
             </div>
         </div>
 
-        <!-- Display Settings Tab -->
+        <!-- Account Settings Tab -->
         <div class="tab-content" id="settings-tab">
             <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 1.25rem; border-radius: 8px; margin-bottom: 2rem;">
-                <h3 style="margin: 0 0 0.5rem 0; color: #1976d2; font-size: 1.1rem;">Account & Display Settings</h3>
+                <h3 style="margin: 0 0 0.5rem 0; color: #1976d2; font-size: 1.1rem;">Account Settings</h3>
                 <p style="margin: 0; color: #1565c0; line-height: 1.6;">Manage your account security and customize what information appears on your website. Change your Shed-Sync login password and toggle visibility of cash prices and rent-to-own options on your public site.</p>
             </div>
 
@@ -1122,30 +1198,6 @@ Call us at {{phone}} or visit our website to learn more!
                             <span class="toggle-text" style="color: #bc9c22;">Show Rent-to-Own Options</span>
                         </label>
                     </div>
-                </div>
-
-                <h3 style="color: #bc9c22; margin-top: 2rem; margin-bottom: 1rem;">Repo/Pre-Owned Building Display</h3>
-                <p class="help-text" style="color: #bc9c22; margin-bottom: 1.5rem;">Customize how repo and pre-owned buildings appear on your website</p>
-
-                <div class="form-group">
-                    <label for="repoSortOrder" style="color: #bc9c22; font-weight: 600;">Building Sort Order</label>
-                    <select id="repoSortOrder" class="form-control">
-                        <option value="last">Show Repo/Pre-Owned Buildings Last</option>
-                        <option value="first">Show Repo/Pre-Owned Buildings First</option>
-                    </select>
-                    <p class="help-text" style="color: #bc9c22;">Control whether repo buildings appear at the beginning or end of your inventory list</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="repoPriceDisplay" style="color: #bc9c22; font-weight: 600;">Repo Price Display Style</label>
-                    <select id="repoPriceDisplay" class="form-control">
-                        <option value="strikethrough">Show Original Price with Strikethrough + "Call for Pre-Owned Price"</option>
-                        <option value="discounted">Show Discounted Price (Auto-calculated by year)</option>
-                    </select>
-                    <p class="help-text" style="color: #bc9c22;">
-                        <strong>Strikethrough:</strong> Shows original price crossed out with call-to-action<br>
-                        <strong>Discounted:</strong> Automatically applies discount: 2024 = 5% off, 2023 = 10% off, 2022 = 15% off, 2021 & older = 20% off
-                    </p>
                 </div>
 
                 <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>

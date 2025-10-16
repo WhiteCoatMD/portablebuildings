@@ -372,26 +372,57 @@ function switchTab(tabName) {
 // Settings Management
 function loadSettings() {
     const settings = getSettings();
+
+    // Account Settings tab - Display toggles
     document.getElementById('showCashPrice').checked = settings.showCashPrice;
     document.getElementById('showRtoOptions').checked = settings.showRtoOptions;
-    document.getElementById('repoSortOrder').value = settings.repoSortOrder || 'last';
-    document.getElementById('repoPriceDisplay').value = settings.repoPriceDisplay || 'strikethrough';
+
+    // Inventory Settings tab - Repo options (radio buttons)
+    const repoSortOrder = settings.repoSortOrder || 'last';
+    const repoPriceDisplay = settings.repoPriceDisplay || 'strikethrough';
+
+    // Set radio buttons for repo sort order
+    const sortOrderRadio = document.querySelector(`input[name="repoSortOrder"][value="${repoSortOrder}"]`);
+    if (sortOrderRadio) sortOrderRadio.checked = true;
+
+    // Set radio buttons for repo price display
+    const priceDisplayRadio = document.querySelector(`input[name="repoPriceDisplay"][value="${repoPriceDisplay}"]`);
+    if (priceDisplayRadio) priceDisplayRadio.checked = true;
 }
 
 function getSettings() {
     return getSetting(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
 }
 
+// Save Account Settings (Display toggles only)
 async function saveSettings() {
+    const currentSettings = getSettings();
     const settings = {
+        ...currentSettings,
         showCashPrice: document.getElementById('showCashPrice').checked,
-        showRtoOptions: document.getElementById('showRtoOptions').checked,
-        repoSortOrder: document.getElementById('repoSortOrder').value,
-        repoPriceDisplay: document.getElementById('repoPriceDisplay').value
+        showRtoOptions: document.getElementById('showRtoOptions').checked
     };
 
     await saveSetting(STORAGE_KEYS.SETTINGS, settings);
     showToast('Settings saved successfully!');
+}
+
+// Save Inventory Settings (Repo display options)
+async function saveInventorySettings() {
+    const currentSettings = getSettings();
+
+    // Get selected radio button values
+    const repoSortOrder = document.querySelector('input[name="repoSortOrder"]:checked')?.value || 'last';
+    const repoPriceDisplay = document.querySelector('input[name="repoPriceDisplay"]:checked')?.value || 'strikethrough';
+
+    const settings = {
+        ...currentSettings,
+        repoSortOrder,
+        repoPriceDisplay
+    };
+
+    await saveSetting(STORAGE_KEYS.SETTINGS, settings);
+    showToast('Inventory settings saved successfully!');
 }
 
 // Password Change
