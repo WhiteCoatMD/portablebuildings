@@ -913,7 +913,7 @@ Call us at {{phone}} or visit our website to learn more!
                 <div class="dns-instructions" id="dns-instructions" style="display: none;">
                     <h4>⚙️ DNS Configuration Required</h4>
                     <p style="color: #a8a8b8; margin-bottom: 1.5rem;">
-                        Follow these steps to connect your custom domain. You'll need to add <strong>TWO</strong> DNS records:
+                        Follow these steps to connect your custom domain. You'll need to add <strong>THREE</strong> DNS records:
                     </p>
 
                     <div style="background: rgba(255, 214, 10, 0.08); border-left: 3px solid #ffd60a; padding: 1.25rem; margin: 1rem 0; border-radius: 4px;">
@@ -922,13 +922,13 @@ Call us at {{phone}} or visit our website to learn more!
                         <ol style="color: #a8a8b8; margin: 0; padding-left: 1.5rem; line-height: 1.8;">
                             <li><strong style="color: #fff;">Log in to your domain registrar</strong> (GoDaddy, Namecheap, etc.) and go to DNS settings</li>
                             <li><strong style="color: #fff;">Find your domain</strong> (e.g., yourdomain.com) and click "DNS" or "Manage DNS"</li>
-                            <li><strong style="color: #fff;">Add the following two records:</strong></li>
+                            <li><strong style="color: #fff;">Add the following three records:</strong></li>
                         </ol>
                     </div>
 
                     <div style="background: rgba(33, 150, 243, 0.1); border-left: 3px solid #2196f3; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
-                        <strong style="color: #2196f3; display: block; margin-bottom: 0.75rem;">Record 1: A Record (for root domain)</strong>
-                        <p style="color: #a8a8b8; margin: 0 0 1rem 0; font-size: 0.9rem;">This makes yourdomain.com work</p>
+                        <strong style="color: #2196f3; display: block; margin-bottom: 0.75rem;">Records 1 & 2: A Records (for root domain)</strong>
+                        <p style="color: #a8a8b8; margin: 0 0 1rem 0; font-size: 0.9rem;">Add BOTH of these A records to make yourdomain.com work</p>
                     </div>
 
                     <div class="dns-record" style="margin: 1.5rem 0;">
@@ -939,8 +939,16 @@ Call us at {{phone}} or visit our website to learn more!
                         <strong style="margin-top: 0.5rem; display: inline-block;">TTL:</strong> <code>1 Hour</code> <span style="color: #a8a8b8; font-size: 0.85rem; font-weight: normal;"> (or leave as default)</span>
                     </div>
 
+                    <div class="dns-record" style="margin: 1.5rem 0; background: rgba(255, 214, 10, 0.05); padding: 1rem; border-radius: 4px;">
+                        <strong>Type:</strong> <code>A</code><br>
+                        <strong>Name:</strong> <code>@</code> <span style="color: #a8a8b8; font-size: 0.85rem; font-weight: normal;">(same as above - add a second A record)</span><br>
+                        <strong>Value/Points to:</strong> <code>76.76.21.123</code>
+                        <button class="copy-btn" onclick="navigator.clipboard.writeText('76.76.21.123').then(() => alert('✓ Copied to clipboard!'))">📋 Copy</button><br>
+                        <strong style="margin-top: 0.5rem; display: inline-block;">TTL:</strong> <code>1 Hour</code> <span style="color: #a8a8b8; font-size: 0.85rem; font-weight: normal;"> (or leave as default)</span>
+                    </div>
+
                     <div style="background: rgba(33, 150, 243, 0.1); border-left: 3px solid #2196f3; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
-                        <strong style="color: #2196f3; display: block; margin-bottom: 0.75rem;">Record 2: CNAME Record (for www subdomain)</strong>
+                        <strong style="color: #2196f3; display: block; margin-bottom: 0.75rem;">Record 3: CNAME Record (for www subdomain)</strong>
                         <p style="color: #a8a8b8; margin: 0 0 1rem 0; font-size: 0.9rem;">This makes www.yourdomain.com work</p>
                     </div>
 

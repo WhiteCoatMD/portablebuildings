@@ -8,6 +8,33 @@ const jwt = require('jsonwebtoken');
 const pool = getPool();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
+/**
+ * Add a domain to Vercel project via API
+ */
+async function addDomainToVercel(domain, token, projectId) {
+    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/domains`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: domain })
+    });
+
+    const data = await response.json();
+
+    if (response.status === 200 || response.status === 201) {
+        console.log(`[Vercel] ✓ Added domain: ${domain}`);
+        return data;
+    } else if (response.status === 409) {
+        console.log(`[Vercel] ℹ Domain already exists: ${domain}`);
+        return data;
+    } else {
+        console.error(`[Vercel] ✗ Failed to add domain ${domain}:`, data);
+        throw new Error(`Failed to add domain to Vercel: ${data.error?.message || 'Unknown error'}`);
+    }
+}
+
 async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({
@@ -72,6 +99,38 @@ async function handler(req, res) {
              WHERE id = $2`,
             [customDomain.toLowerCase(), userId]
         );
+
+        // Automatically add domain to Vercel project
+        const vercelToken = process.env.VERCEL_TOKEN;
+        const vercelProjectId = process.env.VERCEL_PROJECT_ID || 'prj_gycZ2zePp7Lv5EPFXXWM2xycgbXf';
+
+        if (vercelToken && vercelProjectId) {
+            try {
+                console.log(`[Save Custom Domain] Adding ${customDomain} to Vercel...`);
+
+                // Add root domain (e.g., example.com)
+                const rootDomain = customDomain.startsWith('www.')
+                    ? customDomain.substring(4)
+                    : customDomain;
+
+                // Add www subdomain (e.g., www.example.com)
+                const wwwDomain = rootDomain.startsWith('www.')
+                    ? rootDomain
+                    : `www.${rootDomain}`;
+
+                // Add both domains to Vercel
+                await addDomainToVercel(rootDomain, vercelToken, vercelProjectId);
+                await addDomainToVercel(wwwDomain, vercelToken, vercelProjectId);
+
+                console.log(`[Save Custom Domain] ✓ Added ${rootDomain} and ${wwwDomain} to Vercel`);
+            } catch (vercelError) {
+                console.error('[Save Custom Domain] Error adding domain to Vercel:', vercelError.message);
+                // Don't fail the request - domain is still saved in database
+                // User can add to Vercel manually if needed
+            }
+        } else {
+            console.warn('[Save Custom Domain] VERCEL_TOKEN or VERCEL_PROJECT_ID not configured - skipping Vercel domain addition');
+        }
 
         return res.status(200).json({
             success: true,
