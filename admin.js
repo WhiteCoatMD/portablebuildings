@@ -2703,6 +2703,12 @@ async function loadDomainInfo() {
         // Show DNS instructions if not verified
         if (!user.domain_verified) {
             document.getElementById('dns-instructions').style.display = 'block';
+
+            // Auto-check domain status in background if pending
+            // This will automatically verify the domain if DNS is configured
+            setTimeout(() => {
+                checkDomainVerification();
+            }, 2000); // Check after 2 seconds to let page load
         }
     }
 
