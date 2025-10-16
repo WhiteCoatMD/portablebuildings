@@ -62,9 +62,11 @@ class SerialNumberDecoder {
 
     getBuildingType() {
         const code = this.parts[1];
+        // Make lookup case-insensitive by converting to uppercase
+        const upperCode = code.toUpperCase();
         return {
             code: code,
-            name: BUILDING_TYPES[code] || 'Unknown Type'
+            name: BUILDING_TYPES[upperCode] || 'Unknown Type'
         };
     }
 
