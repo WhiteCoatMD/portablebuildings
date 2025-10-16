@@ -34,6 +34,17 @@ class InventoryApp {
     }
 
     loadSettings() {
+        // For multi-tenant sites, use settings from SITE_CONFIG
+        if (window.SITE_CONFIG && window.SITE_CONFIG.settings) {
+            return {
+                showCashPrice: window.SITE_CONFIG.settings.showCashPrice !== false,
+                showRtoOptions: window.SITE_CONFIG.settings.showRtoOptions !== false,
+                repoSortOrder: window.SITE_CONFIG.settings.repoSortOrder || 'last',
+                repoPriceDisplay: window.SITE_CONFIG.settings.repoPriceDisplay || 'strikethrough'
+            };
+        }
+
+        // For non-multi-tenant sites, use localStorage
         const stored = localStorage.getItem('cpb_admin_settings');
         return stored ? JSON.parse(stored) : {
             showCashPrice: true,

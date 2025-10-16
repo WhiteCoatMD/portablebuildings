@@ -168,25 +168,41 @@ async function handler(req, res) {
                 customDomain: user.custom_domain,
                 settings: settings,
                 locationHours: user.location_hours || {},
-                inventory: inventory.map(item => ({
-                    serialNumber: item.serial_number,
-                    typeCode: item.type_code,
-                    typeName: item.type_name,
-                    title: item.title,
-                    sizeDisplay: item.size_display,
-                    width: item.width,
-                    length: item.length,
-                    dateBuilt: item.date_built,
-                    price: item.price,
-                    cashPrice: item.price,
-                    rto36: item.rto36,
-                    rto48: item.rto48,
-                    rto60: item.rto60,
-                    rto72: item.rto72,
-                    isRepo: item.is_repo,
-                    location: item.location,
-                    status: item.auto_status || 'available'
-                }))
+                inventory: inventory.map(item => {
+                    // Parse date built for repo discount calculations
+                    let dateBuiltObj = null;
+                    if (item.date_built) {
+                        const dateMatch = item.date_built.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+                        if (dateMatch) {
+                            dateBuiltObj = {
+                                month: dateMatch[1],
+                                day: dateMatch[2],
+                                year: dateMatch[3]
+                            };
+                        }
+                    }
+
+                    return {
+                        serialNumber: item.serial_number,
+                        typeCode: item.type_code,
+                        typeName: item.type_name,
+                        title: item.title,
+                        sizeDisplay: item.size_display,
+                        width: item.width,
+                        length: item.length,
+                        dateBuilt: item.date_built,
+                        dateBuiltObj: dateBuiltObj,
+                        price: item.price,
+                        cashPrice: item.price,
+                        rto36: item.rto36,
+                        rto48: item.rto48,
+                        rto60: item.rto60,
+                        rto72: item.rto72,
+                        isRepo: item.is_repo,
+                        location: item.location,
+                        status: item.auto_status || 'available'
+                    };
+                })
             }
         });
 
