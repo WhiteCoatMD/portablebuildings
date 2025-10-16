@@ -136,6 +136,13 @@
                     </button>
                 </div>
                 <p id="gpb-status" class="help-text" style="margin-top: 1rem; font-weight: 600; color: #bc9c22;"></p>
+
+                <div style="background: rgba(33, 150, 243, 0.1); border-left: 4px solid #2196f3; padding: 1.25rem; margin-top: 1.5rem; border-radius: 6px;">
+                    <p style="margin: 0; color: #2196f3; font-weight: 600; font-size: 1rem;">📱 Manage on the Go!</p>
+                    <p style="margin: 0.75rem 0 0 0; color: #a8a8b8; line-height: 1.6;">
+                        You can log in to your admin panel from your phone and access the <strong style="color: #fff;">Manage Buildings</strong> tab to upload photos directly to your listings from your mobile device. Perfect for adding photos while you're at the lot!
+                    </p>
+                </div>
             </div>
 
             <div class="card" style="background: #1a1a2e; color: #bc9c22;">
@@ -1115,6 +1122,30 @@ Call us at {{phone}} or visit our website to learn more!
                             <span class="toggle-text" style="color: #bc9c22;">Show Rent-to-Own Options</span>
                         </label>
                     </div>
+                </div>
+
+                <h3 style="color: #bc9c22; margin-top: 2rem; margin-bottom: 1rem;">Repo/Pre-Owned Building Display</h3>
+                <p class="help-text" style="color: #bc9c22; margin-bottom: 1.5rem;">Customize how repo and pre-owned buildings appear on your website</p>
+
+                <div class="form-group">
+                    <label for="repoSortOrder" style="color: #bc9c22; font-weight: 600;">Building Sort Order</label>
+                    <select id="repoSortOrder" class="form-control">
+                        <option value="last">Show Repo/Pre-Owned Buildings Last</option>
+                        <option value="first">Show Repo/Pre-Owned Buildings First</option>
+                    </select>
+                    <p class="help-text" style="color: #bc9c22;">Control whether repo buildings appear at the beginning or end of your inventory list</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="repoPriceDisplay" style="color: #bc9c22; font-weight: 600;">Repo Price Display Style</label>
+                    <select id="repoPriceDisplay" class="form-control">
+                        <option value="strikethrough">Show Original Price with Strikethrough + "Call for Pre-Owned Price"</option>
+                        <option value="discounted">Show Discounted Price (Auto-calculated by year)</option>
+                    </select>
+                    <p class="help-text" style="color: #bc9c22;">
+                        <strong>Strikethrough:</strong> Shows original price crossed out with call-to-action<br>
+                        <strong>Discounted:</strong> Automatically applies discount: 2024 = 5% off, 2023 = 10% off, 2022 = 15% off, 2021 & older = 20% off
+                    </p>
                 </div>
 
                 <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>

@@ -35,7 +35,44 @@ class InventoryApp {
 
     loadSettings() {
         const stored = localStorage.getItem('cpb_admin_settings');
-        return stored ? JSON.parse(stored) : { showCashPrice: true, showRtoOptions: true };
+        return stored ? JSON.parse(stored) : {
+            showCashPrice: true,
+            showRtoOptions: true,
+            repoSortOrder: 'last',
+            repoPriceDisplay: 'strikethrough'
+        };
+    }
+
+    /**
+     * Calculate repo discount based on year built
+     * 2024: 5% off
+     * 2023: 10% off
+     * 2022: 15% off
+     * 2021 and older: 20% off
+     */
+    calculateRepoDiscount(building) {
+        if (!building.isRepo || !building.dateBuiltObj) {
+            return 0;
+        }
+
+        const yearBuilt = parseInt(building.dateBuiltObj.year);
+        const currentYear = new Date().getFullYear();
+
+        if (yearBuilt >= 2024) {
+            return 0.05; // 5% off
+        } else if (yearBuilt === 2023) {
+            return 0.10; // 10% off
+        } else if (yearBuilt === 2022) {
+            return 0.15; // 15% off
+        } else {
+            return 0.20; // 20% off for 2021 and older
+        }
+    }
+
+    calculateDiscountedPrice(building) {
+        const discountRate = this.calculateRepoDiscount(building);
+        const discountedPrice = building.price * (1 - discountRate);
+        return Math.round(discountedPrice); // Round to nearest dollar
     }
 
     loadBuildingOverrides() {
@@ -357,7 +394,25 @@ class InventoryApp {
             return;
         }
 
-        const html = this.filteredInventory.map(building => this.createBuildingCard(building)).join('');
+        // Sort buildings based on repo sort order setting
+        let sortedInventory = [...this.filteredInventory];
+        if (this.settings.repoSortOrder === 'first') {
+            // Repos first, then regular buildings
+            sortedInventory.sort((a, b) => {
+                if (a.isRepo && !b.isRepo) return -1;
+                if (!a.isRepo && b.isRepo) return 1;
+                return 0;
+            });
+        } else {
+            // Regular buildings first, then repos (default)
+            sortedInventory.sort((a, b) => {
+                if (a.isRepo && !b.isRepo) return 1;
+                if (!a.isRepo && b.isRepo) return -1;
+                return 0;
+            });
+        }
+
+        const html = sortedInventory.map(building => this.createBuildingCard(building)).join('');
         this.elements.buildingsGrid.innerHTML = html;
     }
 
@@ -415,10 +470,28 @@ class InventoryApp {
         // Price display based on settings
         let priceSection = '';
         if (this.settings.showCashPrice) {
-            const priceDisplay = building.isRepo ?
-                `<span class="value strikethrough">$${building.price.toLocaleString()}</span>
-                 <div class="repo-price-note">Call for Pre-Owned Price</div>` :
-                `<span class="value">$${building.price.toLocaleString()}</span>`;
+            let priceDisplay;
+
+            if (building.isRepo) {
+                if (this.settings.repoPriceDisplay === 'discounted') {
+                    // Show discounted price
+                    const discountedPrice = this.calculateDiscountedPrice(building);
+                    const discountPercent = Math.round(this.calculateRepoDiscount(building) * 100);
+                    priceDisplay = `
+                        <span class="value strikethrough">$${building.price.toLocaleString()}</span>
+                        <span class="value" style="color: #28a745; font-weight: 700;">$${discountedPrice.toLocaleString()}</span>
+                        <div class="repo-price-note" style="color: #28a745;">${discountPercent}% Pre-Owned Discount Applied!</div>
+                    `;
+                } else {
+                    // Show strikethrough with CTA (default)
+                    priceDisplay = `
+                        <span class="value strikethrough">$${building.price.toLocaleString()}</span>
+                        <div class="repo-price-note">Call for Pre-Owned Price</div>
+                    `;
+                }
+            } else {
+                priceDisplay = `<span class="value">$${building.price.toLocaleString()}</span>`;
+            }
 
             priceSection = `
                 <div class="building-detail-item">

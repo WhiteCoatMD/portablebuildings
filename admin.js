@@ -374,6 +374,8 @@ function loadSettings() {
     const settings = getSettings();
     document.getElementById('showCashPrice').checked = settings.showCashPrice;
     document.getElementById('showRtoOptions').checked = settings.showRtoOptions;
+    document.getElementById('repoSortOrder').value = settings.repoSortOrder || 'last';
+    document.getElementById('repoPriceDisplay').value = settings.repoPriceDisplay || 'strikethrough';
 }
 
 function getSettings() {
@@ -383,7 +385,9 @@ function getSettings() {
 async function saveSettings() {
     const settings = {
         showCashPrice: document.getElementById('showCashPrice').checked,
-        showRtoOptions: document.getElementById('showRtoOptions').checked
+        showRtoOptions: document.getElementById('showRtoOptions').checked,
+        repoSortOrder: document.getElementById('repoSortOrder').value,
+        repoPriceDisplay: document.getElementById('repoPriceDisplay').value
     };
 
     await saveSetting(STORAGE_KEYS.SETTINGS, settings);
