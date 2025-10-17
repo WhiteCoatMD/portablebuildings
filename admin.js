@@ -2182,8 +2182,14 @@ async function checkAndPostToFacebook(building) {
 
 // Test Facebook Posting
 async function testFacebookPost() {
-    const btn = document.getElementById('test-fb-btn');
-    const status = document.getElementById('test-fb-status');
+    const btn = document.getElementById('test-fb-btn-2');
+    const status = document.getElementById('test-fb-status-2');
+
+    if (!btn || !status) {
+        console.error('Test Facebook button or status element not found');
+        showToast('Error: UI elements not found', true);
+        return;
+    }
 
     // First, save the current template value before testing
     const templateTextarea = document.getElementById('autoPostTemplate');
