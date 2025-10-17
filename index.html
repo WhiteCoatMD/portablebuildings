@@ -343,6 +343,54 @@
         <a href="login.html" class="cta-button">Dealer Login →</a>
     </div>
 
+    <!-- Demo Request Form - Moved to top -->
+    <div class="container" style="padding: 4rem 2rem;">
+        <h2 class="section-title">Request a Free Demo</h2>
+        <p class="section-subtitle">See how ShedSync can transform your portable buildings business</p>
+
+        <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2.5rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid #2a2a3e;">
+            <form id="demo-request-form" onsubmit="submitDemoRequest(event)">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 1.25rem;">
+                    <div>
+                        <label style="display: block; color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">Your Name *</label>
+                        <input type="text" id="demo-name" name="name" required style="width: 100%; padding: 0.875rem; border: 2px solid #2a2a3e; border-radius: 6px; font-size: 1rem; background: #0f1419; color: #fff;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="display: block; color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">City *</label>
+                            <input type="text" id="demo-city" name="city" required style="width: 100%; padding: 0.875rem; border: 2px solid #2a2a3e; border-radius: 6px; font-size: 1rem; background: #0f1419; color: #fff;">
+                        </div>
+                        <div>
+                            <label style="display: block; color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">State *</label>
+                            <input type="text" id="demo-state" name="state" required placeholder="LA" style="width: 100%; padding: 0.875rem; border: 2px solid #2a2a3e; border-radius: 6px; font-size: 1rem; background: #0f1419; color: #fff;">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="display: block; color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">Phone Number *</label>
+                        <input type="tel" id="demo-phone" name="phone" required placeholder="318-555-1234" style="width: 100%; padding: 0.875rem; border: 2px solid #2a2a3e; border-radius: 6px; font-size: 1rem; background: #0f1419; color: #fff;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">Email Address *</label>
+                        <input type="email" id="demo-email" name="email" required placeholder="john@portablebuildings.com" style="width: 100%; padding: 0.875rem; border: 2px solid #2a2a3e; border-radius: 6px; font-size: 1rem; background: #0f1419; color: #fff;">
+                    </div>
+
+                    <button type="submit" class="cta-button" style="width: 100%; margin-top: 1rem; cursor: pointer; border: none;">
+                        Request Free Demo
+                    </button>
+                </div>
+            </form>
+
+            <div id="demo-success" style="display: none; text-align: center; padding: 2rem;">
+                <div style="font-size: 3.5rem; margin-bottom: 1rem;">✅</div>
+                <h3 style="color: #ffd60a; margin-bottom: 0.75rem; font-size: 1.5rem;">Thank You!</h3>
+                <p style="color: #a8a8b8; font-size: 1.05rem;">We received your demo request and will be in touch within 24 hours to schedule your personalized demonstration.</p>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <h2 class="section-title">Built for Dealers</h2>
         <p class="section-subtitle">Everything you need to manage and showcase your portable buildings inventory online</p>
@@ -391,10 +439,51 @@
         </div>
     </div>
 
-    <div class="container" style="text-align: center; padding: 4rem 2rem;">
-        <h2 class="section-title">Ready to Get Started?</h2>
-        <p class="section-subtitle">Join other portable building dealers using ShedSync to manage their inventory</p>
-        <a href="mailto:support@shed-sync.com" class="cta-button">Contact Us</a>
+    <div class="container" style="padding: 4rem 2rem;">
+        <h2 class="section-title">Request a Free Demo</h2>
+        <p class="section-subtitle">See how ShedSync can transform your portable buildings business</p>
+
+        <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2.5rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid #2a2a3e;">
+            <form id="demo-request-form" onsubmit="submitDemoRequest(event)">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 1.25rem;">
+                    <div>
+                        <label style="display: block; color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">Your Name *</label>
+                        <input type="text" id="demo-name" name="name" required style="width: 100%; padding: 0.875rem; border: 2px solid #2a2a3e; border-radius: 6px; font-size: 1rem; background: #0f1419; color: #fff;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="display: block; color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">City *</label>
+                            <input type="text" id="demo-city" name="city" required style="width: 100%; padding: 0.875rem; border: 2px solid #2a2a3e; border-radius: 6px; font-size: 1rem; background: #0f1419; color: #fff;">
+                        </div>
+                        <div>
+                            <label style="display: block; color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">State *</label>
+                            <input type="text" id="demo-state" name="state" required placeholder="LA" style="width: 100%; padding: 0.875rem; border: 2px solid #2a2a3e; border-radius: 6px; font-size: 1rem; background: #0f1419; color: #fff;">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="display: block; color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">Phone Number *</label>
+                        <input type="tel" id="demo-phone" name="phone" required placeholder="318-555-1234" style="width: 100%; padding: 0.875rem; border: 2px solid #2a2a3e; border-radius: 6px; font-size: 1rem; background: #0f1419; color: #fff;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; color: #ffd60a; font-weight: 600; margin-bottom: 0.5rem;">Email Address *</label>
+                        <input type="email" id="demo-email" name="email" required placeholder="john@portablebuildings.com" style="width: 100%; padding: 0.875rem; border: 2px solid #2a2a3e; border-radius: 6px; font-size: 1rem; background: #0f1419; color: #fff;">
+                    </div>
+
+                    <button type="submit" class="cta-button" style="width: 100%; margin-top: 1rem; cursor: pointer; border: none;">
+                        Request Free Demo
+                    </button>
+                </div>
+            </form>
+
+            <div id="demo-success" style="display: none; text-align: center; padding: 2rem;">
+                <div style="font-size: 3.5rem; margin-bottom: 1rem;">✅</div>
+                <h3 style="color: #ffd60a; margin-bottom: 0.75rem; font-size: 1.5rem;">Thank You!</h3>
+                <p style="color: #a8a8b8; font-size: 1.05rem;">We received your demo request and will be in touch within 24 hours to schedule your personalized demonstration.</p>
+            </div>
+        </div>
     </div>
 
     <footer>
@@ -435,6 +524,43 @@
         }
 
         loadDemoSites();
+
+        // Demo Request Form Submission
+        async function submitDemoRequest(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const data = {
+                name: formData.get('name'),
+                city: formData.get('city'),
+                state: formData.get('state'),
+                phone: formData.get('phone'),
+                email: formData.get('email')
+            };
+
+            try {
+                const response = await fetch('/api/public/submit-demo-lead', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success message
+                    document.getElementById('demo-request-form').style.display = 'none';
+                    document.getElementById('demo-success').style.display = 'block';
+                } else {
+                    alert('Sorry, there was an error submitting your request. Please email us at support@shed-sync.com');
+                }
+            } catch (error) {
+                console.error('Error submitting demo request:', error);
+                alert('Sorry, there was an error submitting your request. Please email us at support@shed-sync.com');
+            }
+        }
     </script>
 </body>
 </html>
