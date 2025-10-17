@@ -498,6 +498,19 @@
         </div>
     </div>
 
+    <!-- Activity & Traffic Modal -->
+    <div id="activity-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <h2>📊 Dealer Activity & Website Traffic</h2>
+            <div id="activity-content" style="line-height: 1.8;">
+                <div class="loading"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-primary" onclick="closeActivityModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let allUsers = [];
 
@@ -908,6 +921,9 @@
                                             <button class="btn btn-secondary" onclick="viewContact(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">📋 Contact</button>
                                             <button class="btn btn-primary" onclick="editUser(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Edit</button>
                                         </div>
+                                        <button class="btn btn-secondary" onclick="viewActivity(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; width: 100%; background: #17a2b8;">
+                                            📊 Activity & Traffic
+                                        </button>
                                         <button class="btn btn-secondary" onclick="resetUserPassword(${user.id})" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; width: 100%;">
                                             🔑 Reset Password
                                         </button>
@@ -1029,6 +1045,143 @@
 
         function closeContactModal() {
             document.getElementById('contact-modal').classList.remove('show');
+        }
+
+        async function viewActivity(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            // Show modal with loading state
+            document.getElementById('activity-modal').classList.add('show');
+            document.getElementById('activity-content').innerHTML = '<div class="loading"></div>';
+
+            try {
+                const response = await fetch(`/api/super-admin/dealer-activity?userId=${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+                    const content = document.getElementById('activity-content');
+
+                    content.innerHTML = `
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #1a1a2e; margin-bottom: 1rem;">🏢 ${user.business_name || user.email}</h3>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                            <div style="background: #e7f3ff; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #2196f3;">
+                                <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">PORTAL LOGINS (30 DAYS)</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: #2196f3;">${stats.loginCount30d}</div>
+                                <div style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
+                                    Last: ${stats.lastLogin ? new Date(stats.lastLogin).toLocaleString() : 'Never'}
+                                </div>
+                            </div>
+
+                            <div style="background: #fff3cd; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ffc107;">
+                                <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">LEAD CHECKS (30 DAYS)</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: #f57c00;">${stats.leadChecks30d}</div>
+                                <div style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
+                                    Last: ${stats.lastLeadCheck ? new Date(stats.lastLeadCheck).toLocaleString() : 'Never'}
+                                </div>
+                            </div>
+
+                            <div style="background: #d4edda; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #28a745;">
+                                <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">UNIQUE VISITORS (30 DAYS)</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: #28a745;">${stats.websiteTraffic.uniqueVisitors30d}</div>
+                                <div style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
+                                    Pageviews: ${stats.websiteTraffic.totalPageviews30d}
+                                </div>
+                            </div>
+
+                            <div style="background: #f8d7da; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #dc3545;">
+                                <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">RECENT ACTIVITY (7 DAYS)</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: #dc3545;">${stats.recentActivity.length}</div>
+                                <div style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
+                                    Activity types
+                                </div>
+                            </div>
+                        </div>
+
+                        ${stats.recentActivity.length > 0 ? `
+                            <div style="margin-bottom: 2rem;">
+                                <h4 style="color: #333; margin-bottom: 1rem;">Recent Activity (Last 7 Days)</h4>
+                                <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+                                    ${stats.recentActivity.map(activity => `
+                                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #dee2e6;">
+                                            <span style="font-weight: 600;">${activity.activity_type.replace(/_/g, ' ').toUpperCase()}</span>
+                                            <span style="color: #666;">${activity.count} times</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${stats.trafficByDay.length > 0 ? `
+                            <div style="margin-bottom: 2rem;">
+                                <h4 style="color: #333; margin-bottom: 1rem;">Website Traffic (Last 7 Days)</h4>
+                                <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+                                    ${stats.trafficByDay.map(day => `
+                                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #dee2e6;">
+                                            <span style="font-weight: 600;">${new Date(day.date).toLocaleDateString()}</span>
+                                            <div>
+                                                <span style="color: #28a745; margin-right: 1rem;">${day.unique_visitors} unique</span>
+                                                <span style="color: #666;">${day.pageviews} views</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${stats.activityTimeline.length > 0 ? `
+                            <div>
+                                <h4 style="color: #333; margin-bottom: 1rem;">Activity Timeline (Last 30 Events)</h4>
+                                <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem; max-height: 300px; overflow-y: auto;">
+                                    ${stats.activityTimeline.map(event => `
+                                        <div style="padding: 0.75rem; margin-bottom: 0.5rem; background: white; border-radius: 4px; border-left: 3px solid #2196f3;">
+                                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                                <div>
+                                                    <strong style="color: #1a1a2e;">${event.activity_type.replace(/_/g, ' ').toUpperCase()}</strong>
+                                                    ${event.details && Object.keys(event.details).length > 0 ? `
+                                                        <div style="font-size: 0.85rem; color: #666; margin-top: 0.25rem;">
+                                                            ${JSON.stringify(event.details)}
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
+                                                <span style="font-size: 0.8rem; color: #999; white-space: nowrap; margin-left: 1rem;">
+                                                    ${new Date(event.created_at).toLocaleString()}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+                } else {
+                    document.getElementById('activity-content').innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: #666;">
+                            Failed to load activity data: ${data.error || 'Unknown error'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Load activity error:', error);
+                document.getElementById('activity-content').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #dc3545;">
+                        Error loading activity data
+                    </div>
+                `;
+            }
+        }
+
+        function closeActivityModal() {
+            document.getElementById('activity-modal').classList.remove('show');
         }
 
         document.getElementById('edit-form').addEventListener('submit', async (e) => {
@@ -1295,6 +1448,12 @@
         document.getElementById('contact-modal').addEventListener('click', (e) => {
             if (e.target.id === 'contact-modal') {
                 closeContactModal();
+            }
+        });
+
+        document.getElementById('activity-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'activity-modal') {
+                closeActivityModal();
             }
         });
     </script>
