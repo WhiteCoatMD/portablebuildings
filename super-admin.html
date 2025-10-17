@@ -399,8 +399,11 @@
 
         <!-- Demo Leads Table -->
         <div class="users-table-container" style="margin-bottom: 2rem;">
-            <div class="table-header">
+            <div class="table-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <h2>📧 Demo Requests</h2>
+                <button class="btn btn-danger" onclick="clearAllDemoRequests()" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;">
+                    🗑️ Clear All Demo Requests
+                </button>
             </div>
             <div id="demo-leads-table-content">
                 <div class="loading"></div>
@@ -661,8 +664,11 @@
         function renderFeatureRequestsTable(requests) {
             const content = document.getElementById('feature-requests-table-content');
 
-            if (requests.length === 0) {
-                content.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">No feature requests yet</div>';
+            // Filter out archived requests
+            const activeRequests = requests.filter(request => request.status !== 'archived');
+
+            if (activeRequests.length === 0) {
+                content.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">No active feature requests</div>';
                 return;
             }
 
@@ -688,7 +694,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${requests.map(request => `
+                        ${activeRequests.map(request => `
                             <tr>
                                 <td>
                                     <strong>${request.business_name}</strong><br>
@@ -1420,6 +1426,44 @@
             } catch (error) {
                 console.error('Reset password error:', error);
                 showError('❌ Failed to reset password');
+            }
+        }
+
+        async function clearAllDemoRequests() {
+            const confirmMsg = `⚠️ WARNING: Clear ALL demo requests?\n\n` +
+                `This will permanently delete all demo request entries from the database.\n\n` +
+                `This action CANNOT be undone!\n\n` +
+                `Type "CLEAR" to confirm:`;
+
+            const confirmation = prompt(confirmMsg);
+
+            if (confirmation !== 'CLEAR') {
+                if (confirmation !== null) {
+                    showError('❌ Action cancelled - confirmation text did not match.');
+                }
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/super-admin/clear-demo-requests', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showError(`✅ Successfully deleted ${data.deleted} demo request(s)`);
+                    loadDemoLeads();
+                    loadStats();
+                } else {
+                    showError('❌ ' + (data.error || 'Failed to clear demo requests'));
+                }
+            } catch (error) {
+                console.error('Clear demo requests error:', error);
+                showError('❌ Failed to clear demo requests');
             }
         }
 
