@@ -220,10 +220,19 @@
                 <button class="modal-close" onclick="closeInquiryModal()">&times;</button>
             </div>
             <div class="modal-body">
+                <!-- Building Info Card -->
+                <div id="inquiry-building-info" style="background: #f8f9fa; border: 2px solid #28a745; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <div style="font-weight: 700; color: #28a745; margin-bottom: 0.5rem; font-size: 0.9rem;">YOU'RE INQUIRING ABOUT:</div>
+                    <div id="inquiry-building-details" style="color: #333; line-height: 1.6;">
+                        <!-- Building details will be populated by JavaScript -->
+                    </div>
+                </div>
+
                 <p style="color: #666; margin-bottom: 1.5rem;">Fill out the form below and we'll be in touch soon!</p>
 
                 <form id="inquiry-form" onsubmit="submitInquiry(event)">
                     <input type="hidden" id="inquiry-building-serial" name="buildingSerial">
+                    <input type="hidden" id="inquiry-building-title" name="buildingTitle">
 
                     <div class="form-group" style="margin-bottom: 1rem;">
                         <label for="inquiry-name" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Your Name *</label>
@@ -273,10 +282,24 @@
 
         currentInquiryBuilding = building;
         document.getElementById('inquiry-building-serial').value = serialNumber;
-        document.getElementById('inquiry-modal-title').textContent = `Inquire About: ${building.title}`;
+        document.getElementById('inquiry-building-title').value = building.title;
+        document.getElementById('inquiry-modal-title').textContent = `Inquire About This Building`;
+
+        // Populate building details in the info card
+        const priceText = building.isRepo ? 'Call for Pre-Owned Price' : `$${building.price.toLocaleString()}`;
+        const buildingDetailsHTML = `
+            <div style="font-size: 1.1rem; font-weight: 600; color: #1a5490; margin-bottom: 0.25rem;">${building.title}</div>
+            <div style="font-size: 0.95rem; margin-bottom: 0.25rem;"><strong>Size:</strong> ${building.sizeDisplay}</div>
+            <div style="font-size: 0.95rem; margin-bottom: 0.25rem;"><strong>Price:</strong> ${priceText}</div>
+            <div style="font-size: 0.95rem;"><strong>Location:</strong> ${building.location || 'GPB Sales'}</div>
+            <div style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">Serial: ${building.serialNumber}</div>
+        `;
+        document.getElementById('inquiry-building-details').innerHTML = buildingDetailsHTML;
 
         // Reset form
         document.getElementById('inquiry-form').reset();
+        document.getElementById('inquiry-building-serial').value = serialNumber;
+        document.getElementById('inquiry-building-title').value = building.title;
         document.getElementById('inquiry-form').style.display = 'block';
         document.getElementById('inquiry-success').style.display = 'none';
 

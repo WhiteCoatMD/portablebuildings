@@ -651,25 +651,25 @@ main {
 
 /* Inquire Button */
 .inquire-btn {
-    width: 75%;
-    padding: 1rem;
+    width: 60%;
+    padding: 0.75rem 1rem;
     margin: 0.75rem auto;
     display: block;
     background: #28a745;
     color: var(--white);
     border: none;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    font-weight: 700;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 3px 8px rgba(40, 167, 69, 0.25);
 }
 
 .inquire-btn:hover {
     background: #218838;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+    box-shadow: 0 5px 12px rgba(40, 167, 69, 0.35);
 }
 
 .rto-tooltip {
@@ -1244,4 +1244,78 @@ footer {
     --header-bg: linear-gradient(135deg, #EA580C 0%, #9A3412 100%);
     --footer-bg: #9A3412;
     --button-color: #EA580C;
+}
+
+/* Lead Inquiry Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.modal-body {
+    padding: 1.5rem;
 }
