@@ -30,16 +30,16 @@ module.exports = async (req, res) => {
             });
         }
 
-        // Verify super admin
+        // Verify admin access
         const userResult = await pool.query(
-            'SELECT is_super_admin FROM users WHERE id = $1',
+            'SELECT is_admin FROM users WHERE id = $1',
             [decoded.userId]
         );
 
-        if (userResult.rows.length === 0 || !userResult.rows[0].is_super_admin) {
+        if (userResult.rows.length === 0 || !userResult.rows[0].is_admin) {
             return res.status(403).json({
                 success: false,
-                error: 'Super admin access required'
+                error: 'Admin access required'
             });
         }
 
