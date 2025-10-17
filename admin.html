@@ -47,12 +47,70 @@
 
         <!-- Site Customization Tab -->
         <div class="tab-content active" id="customization-tab">
+            <style>
+                .customization-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 1.5rem;
+                    margin-bottom: 2rem;
+                }
+
+                .customization-grid .card {
+                    margin-bottom: 0;
+                    cursor: pointer;
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                }
+
+                .customization-grid .card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                }
+
+                .card.expanded {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) !important;
+                    width: 90%;
+                    max-width: 800px;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    z-index: 1000;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                    cursor: default;
+                }
+
+                .card-overlay {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    z-index: 999;
+                }
+
+                .card-overlay.active {
+                    display: block;
+                }
+
+                @media (max-width: 1024px) {
+                    .customization-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+
             <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 1.25rem; border-radius: 8px; margin-bottom: 2rem;">
                 <h3 style="margin: 0 0 0.5rem 0; color: #1976d2; font-size: 1.1rem;">Site Customization</h3>
-                <p style="margin: 0; color: #1565c0; line-height: 1.6;">Personalize your website's appearance, content, and branding. Update your business information, choose color schemes, set operating hours, configure inventory sync, and manage hero images. Changes save to your live site immediately after clicking "Save All Customization" at the bottom of this page.</p>
+                <p style="margin: 0; color: #1565c0; line-height: 1.6;">Personalize your website's appearance, content, and branding. Click any card to expand it. Changes save to your live site immediately after clicking "Save All Customization" at the bottom of this page.</p>
             </div>
 
-            <div class="card" style="background: #1a1a2e; color: #bc9c22;">
+            <div class="card-overlay" id="card-overlay" onclick="closeExpandedCard()"></div>
+
+            <div class="customization-grid">
+            <div class="card customization-card" style="background: #1a1a2e; color: #bc9c22;" onclick="toggleCardExpand(this, event)">
                 <h2 style="color: #bc9c22;">Business Information</h2>
 
                 <div class="form-group">
@@ -105,7 +163,7 @@
                 </div>
             </div>
 
-            <div class="card" style="background: #1a1a2e; color: #bc9c22;">
+            <div class="card customization-card" style="background: #1a1a2e; color: #bc9c22;" onclick="toggleCardExpand(this, event)">
                 <h2 style="color: #bc9c22;">Location Hours</h2>
                 <p class="help-text" style="color: #bc9c22;">Set your business hours to display on your website footer</p>
 
@@ -199,7 +257,7 @@
             </div>
 
 
-            <div class="card" style="background: #1a1a2e; color: #bc9c22;">
+            <div class="card customization-card" style="background: #1a1a2e; color: #bc9c22;" onclick="toggleCardExpand(this, event)">
                 <h2 style="color: #bc9c22;">Color Scheme</h2>
                 <p class="help-text" style="color: #bc9c22;">Choose a professional 2-color gradient scheme</p>
 
@@ -437,7 +495,7 @@
                 </div>
             </div>
 
-            <div class="card" style="background: #1a1a2e; color: #bc9c22;">
+            <div class="card customization-card" style="background: #1a1a2e; color: #bc9c22;" onclick="toggleCardExpand(this, event)">
                 <h2 style="color: #bc9c22;">Welcome Message</h2>
 
                 <div class="form-group">
@@ -452,7 +510,7 @@
                 </div>
             </div>
 
-            <div class="card" style="background: #1a1a2e; color: #bc9c22;">
+            <div class="card customization-card" style="background: #1a1a2e; color: #bc9c22;" onclick="toggleCardExpand(this, event)">
                 <h2 style="color: #bc9c22;">Hero Carousel Images</h2>
                 <p class="help-text" style="color: #bc9c22;">Current images in the carousel. Drag to reorder, click X to remove.</p>
 
@@ -469,6 +527,7 @@
                     </div>
                 </div>
             </div>
+            </div><!-- End customization-grid -->
 
             <button class="btn btn-primary btn-lg" onclick="saveCustomization()">💾 Save All Customization</button>
         </div>
@@ -1570,6 +1629,9 @@ Call us at {{phone}} or visit our website to learn more!
             </div>
         </div>
     </div>
+
+    <!-- Overlay for expanded cards -->
+    <div id="card-overlay" class="card-overlay" onclick="closeExpandedCard()"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
     <script src="decoder.js?v=4"></script>
