@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
         }
 
         const clientId = process.env.GOOGLE_BUSINESS_CLIENT_ID;
-        const redirectUri = `${req.headers.origin || 'https://portablebuildings.vercel.app'}/api/auth/google-business/callback`;
+        const redirectUri = 'https://portablebuildings.vercel.app/api/auth/google-business/callback';
 
         if (!clientId) {
             return res.status(500).json({

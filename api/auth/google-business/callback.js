@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
 
         const clientId = process.env.GOOGLE_BUSINESS_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_BUSINESS_CLIENT_SECRET;
-        const redirectUri = `${req.headers.origin || 'https://portablebuildings.vercel.app'}/api/auth/google-business/callback`;
+        const redirectUri = 'https://portablebuildings.vercel.app/api/auth/google-business/callback';
 
         if (!clientId || !clientSecret) {
             console.error('[GBP OAuth Callback] Missing credentials');
