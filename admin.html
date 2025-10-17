@@ -200,6 +200,88 @@
                 </div>
 
                 <div class="form-group">
+                    <label style="color: #bc9c22;">📅 Posting Schedule</label>
+                    <p class="help-text" style="color: #bc9c22; margin-bottom: 1rem;">Control when new buildings are posted to Facebook</p>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="color: #bc9c22; font-weight: 600; display: block; margin-bottom: 0.5rem;">Post Frequency</label>
+                        <select id="postFrequency" class="form-control" onchange="toggleCustomSchedule()" style="background: #2a2a3e; color: #bc9c22; border: 1px solid #5a5a6a;">
+                            <option value="immediate">Post Immediately (as inventory syncs)</option>
+                            <option value="daily">Once Daily (optimal time)</option>
+                            <option value="3-5week">3-5 Times Per Week</option>
+                            <option value="custom">Custom Schedule</option>
+                        </select>
+                        <p class="help-text" style="color: #bc9c22; margin-top: 0.5rem;">Choose how often new buildings should be posted</p>
+                    </div>
+
+                    <!-- Custom Schedule Section (Hidden by default) -->
+                    <div id="customScheduleSection" style="display: none; background: rgba(188, 156, 34, 0.1); padding: 1.5rem; border-radius: 8px; border: 1px solid #bc9c22;">
+                        <h4 style="color: #bc9c22; margin-top: 0;">Custom Posting Schedule</h4>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="color: #bc9c22; font-weight: 600; display: block; margin-bottom: 0.75rem;">Select Days to Post</label>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem;">
+                                <label class="day-checkbox" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="schedMon" value="monday" class="schedule-day">
+                                    <span style="color: #bc9c22;">Monday</span>
+                                </label>
+                                <label class="day-checkbox" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="schedTue" value="tuesday" class="schedule-day">
+                                    <span style="color: #bc9c22;">Tuesday</span>
+                                </label>
+                                <label class="day-checkbox" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="schedWed" value="wednesday" class="schedule-day">
+                                    <span style="color: #bc9c22;">Wednesday</span>
+                                </label>
+                                <label class="day-checkbox" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="schedThu" value="thursday" class="schedule-day">
+                                    <span style="color: #bc9c22;">Thursday</span>
+                                </label>
+                                <label class="day-checkbox" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="schedFri" value="friday" class="schedule-day">
+                                    <span style="color: #bc9c22;">Friday</span>
+                                </label>
+                                <label class="day-checkbox" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="schedSat" value="saturday" class="schedule-day">
+                                    <span style="color: #bc9c22;">Saturday</span>
+                                </label>
+                                <label class="day-checkbox" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="schedSun" value="sunday" class="schedule-day">
+                                    <span style="color: #bc9c22;">Sunday</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1rem;">
+                            <label style="color: #bc9c22; font-weight: 600; display: block; margin-bottom: 0.75rem;">Posting Time Window</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label style="color: #bc9c22; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">Start Time</label>
+                                    <input type="time" id="schedStartTime" class="form-control" value="09:00" style="background: #2a2a3e; color: #bc9c22; border: 1px solid #5a5a6a;">
+                                </div>
+                                <div>
+                                    <label style="color: #bc9c22; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">End Time</label>
+                                    <input type="time" id="schedEndTime" class="form-control" value="17:00" style="background: #2a2a3e; color: #bc9c22; border: 1px solid #5a5a6a;">
+                                </div>
+                            </div>
+                            <p class="help-text" style="color: #bc9c22; margin-top: 0.5rem;">Posts will be scheduled randomly within this time window on selected days</p>
+                        </div>
+
+                        <div>
+                            <label style="color: #bc9c22; font-weight: 600; display: block; margin-bottom: 0.75rem;">Max Posts Per Day</label>
+                            <select id="maxPostsPerDay" class="form-control" style="background: #2a2a3e; color: #bc9c22; border: 1px solid #5a5a6a;">
+                                <option value="1">1 post per day</option>
+                                <option value="2">2 posts per day</option>
+                                <option value="3">3 posts per day</option>
+                                <option value="5">5 posts per day</option>
+                                <option value="unlimited">Unlimited</option>
+                            </select>
+                            <p class="help-text" style="color: #bc9c22; margin-top: 0.5rem;">Limit how many buildings can be posted in a single day</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="autoPostTemplate-2" style="color: #bc9c22;">Post Template</label>
                     <textarea id="autoPostTemplate-2" class="form-control" rows="10"
                               placeholder="Use {{name}}, {{size}}, {{price}}, {{type}} as placeholders">🏠 New Arrival! {{name}}

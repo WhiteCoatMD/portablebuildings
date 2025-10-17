@@ -4558,4 +4558,20 @@ window.testGoogleBusinessPost = testGoogleBusinessPost;
 window.showMarketingPlatform = showMarketingPlatform;
 window.backToMarketingSelector = backToMarketingSelector;
 
+// Facebook Posting Schedule Functions
+function toggleCustomSchedule() {
+    const frequency = document.getElementById('postFrequency');
+    const customSection = document.getElementById('customScheduleSection');
+
+    if (frequency && customSection) {
+        if (frequency.value === 'custom') {
+            customSection.style.display = 'block';
+        } else {
+            customSection.style.display = 'none';
+        }
+    }
+}
+
+window.toggleCustomSchedule = toggleCustomSchedule;
+
 // Simplified card layout - no expansion functionality needed
