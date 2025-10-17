@@ -407,6 +407,16 @@
             </div>
         </div>
 
+        <!-- Feature Requests Table -->
+        <div class="users-table-container" style="margin-bottom: 2rem;">
+            <div class="table-header">
+                <h2>💡 Feature Requests</h2>
+            </div>
+            <div id="feature-requests-table-content">
+                <div class="loading"></div>
+            </div>
+        </div>
+
         <!-- Users Table -->
         <div class="users-table-container">
             <div class="table-header">
@@ -501,6 +511,7 @@
         loadStats();
         loadUsers();
         loadDemoLeads();
+        loadFeatureRequests();
 
         async function loadStats() {
             try {
@@ -599,6 +610,91 @@
                                 </td>
                                 <td>
                                     ${lead.notes ? `<div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${lead.notes}</div>` : '<em style="color: #999;">No notes</em>'}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            content.innerHTML = tableHTML;
+        }
+
+        async function loadFeatureRequests() {
+            try {
+                const response = await fetch('/api/super-admin/feature-requests', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    renderFeatureRequestsTable(data.requests);
+                } else {
+                    showError(data.error || 'Failed to load feature requests');
+                    document.getElementById('feature-requests-table-content').innerHTML =
+                        '<div style="padding: 2rem; text-align: center; color: #666;">Failed to load feature requests</div>';
+                }
+            } catch (error) {
+                console.error('Load feature requests error:', error);
+                showError('Failed to load feature requests');
+                document.getElementById('feature-requests-table-content').innerHTML =
+                    '<div style="padding: 2rem; text-align: center; color: #666;">Error loading feature requests</div>';
+            }
+        }
+
+        function renderFeatureRequestsTable(requests) {
+            const content = document.getElementById('feature-requests-table-content');
+
+            if (requests.length === 0) {
+                content.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">No feature requests yet</div>';
+                return;
+            }
+
+            // Add status colors for feature requests
+            const statusColors = {
+                'pending': 'status-new',
+                'in-progress': 'status-trial',
+                'completed': 'status-active',
+                'declined': 'status-cancelled'
+            };
+
+            const tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${requests.map(request => `
+                            <tr>
+                                <td>
+                                    <strong>${request.business_name}</strong><br>
+                                    <small style="color: #666;">${request.user_email}</small>
+                                </td>
+                                <td><strong>${request.title}</strong></td>
+                                <td>
+                                    <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        ${request.description}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge ${statusColors[request.status] || 'status-new'}">
+                                        ${request.status}
+                                    </span>
+                                </td>
+                                <td>
+                                    ${new Date(request.created_at).toLocaleDateString()}<br>
+                                    <small style="color: #666;">
+                                        ${new Date(request.created_at).toLocaleTimeString()}
+                                    </small>
                                 </td>
                             </tr>
                         `).join('')}
