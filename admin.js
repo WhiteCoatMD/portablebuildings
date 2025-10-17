@@ -1917,6 +1917,33 @@ function getFacebookConfig() {
     return getSetting(STORAGE_KEYS.FACEBOOK_CONFIG, null);
 }
 
+// Save just the Facebook template (used for auto-save when pasting templates)
+async function saveFacebookTemplate(template) {
+    try {
+        // Get current Facebook config
+        const currentConfig = getFacebookConfig() || {
+            enabled: false,
+            pageId: '',
+            accessToken: '',
+            newOnly: true,
+            withImages: true,
+            availableOnly: true,
+            template: ''
+        };
+
+        // Update only the template
+        currentConfig.template = template;
+
+        // Save back to storage
+        await saveSetting(STORAGE_KEYS.FACEBOOK_CONFIG, currentConfig);
+
+        showToast('✅ Template auto-saved successfully!');
+    } catch (error) {
+        console.error('Error auto-saving template:', error);
+        showToast('⚠️ Template loaded but failed to auto-save. Please save manually.', true);
+    }
+}
+
 // Button Color Management
 function loadButtonColor() {
     const saved = getSetting(STORAGE_KEYS.BUTTON_COLOR, null);
@@ -3711,7 +3738,8 @@ window.addEventListener('message', (event) => {
         const templateTextarea = document.getElementById('autoPostTemplate');
         if (templateTextarea) {
             templateTextarea.value = event.data.template;
-            showToast('✅ Template loaded! Remember to save your settings.');
+            // Auto-save the template
+            saveFacebookTemplate(event.data.template);
         }
     }
 });
