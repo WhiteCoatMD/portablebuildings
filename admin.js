@@ -2499,6 +2499,8 @@ function initializeBackgroundColorPicker() {
 
 function updateBackgroundPreview() {
     const preview = document.getElementById('background-preview');
+    if (!preview) return; // Element doesn't exist, skip preview update
+
     const selectedType = document.querySelector('input[name="backgroundType"]:checked')?.value || 'solid';
 
     if (selectedType === 'solid') {
@@ -4181,18 +4183,21 @@ async function loadFacebookConnectionStatus() {
     const pageName = getSetting('cpb_facebook_page_name', null);
     const pageId = getSetting('cpb_facebook_page_id', null);
 
-    const connectedDiv = document.getElementById('facebook-connected');
-    const notConnectedDiv = document.getElementById('facebook-not-connected');
+    const connectedDiv = document.getElementById('facebook-connected-2');
+    const notConnectedDiv = document.getElementById('facebook-not-connected-2');
 
     if (pageName && pageId) {
         // Show connected status
-        document.getElementById('connected-page-name').textContent = pageName;
-        connectedDiv.style.display = 'block';
-        notConnectedDiv.style.display = 'none';
+        const nameElement = document.getElementById('connected-page-name-2');
+        if (nameElement) {
+            nameElement.textContent = pageName;
+        }
+        if (connectedDiv) connectedDiv.style.display = 'block';
+        if (notConnectedDiv) notConnectedDiv.style.display = 'none';
     } else {
         // Show not connected
-        connectedDiv.style.display = 'none';
-        notConnectedDiv.style.display = 'block';
+        if (connectedDiv) connectedDiv.style.display = 'none';
+        if (notConnectedDiv) notConnectedDiv.style.display = 'block';
     }
 }
 
