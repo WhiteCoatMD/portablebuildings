@@ -587,6 +587,8 @@ main {
     border-top: 1px solid var(--border);
     margin-top: 1rem;
     justify-content: center;
+    position: relative;
+    z-index: 1;
 }
 
 .share-btn {
@@ -662,6 +664,9 @@ main {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    position: relative;
+    z-index: 100;
+    pointer-events: auto;
 }
 
 .inquire-btn:hover {
