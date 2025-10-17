@@ -39,15 +39,14 @@ module.exports = async (req, res) => {
         })).toString('base64');
 
         // Facebook OAuth URL with required permissions
-        // Using pages_manage_posts and pages_read_engagement
+        // Using pages_manage_posts only (for creating posts)
         // With Standard Access: Works for app developers/testers only
         // With Advanced Access: Works for all users (requires App Review)
-        // Test this flow to make "Request Advanced Access" button available in Facebook App Dashboard
         const facebookAuthUrl = `https://www.facebook.com/v21.0/dialog/oauth?` +
             `client_id=${FACEBOOK_APP_ID}` +
             `&redirect_uri=${encodeURIComponent(FACEBOOK_REDIRECT_URI)}` +
             `&state=${state}` +
-            `&scope=pages_manage_posts,pages_read_engagement` +
+            `&scope=pages_manage_posts,pages_show_list` +
             `&response_type=code`;
 
         console.log('[FB OAuth] Redirecting user to Facebook authorization');
