@@ -3984,8 +3984,38 @@ function loadTemplateLibrary() {
         'SEASONAL': '#fd7e14'
     };
 
+    // Example preview data for each template
+    const previewExamples = {
+        1: { name: '12x24 Lofted Barn', size: '12x24', price: '$8,995', location: 'Monroe, LA', type: 'LoftedBarn', rto: '• 36 months: $312.45/mo\n• 48 months: $249.78/mo\n• 60 months: $211.56/mo\n• 72 months: $186.23/mo' },
+        2: { name: '10x16 Utility Shed', size: '10x16', price: '$4,495', location: 'Ruston', type: 'UtilityShed', rto: '• 36 months: $156.23/mo\n• 48 months: $124.89/mo\n• 60 months: $105.78/mo\n• 72 months: $93.12/mo' },
+        3: { name: '12x20 Lofted Barn Cabin', size: '12x20', price: '$8,495', location: 'West Monroe', type: 'LoftedBarnCabin', rto: '• 36 months: $295.12/mo\n• 48 months: $236.09/mo\n• 60 months: $200.08/mo\n• 72 months: $176.07/mo' },
+        4: { name: '10x12 Lofted Barn', size: '10x12', price: '$5,295', location: 'Bastrop, LA', type: 'LoftedBarn', rto: '• 36 months: $184.01/mo\n• 48 months: $147.21/mo\n• 60 months: $124.68/mo\n• 72 months: $109.80/mo' },
+        5: { name: '8x12 Mini Shed', size: '8x12', price: '$3,295', location: 'Pineville', type: 'MiniShed', rto: '48 months: $91.12/mo' },
+        6: { name: '12x16 Utility Building', size: '12x16', price: '$6,295', location: 'Shreveport', type: 'UtilityBuilding', rto: '• 36 months: $218.80/mo\n• 48 months: $175.04/mo\n• 60 months: $148.28/mo\n• 72 months: $130.58/mo' },
+        7: { name: '10x20 Side Lofted Barn', size: '10x20', price: '$7,495', location: 'Alexandria', type: 'SideLoftedBarn', rto: '60 months: $158.23/mo' },
+        8: { name: '14x28 Lofted Barn Cabin', size: '14x28', price: '$12,995', location: 'Lake Charles', type: 'LoftedBarnCabin', rto: '• 36 months: $451.73/mo\n• 48 months: $361.38/mo\n• 60 months: $306.17/mo\n• 72 months: $269.63/mo' },
+        9: { name: '10x14 Utility Shed', size: '10x14', price: '$5,495', location: 'Natchitoches', type: 'UtilityShed', rto: '72 months: $121.45/mo' },
+        10: { name: '12x16 Lofted Barn', size: '12x16', price: '$6,995', location: 'Bossier City', type: 'LoftedBarn', rto: '• 36 months: $243.23/mo\n• 48 months: $194.58/mo\n• 60 months: $164.79/mo\n• 72 months: $145.15/mo' }
+    };
+
     container.innerHTML = Object.keys(facebookTemplates).map(num => {
         const template = facebookTemplates[num];
+        const example = previewExamples[num];
+
+        // Generate preview text by replacing placeholders
+        let previewText = template.template
+            .replace(/\{\{name\}\}/g, example.name)
+            .replace(/\{\{size\}\}/g, example.size)
+            .replace(/\{\{price\}\}/g, example.price)
+            .replace(/\{\{location\}\}/g, example.location)
+            .replace(/\{\{type\}\}/g, example.type)
+            .replace(/\{\{phone\}\}/g, '318-594-5909')
+            .replace(/\{\{rtoAll\}\}/g, `Rent-to-Own Options:\n${example.rto}\n*Plus your local sales tax`)
+            .replace(/\{\{rto36\}\}/g, example.rto.split('\n')[0] || '')
+            .replace(/\{\{rto48\}\}/g, example.rto.split('\n')[1] || example.rto)
+            .replace(/\{\{rto60\}\}/g, example.rto.split('\n')[2] || example.rto)
+            .replace(/\{\{rto72\}\}/g, example.rto.split('\n')[3] || example.rto);
+
         return `
             <div style="background: white; border: 2px solid #dee2e6; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                 <div style="background: linear-gradient(135deg, #1877f2 0%, #1465d8 100%); color: white; padding: 1.5rem;">
@@ -4003,9 +4033,43 @@ function loadTemplateLibrary() {
                         `).join('')}
                     </div>
                 </div>
-                <div style="padding: 1.5rem;">
-                    <div style="background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-family: 'Courier New', monospace; font-size: 0.85rem; white-space: pre-wrap; color: #495057; line-height: 1.8; max-height: 300px; overflow-y: auto;">
+
+                <!-- Two-column layout: Template Code + Preview -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0;">
+                    <!-- Left column: Template code -->
+                    <div style="padding: 1.5rem; background: #f8f9fa; border-right: 2px solid #dee2e6;">
+                        <div style="font-weight: 700; color: #1a1a2e; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #dee2e6; font-size: 0.95rem;">
+                            📝 Template Code
+                        </div>
+                        <div style="background: white; border: 2px dashed #dee2e6; border-radius: 8px; padding: 1rem; font-family: 'Courier New', monospace; font-size: 0.85rem; white-space: pre-wrap; color: #495057; line-height: 1.8; max-height: 400px; overflow-y: auto;">
 ${template.template}</div>
+                    </div>
+
+                    <!-- Right column: Facebook preview -->
+                    <div style="padding: 1.5rem; background: white;">
+                        <div style="font-weight: 700; color: #1a1a2e; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #dee2e6; font-size: 0.95rem;">
+                            👁️ How It Looks on Facebook
+                        </div>
+                        <div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; max-height: 400px; overflow-y: auto;">
+                            <!-- Facebook post header -->
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e4e6eb;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #1877f2 0%, #1465d8 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.1rem;">
+                                    🏠
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 700; font-size: 0.95rem; color: #050505;">Your Business Name</div>
+                                    <div style="font-size: 0.8rem; color: #65676b;">Just now · 🌎</div>
+                                </div>
+                            </div>
+                            <!-- Facebook post content -->
+                            <div style="font-size: 0.95rem; color: #050505; white-space: pre-wrap; line-height: 1.5;">
+${previewText}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Use template button -->
+                <div style="padding: 1.5rem; background: white; border-top: 2px solid #dee2e6;">
                     <button onclick="useTemplate(${num})" style="width: 100%; background: #28a745; color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease;">
                         ✨ Use This Template
                     </button>
