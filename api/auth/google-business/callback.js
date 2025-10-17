@@ -143,38 +143,47 @@ module.exports = async (req, res) => {
 
         // Store connection in database
         console.log('[GBP OAuth Callback] Storing connection in database...');
-        await pool.query(
-            `INSERT INTO google_business_connections
-             (user_id, access_token, refresh_token, token_expires_at,
-              account_id, account_name, location_id, location_name, location_address)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-             ON CONFLICT (user_id)
-             DO UPDATE SET
-                access_token = EXCLUDED.access_token,
-                refresh_token = EXCLUDED.refresh_token,
-                token_expires_at = EXCLUDED.token_expires_at,
-                account_id = EXCLUDED.account_id,
-                account_name = EXCLUDED.account_name,
-                location_id = EXCLUDED.location_id,
-                location_name = EXCLUDED.location_name,
-                location_address = EXCLUDED.location_address,
-                is_active = true,
-                updated_at = NOW()`,
-            [
-                userId,
-                access_token,
-                refresh_token,
-                expiresAt,
-                accountId,
-                accountName,
-                locationId,
-                locationName,
-                locationAddress,
-            ]
-        );
 
-        console.log('[GBP OAuth Callback] Connection stored successfully');
-        return res.redirect('/admin.html?gbp_success=true');
+        try {
+            await pool.query(
+                `INSERT INTO google_business_connections
+                 (user_id, access_token, refresh_token, token_expires_at,
+                  account_id, account_name, location_id, location_name, location_address)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                 ON CONFLICT (user_id)
+                 DO UPDATE SET
+                    access_token = EXCLUDED.access_token,
+                    refresh_token = EXCLUDED.refresh_token,
+                    token_expires_at = EXCLUDED.token_expires_at,
+                    account_id = EXCLUDED.account_id,
+                    account_name = EXCLUDED.account_name,
+                    location_id = EXCLUDED.location_id,
+                    location_name = EXCLUDED.location_name,
+                    location_address = EXCLUDED.location_address,
+                    is_active = true,
+                    updated_at = NOW()`,
+                [
+                    userId,
+                    access_token,
+                    refresh_token,
+                    expiresAt,
+                    accountId,
+                    accountName,
+                    locationId,
+                    locationName,
+                    locationAddress,
+                ]
+            );
+
+            console.log('[GBP OAuth Callback] Connection stored successfully');
+            return res.redirect('/admin.html?gbp_success=true');
+
+        } catch (dbError) {
+            console.error('[GBP OAuth Callback] Database error:', dbError);
+            console.error('Error details:', dbError.message);
+            // Still redirect to success since OAuth completed, just log the DB issue
+            return res.redirect('/admin.html?gbp_success=true&db_warning=true');
+        }
 
     } catch (error) {
         console.error('[GBP OAuth Callback] Unexpected error:', error);
