@@ -84,23 +84,30 @@ module.exports = async (req, res) => {
 
         const longLivedToken = longLivedTokenResponse.data.access_token;
 
-        // Store in database
+        // Create Facebook config object
+        const fbConfig = {
+            enabled: false, // User needs to enable it manually
+            pageId: pageId,
+            accessToken: longLivedToken,
+            pageName: pageName,
+            conditions: {
+                newOnly: true,
+                withImages: true,
+                availableOnly: true
+            },
+            template: `🏠 New Arrival! {{name}}\n\n📐 Size: {{size}}\n💰 Cash Price: {{price}}\n📍 Location: {{location}}\n\nCall us at {{phone}} or visit our website to learn more!\n\n#PortableBuildings #{{type}} #ForSale`
+        };
+
+        // Store in database as cpb_facebook_config
         await pool.query(
             `INSERT INTO user_settings (user_id, setting_key, setting_value)
-             VALUES ($1, 'cpb_facebook_page_id', $2)
+             VALUES ($1, 'cpb_facebook_config', $2)
              ON CONFLICT (user_id, setting_key)
              DO UPDATE SET setting_value = $2, updated_at = NOW()`,
-            [userId, JSON.stringify(pageId)]
+            [userId, JSON.stringify(fbConfig)]
         );
 
-        await pool.query(
-            `INSERT INTO user_settings (user_id, setting_key, setting_value)
-             VALUES ($1, 'cpb_facebook_access_token', $2)
-             ON CONFLICT (user_id, setting_key)
-             DO UPDATE SET setting_value = $2, updated_at = NOW()`,
-            [userId, JSON.stringify(longLivedToken)]
-        );
-
+        // Also save page name separately for display
         await pool.query(
             `INSERT INTO user_settings (user_id, setting_key, setting_value)
              VALUES ($1, 'cpb_facebook_page_name', $2)
@@ -109,10 +116,73 @@ module.exports = async (req, res) => {
             [userId, JSON.stringify(pageName)]
         );
 
+        // Also save page ID separately for display
+        await pool.query(
+            `INSERT INTO user_settings (user_id, setting_key, setting_value)
+             VALUES ($1, 'cpb_facebook_page_id', $2)
+             ON CONFLICT (user_id, setting_key)
+             DO UPDATE SET setting_value = $2, updated_at = NOW()`,
+            [userId, JSON.stringify(pageId)]
+        );
+
         console.log('[FB OAuth] Successfully connected Facebook page:', pageName);
 
-        // Redirect back to admin with success message
-        res.redirect(`/admin.html?tab=customization&fb_success=true&page_name=${encodeURIComponent(pageName)}`);
+        // Return HTML that closes popup and notifies parent
+        res.send(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Facebook Connected</title>
+                <style>
+                    body {
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        height: 100vh;
+                        margin: 0;
+                        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                        color: white;
+                    }
+                    .container {
+                        text-align: center;
+                    }
+                    .success {
+                        font-size: 4rem;
+                        margin-bottom: 1rem;
+                    }
+                    h1 {
+                        margin: 0 0 0.5rem 0;
+                        color: #ffd60a;
+                    }
+                    p {
+                        margin: 0;
+                        opacity: 0.8;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="success">✅</div>
+                    <h1>Facebook Connected!</h1>
+                    <p>Connected to: ${pageName}</p>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">This window will close automatically...</p>
+                </div>
+                <script>
+                    // Notify parent window
+                    if (window.opener) {
+                        window.opener.postMessage({
+                            type: 'facebook_connected',
+                            pageName: '${pageName}',
+                            pageId: '${pageId}'
+                        }, '*');
+                    }
+                    // Close popup after 2 seconds
+                    setTimeout(() => window.close(), 2000);
+                </script>
+            </body>
+            </html>
+        `);
 
     } catch (error) {
         console.error('[FB OAuth] Error in callback:', error);

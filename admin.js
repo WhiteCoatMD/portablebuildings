@@ -3537,23 +3537,36 @@ async function loadFacebookConnectionStatus() {
     }
 }
 
+// Listen for Facebook OAuth popup messages
+window.addEventListener('message', (event) => {
+    // Only accept messages from our own origin
+    if (event.origin !== window.location.origin) {
+        return;
+    }
+
+    if (event.data.type === 'facebook_connected') {
+        showToast(`✅ Successfully connected to Facebook page: ${event.data.pageName}`);
+        loadFacebookConnectionStatus();
+    }
+});
+
 // Check for OAuth callback success/error on page load
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    
+
     if (urlParams.get('fb_success')) {
         const pageName = urlParams.get('page_name');
         showToast(`✅ Successfully connected to Facebook page: ${pageName}`);
         loadFacebookConnectionStatus();
-        
+
         // Clean up URL
         window.history.replaceState({}, document.title, window.location.pathname + '#customization');
     }
-    
+
     if (urlParams.get('fb_error')) {
         const error = urlParams.get('fb_error');
         showToast(`❌ Facebook connection failed: ${error}`, true);
-        
+
         // Clean up URL
         window.history.replaceState({}, document.title, window.location.pathname + '#customization');
     }
