@@ -380,6 +380,7 @@ function loadSettings() {
     // Inventory Settings tab - Repo options (radio buttons)
     const repoSortOrder = settings.repoSortOrder || 'last';
     const repoPriceDisplay = settings.repoPriceDisplay || 'strikethrough';
+    const soldBuildingBehavior = settings.soldBuildingBehavior || 'auto-delete';
 
     // Set radio buttons for repo sort order
     const sortOrderRadio = document.querySelector(`input[name="repoSortOrder"][value="${repoSortOrder}"]`);
@@ -388,6 +389,10 @@ function loadSettings() {
     // Set radio buttons for repo price display
     const priceDisplayRadio = document.querySelector(`input[name="repoPriceDisplay"][value="${repoPriceDisplay}"]`);
     if (priceDisplayRadio) priceDisplayRadio.checked = true;
+
+    // Set radio buttons for sold building behavior
+    const soldBehaviorRadio = document.querySelector(`input[name="soldBuildingBehavior"][value="${soldBuildingBehavior}"]`);
+    if (soldBehaviorRadio) soldBehaviorRadio.checked = true;
 }
 
 function getSettings() {
@@ -414,11 +419,13 @@ async function saveInventorySettings() {
     // Get selected radio button values
     const repoSortOrder = document.querySelector('input[name="repoSortOrder"]:checked')?.value || 'last';
     const repoPriceDisplay = document.querySelector('input[name="repoPriceDisplay"]:checked')?.value || 'strikethrough';
+    const soldBuildingBehavior = document.querySelector('input[name="soldBuildingBehavior"]:checked')?.value || 'auto-delete';
 
     const settings = {
         ...currentSettings,
         repoSortOrder,
-        repoPriceDisplay
+        repoPriceDisplay,
+        soldBuildingBehavior
     };
 
     await saveSetting(STORAGE_KEYS.SETTINGS, settings);

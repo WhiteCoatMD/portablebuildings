@@ -693,6 +693,24 @@ Call us at {{phone}} or visit our website to learn more!
                     </p>
                 </div>
 
+                <div class="form-group">
+                    <label style="color: #bc9c22; font-weight: 600; display: block; margin-bottom: 0.75rem;">Sold Building Behavior</label>
+                    <div class="button-group" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <label class="btn-radio" style="flex: 1;">
+                            <input type="radio" name="soldBuildingBehavior" id="soldBehavior-auto" value="auto-delete" checked style="display: none;">
+                            <span class="btn-radio-label">Auto-Delete (2 days)</span>
+                        </label>
+                        <label class="btn-radio" style="flex: 1;">
+                            <input type="radio" name="soldBuildingBehavior" id="soldBehavior-manual" value="manual-delete" style="display: none;">
+                            <span class="btn-radio-label">Keep Until Deleted</span>
+                        </label>
+                    </div>
+                    <p class="help-text" style="color: #bc9c22;">
+                        <strong>Auto-Delete:</strong> Pending (2 days) → Sold (2 days) → Automatically removed<br>
+                        <strong>Keep Until Deleted:</strong> Pending (2 days) → Sold (stays until you manually delete)
+                    </p>
+                </div>
+
                 <button class="btn btn-primary" onclick="saveInventorySettings()">Save Inventory Settings</button>
             </div>
         </div>

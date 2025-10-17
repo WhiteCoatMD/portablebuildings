@@ -38,14 +38,18 @@ class BuildingStatusTracker {
     /**
      * Process inventory changes and update statuses
      * @param {Array} currentInventory - Serial numbers currently in portal
+     * @param {Object} options - Processing options (e.g., autoDeleteSold)
      * @returns {Object} Status updates to apply
      */
-    async processInventoryChange(currentInventory) {
+    async processInventoryChange(currentInventory, options = {}) {
         await this.load();
 
         const currentSerials = new Set(currentInventory.map(item => item.serialNumber));
         const previousSerials = new Set(Object.keys(this.statuses.buildings));
         const now = new Date().toISOString();
+
+        // Default: auto-delete sold buildings after 72 hours (can be disabled via options)
+        const autoDeleteSold = options.autoDeleteSold !== false;
 
         const updates = {
             newPending: [],
@@ -98,19 +102,23 @@ class BuildingStatusTracker {
             }
         }
 
-        // Check for sold buildings that should be removed (72 hours old)
-        const SEVENTY_TWO_HOURS = 72 * 60 * 60 * 1000;
-        for (const [serial, building] of Object.entries(this.statuses.buildings)) {
-            if (building.status === 'sold' && building.soldAt) {
-                const soldTime = new Date(building.soldAt).getTime();
-                const hoursSinceSold = (Date.now() - soldTime) / 1000 / 60 / 60;
+        // Check for sold buildings that should be removed (only if autoDeleteSold is enabled)
+        if (autoDeleteSold) {
+            const SEVENTY_TWO_HOURS = 72 * 60 * 60 * 1000;
+            for (const [serial, building] of Object.entries(this.statuses.buildings)) {
+                if (building.status === 'sold' && building.soldAt) {
+                    const soldTime = new Date(building.soldAt).getTime();
+                    const hoursSinceSold = (Date.now() - soldTime) / 1000 / 60 / 60;
 
-                if (Date.now() - soldTime >= SEVENTY_TWO_HOURS) {
-                    delete this.statuses.buildings[serial];
-                    updates.toRemove.push(serial);
-                    console.log(`🗑️  ${serial}: REMOVED (sold ${hoursSinceSold.toFixed(1)} hours ago)`);
+                    if (Date.now() - soldTime >= SEVENTY_TWO_HOURS) {
+                        delete this.statuses.buildings[serial];
+                        updates.toRemove.push(serial);
+                        console.log(`🗑️  ${serial}: REMOVED (sold ${hoursSinceSold.toFixed(1)} hours ago)`);
+                    }
                 }
             }
+        } else {
+            console.log('⏸️  Auto-delete disabled: Sold buildings will remain until manually deleted');
         }
 
         this.statuses.lastSync = now;

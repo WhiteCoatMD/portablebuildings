@@ -70,8 +70,8 @@
         }
 
         .templates-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 2rem;
         }
 
@@ -84,7 +84,7 @@
         }
 
         .template-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.15);
         }
 
@@ -116,20 +116,52 @@
         }
 
         .template-body {
+            padding: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .template-column {
             padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .template-column.left {
+            background: #f8f9fa;
+            border-right: 2px solid #dee2e6;
+        }
+
+        .template-column.right {
+            background: white;
+        }
+
+        .column-header {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
         }
 
         .template-code {
-            background: #f8f9fa;
+            flex: 1;
+            background: white;
             border: 2px dashed #dee2e6;
             border-radius: 8px;
             padding: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             white-space: pre-wrap;
             color: #495057;
             line-height: 1.8;
+            overflow-y: auto;
         }
 
         .preview-label {
@@ -237,9 +269,63 @@
         .strategy-tag.social-proof { background: #6f42c1; }
         .strategy-tag.question { background: #17a2b8; }
 
-        @media (max-width: 768px) {
-            .templates-grid {
+        .template-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            background: white;
+        }
+
+        .btn-use-template {
+            flex: 1;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-use-template:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-copy-template {
+            flex: 1;
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-copy-template:hover {
+            background: #1465d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(24, 119, 242, 0.3);
+        }
+
+        @media (max-width: 1024px) {
+            .template-body {
                 grid-template-columns: 1fr;
+            }
+
+            .template-column.left {
+                border-right: none;
+                border-bottom: 2px solid #dee2e6;
+            }
+
+            .template-actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -278,7 +364,9 @@
                     </div>
                 </div>
                 <div class="template-body">
-                    <div class="template-code">🚨 JUST ARRIVED! {{name}}
+                    <div class="template-column left">
+                        <div class="column-header">📝 Template Code</div>
+                        <div class="template-code">🚨 JUST ARRIVED! {{name}}
 
 📐 Size: {{size}}
 💰 Cash Price: {{price}}
@@ -292,17 +380,18 @@
 💬 DM us to reserve before it's gone!
 
 #PortableBuildings #{{type}} #NewArrival #LimitedAvailability</div>
-
-                    <div class="preview-label">Mock Facebook Post Preview:</div>
-                    <div class="fb-post-preview">
-                        <div class="fb-post-header">
-                            <div class="fb-avatar">🏠</div>
-                            <div class="fb-post-info">
-                                <div class="fb-page-name">Your Business Name</div>
-                                <div class="fb-post-time">Just now · 🌎</div>
+                    </div>
+                    <div class="template-column right">
+                        <div class="column-header">👁️ Example Post</div>
+                        <div class="fb-post-preview" style="flex: 1;">
+                            <div class="fb-post-header">
+                                <div class="fb-avatar">🏠</div>
+                                <div class="fb-post-info">
+                                    <div class="fb-page-name">Your Business Name</div>
+                                    <div class="fb-post-time">Just now · 🌎</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="fb-post-content">🚨 JUST ARRIVED! 12x24 Lofted Barn
+                            <div class="fb-post-content">🚨 JUST ARRIVED! 12x24 Lofted Barn
 
 📐 Size: 12x24
 💰 Cash Price: $8,995
@@ -321,11 +410,12 @@ Rent-to-Own Options:
 💬 DM us to reserve before it's gone!
 
 #PortableBuildings #LoftedBarn #NewArrival #LimitedAvailability</div>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                        <button class="copy-btn" onclick="useTemplate(this, 1)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
-                        <button class="copy-btn" onclick="copyTemplate(this, 1)" style="flex: 1;">📋 Copy Template</button>
-                    </div>
+                </div>
+                <div class="template-actions">
+                    <button class="btn-use-template" onclick="useTemplate(this, 1)">✨ Use This Template</button>
+                    <button class="btn-copy-template" onclick="copyTemplate(this, 1)">📋 Copy to Clipboard</button>
                 </div>
             </div>
 

@@ -123,27 +123,14 @@ Call us at {{phone}} or visit our website to learn more!
             .replace(/\{\{rto72\}\}/g, rto72)
             .replace(/\{\{rtoAll\}\}/g, rtoAll);
 
-        // Prepare Facebook API request
-        const fbApiUrl = `https://graph.facebook.com/v18.0/${config.pageId}/photos`;
-
-        let postData;
-
-        // If building has images, post with photo
-        if (building.images && building.images.length > 0) {
-            postData = {
-                url: building.images[0], // Use first image
-                caption: message,
-                access_token: config.accessToken
-            };
-        } else {
-            // Post text-only to feed
+        // If building has no images, post text-only to feed
+        if (!building.images || building.images.length === 0) {
             const feedUrl = `https://graph.facebook.com/v18.0/${config.pageId}/feed`;
-            postData = {
+            const postData = {
                 message: message,
                 access_token: config.accessToken
             };
 
-            // Post to feed instead of photos
             const response = await fetch(feedUrl, {
                 method: 'POST',
                 headers: {
@@ -170,31 +157,115 @@ Call us at {{phone}} or visit our website to learn more!
             });
         }
 
-        // Post with image
-        const response = await fetch(fbApiUrl, {
+        // If building has exactly 1 image, post single photo
+        if (building.images.length === 1) {
+            const fbApiUrl = `https://graph.facebook.com/v18.0/${config.pageId}/photos`;
+            const postData = {
+                url: building.images[0],
+                caption: message,
+                access_token: config.accessToken
+            };
+
+            const response = await fetch(fbApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(postData)
+            });
+
+            const result = await response.json();
+
+            if (result.error) {
+                console.error('Facebook API Error:', result.error);
+                return res.status(400).json({
+                    success: false,
+                    error: result.error.message || 'Failed to post to Facebook',
+                    fbError: result.error
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                postId: result.id,
+                postUrl: result.post_id ? `https://facebook.com/${result.post_id}` : null,
+                message: 'Successfully posted to Facebook with 1 image'
+            });
+        }
+
+        // Building has multiple images - use batch photo upload
+        // Step 1: Upload each photo without publishing (get photo IDs)
+        const photoIds = [];
+        const fbPhotosUrl = `https://graph.facebook.com/v18.0/${config.pageId}/photos`;
+
+        for (let i = 0; i < building.images.length; i++) {
+            const imageUrl = building.images[i];
+            const photoData = {
+                url: imageUrl,
+                published: false, // Don't publish yet
+                access_token: config.accessToken
+            };
+
+            const photoResponse = await fetch(fbPhotosUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(photoData)
+            });
+
+            const photoResult = await photoResponse.json();
+
+            if (photoResult.error) {
+                console.error(`Facebook API Error uploading image ${i + 1}:`, photoResult.error);
+                // Continue with other images even if one fails
+                continue;
+            }
+
+            if (photoResult.id) {
+                photoIds.push({ media_fbid: photoResult.id });
+            }
+        }
+
+        if (photoIds.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Failed to upload any images to Facebook'
+            });
+        }
+
+        // Step 2: Create a multi-photo post with the uploaded photos
+        const feedUrl = `https://graph.facebook.com/v18.0/${config.pageId}/feed`;
+        const multiPhotoData = {
+            message: message,
+            attached_media: photoIds,
+            access_token: config.accessToken
+        };
+
+        const postResponse = await fetch(feedUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(postData)
+            body: JSON.stringify(multiPhotoData)
         });
 
-        const result = await response.json();
+        const postResult = await postResponse.json();
 
-        if (result.error) {
-            console.error('Facebook API Error:', result.error);
+        if (postResult.error) {
+            console.error('Facebook API Error creating multi-photo post:', postResult.error);
             return res.status(400).json({
                 success: false,
-                error: result.error.message || 'Failed to post to Facebook',
-                fbError: result.error
+                error: postResult.error.message || 'Failed to post to Facebook',
+                fbError: postResult.error
             });
         }
 
         return res.status(200).json({
             success: true,
-            postId: result.id,
-            postUrl: result.post_id ? `https://facebook.com/${result.post_id}` : null,
-            message: 'Successfully posted to Facebook with image'
+            postId: postResult.id,
+            imageCount: photoIds.length,
+            message: `Successfully posted to Facebook with ${photoIds.length} images`
         });
 
     } catch (error) {
