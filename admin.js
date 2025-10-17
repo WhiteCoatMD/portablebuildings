@@ -4255,15 +4255,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function connectGoogleBusinessOAuth() {
     const token = localStorage.getItem('auth_token');
-    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+    const user = window.currentUser;
 
-    if (!token || !userData.id) {
+    if (!token || !user || !user.id) {
         showToast('Please log in first', true);
         return;
     }
 
     try {
-        const response = await fetch(`/api/auth/google-business/init?userId=${userData.id}`, {
+        const response = await fetch(`/api/auth/google-business/init?userId=${user.id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -4317,9 +4317,9 @@ async function connectGoogleBusinessOAuth() {
 
 async function disconnectGoogleBusiness() {
     const token = localStorage.getItem('auth_token');
-    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+    const user = window.currentUser;
 
-    if (!token || !userData.id) {
+    if (!token || !user || !user.id) {
         showToast('Please log in first', true);
         return;
     }
@@ -4329,7 +4329,7 @@ async function disconnectGoogleBusiness() {
     }
 
     try {
-        const response = await fetch(`/api/google-business/connection?userId=${userData.id}`, {
+        const response = await fetch(`/api/google-business/connection?userId=${user.id}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -4352,14 +4352,14 @@ async function disconnectGoogleBusiness() {
 
 async function loadGoogleBusinessConnectionStatus() {
     const token = localStorage.getItem('auth_token');
-    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+    const user = window.currentUser;
 
-    if (!token || !userData.id) {
+    if (!token || !user || !user.id) {
         return;
     }
 
     try {
-        const response = await fetch(`/api/google-business/connection?userId=${userData.id}`, {
+        const response = await fetch(`/api/google-business/connection?userId=${user.id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -4392,9 +4392,9 @@ async function loadGoogleBusinessConnectionStatus() {
 
 async function testGoogleBusinessPost() {
     const token = localStorage.getItem('auth_token');
-    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+    const user = window.currentUser;
 
-    if (!token || !userData.id) {
+    if (!token || !user || !user.id) {
         showToast('Please log in first', true);
         return;
     }
@@ -4415,7 +4415,7 @@ async function testGoogleBusinessPost() {
                 'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
-                userId: userData.id
+                userId: user.id
             })
         });
 
