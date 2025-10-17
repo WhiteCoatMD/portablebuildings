@@ -386,7 +386,17 @@ class InventoryApp {
             const override = this.buildingOverrides[item.serialNumber];
             if (override && override.hidden) return false;
 
-            const typeMatch = this.filters.type === 'all' || item.typeCode === this.filters.type;
+            // Handle Cabin type - it can have typeCode 'CB' or 'C'
+            let typeMatch;
+            if (this.filters.type === 'all') {
+                typeMatch = true;
+            } else if (this.filters.type === 'CB') {
+                // When Cabin filter is selected, match both 'CB' and 'C' type codes
+                typeMatch = item.typeCode === 'CB' || item.typeCode === 'C';
+            } else {
+                typeMatch = item.typeCode === this.filters.type;
+            }
+
             const sizeMatch = this.filters.size === 'all' || item.sizeDisplay === this.filters.size;
             const locationMatch = this.filters.location === 'all' || item.location === this.filters.location;
             const statusMatch = this.filters.status === 'all' ||

@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Post Templates - High-Converting</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #1a1a2e;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .intro {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .intro h2 {
+            color: #1877f2;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .intro p {
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+
+        .wildcards {
+            background: #e7f3ff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            border-left: 4px solid #1877f2;
+        }
+
+        .wildcards strong {
+            color: #1877f2;
+        }
+
+        .wildcards code {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #c7254e;
+            font-size: 0.9rem;
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 2rem;
+        }
+
+        .template-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .template-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .template-header {
+            background: linear-gradient(135deg, #1877f2 0%, #1465d8 100%);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .template-number {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .template-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .template-strategy {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .template-body {
+            padding: 1.5rem;
+        }
+
+        .template-code {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            color: #495057;
+            line-height: 1.8;
+        }
+
+        .preview-label {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .preview-label::before {
+            content: '👁️';
+            font-size: 1.2rem;
+        }
+
+        .fb-post-preview {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .fb-post-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e4e6eb;
+        }
+
+        .fb-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #1877f2 0%, #1465d8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .fb-post-info {
+            flex: 1;
+        }
+
+        .fb-page-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #050505;
+        }
+
+        .fb-post-time {
+            font-size: 0.8rem;
+            color: #65676b;
+        }
+
+        .fb-post-content {
+            font-size: 0.95rem;
+            color: #050505;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #1465d8;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+
+        .strategy-tag {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .strategy-tag.urgency { background: #dc3545; }
+        .strategy-tag.scarcity { background: #fd7e14; }
+        .strategy-tag.value { background: #28a745; }
+        .strategy-tag.social-proof { background: #6f42c1; }
+        .strategy-tag.question { background: #17a2b8; }
+
+        @media (max-width: 768px) {
+            .templates-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Facebook Post Templates - High-Converting</h1>
+
+        <div class="intro">
+            <h2>Research-Backed Templates for Maximum Engagement</h2>
+            <p><strong>Key Findings:</strong> CTAs with urgency generate up to 332% higher conversion rates. 60% of buyers are influenced by FOMO (Fear of Missing Out).</p>
+            <p><strong>Best Practices:</strong> Use authentic urgency, include specific numbers, keep CTAs 3-6 words, and respond within 5 minutes for 100x better connection rate.</p>
+
+            <div class="wildcards">
+                <strong>Available Wildcards:</strong><br>
+                <code>{{name}}</code> - Building title &nbsp;|&nbsp;
+                <code>{{size}}</code> - Size &nbsp;|&nbsp;
+                <code>{{price}}</code> - Cash price &nbsp;|&nbsp;
+                <code>{{type}}</code> - Building type &nbsp;|&nbsp;
+                <code>{{location}}</code> - Location &nbsp;|&nbsp;
+                <code>{{phone}}</code> - Phone<br>
+                <code>{{rto36}}</code>, <code>{{rto48}}</code>, <code>{{rto60}}</code>, <code>{{rto72}}</code> - Individual RTO terms &nbsp;|&nbsp;
+                <code>{{rtoAll}}</code> - All RTO options
+            </div>
+        </div>
+
+        <div class="templates-grid">
+            <!-- Template 1: Urgency + New Arrival -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-number">Template #1</div>
+                    <div class="template-title">🚨 New Arrival Alert</div>
+                    <div class="template-strategy">
+                        <span class="strategy-tag urgency">URGENCY</span>
+                        <span class="strategy-tag scarcity">SCARCITY</span>
+                    </div>
+                </div>
+                <div class="template-body">
+                    <div class="template-code">🚨 JUST ARRIVED! {{name}}
+
+📐 Size: {{size}}
+💰 Cash Price: {{price}}
+📍 Currently at: {{location}}
+
+⚡ Won't last long - buildings like this sell FAST!
+
+{{rtoAll}}
+
+📞 Call NOW: {{phone}}
+💬 DM us to reserve before it's gone!
+
+#PortableBuildings #{{type}} #NewArrival #LimitedAvailability</div>
+
+                    <div class="preview-label">Mock Facebook Post Preview:</div>
+                    <div class="fb-post-preview">
+                        <div class="fb-post-header">
+                            <div class="fb-avatar">🏠</div>
+                            <div class="fb-post-info">
+                                <div class="fb-page-name">Your Business Name</div>
+                                <div class="fb-post-time">Just now · 🌎</div>
+                            </div>
+                        </div>
+                        <div class="fb-post-content">🚨 JUST ARRIVED! 12x24 Lofted Barn
+
+📐 Size: 12x24
+💰 Cash Price: $8,995
+📍 Currently at: Monroe, LA
+
+⚡ Won't last long - buildings like this sell FAST!
+
+Rent-to-Own Options:
+• 36 months: $312.45/mo
+• 48 months: $249.78/mo
+• 60 months: $211.56/mo
+• 72 months: $186.23/mo
+*Plus your local sales tax
+
+📞 Call NOW: 318-594-5909
+💬 DM us to reserve before it's gone!
+
+#PortableBuildings #LoftedBarn #NewArrival #LimitedAvailability</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="copy-btn" onclick="useTemplate(this, 1)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
+                        <button class="copy-btn" onclick="copyTemplate(this, 1)" style="flex: 1;">📋 Copy Template</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 2: Question Hook -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-number">Template #2</div>
+                    <div class="template-title">❓ Question Hook</div>
+                    <div class="template-strategy">
+                        <span class="strategy-tag question">ENGAGEMENT</span>
+                        <span class="strategy-tag value">VALUE</span>
+                    </div>
+                </div>
+                <div class="template-body">
+                    <div class="template-code">❓ Need extra storage space but short on cash?
+
+✅ Here's your solution: {{name}}
+
+📏 Perfect {{size}} - ideal for tools, equipment, or hobby space
+💵 Only {{price}} cash OR flexible rent-to-own!
+
+📍 Ready for delivery to {{location}} area
+
+No credit check • Same day approval • FREE delivery available
+
+{{rtoAll}}
+
+👉 Call {{phone}} or comment "INTERESTED" below!
+
+#StorageSolution #{{type}} #RentToOwn #NoCredit</div>
+
+                    <div class="preview-label">Mock Facebook Post Preview:</div>
+                    <div class="fb-post-preview">
+                        <div class="fb-post-header">
+                            <div class="fb-avatar">🏠</div>
+                            <div class="fb-post-info">
+                                <div class="fb-page-name">Your Business Name</div>
+                                <div class="fb-post-time">2 hours ago · 🌎</div>
+                            </div>
+                        </div>
+                        <div class="fb-post-content">❓ Need extra storage space but short on cash?
+
+✅ Here's your solution: 10x16 Utility Shed
+
+📏 Perfect 10x16 - ideal for tools, equipment, or hobby space
+💵 Only $4,495 cash OR flexible rent-to-own!
+
+📍 Ready for delivery to Ruston area
+
+No credit check • Same day approval • FREE delivery available
+
+Rent-to-Own Options:
+• 36 months: $156.23/mo
+• 48 months: $124.89/mo
+• 60 months: $105.78/mo
+• 72 months: $93.12/mo
+*Plus your local sales tax
+
+👉 Call 318-594-5909 or comment "INTERESTED" below!
+
+#StorageSolution #UtilityShed #RentToOwn #NoCredit</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="copy-btn" onclick="useTemplate(this, 2)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
+                        <button class="copy-btn" onclick="copyTemplate(this, 2)" style="flex: 1;">📋 Copy Template</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 3: Price Drop Alert -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-number">Template #3</div>
+                    <div class="template-title">💥 Price Drop</div>
+                    <div class="template-strategy">
+                        <span class="strategy-tag urgency">URGENCY</span>
+                        <span class="strategy-tag value">VALUE</span>
+                    </div>
+                </div>
+                <div class="template-body">
+                    <div class="template-code">💥 PRICE DROP ALERT! 💥
+
+This {{name}} just got MORE affordable!
+
+Was: $XX,XXX → NOW: {{price}} ✅
+
+📐 {{size}} of premium space
+📍 Located at {{location}}
+🚚 FREE delivery within 50 miles
+
+⏰ This price won't last - First come, first served!
+
+Can't pay cash? No problem!
+{{rtoAll}}
+
+📞 Text or call: {{phone}}
+⚡ Move fast on this one!
+
+#DealAlert #{{type}} #PriceDrop #LimitedTime</div>
+
+                    <div class="preview-label">Mock Facebook Post Preview:</div>
+                    <div class="fb-post-preview">
+                        <div class="fb-post-header">
+                            <div class="fb-avatar">🏠</div>
+                            <div class="fb-post-info">
+                                <div class="fb-page-name">Your Business Name</div>
+                                <div class="fb-post-time">3 hours ago · 🌎</div>
+                            </div>
+                        </div>
+                        <div class="fb-post-content">💥 PRICE DROP ALERT! 💥
+
+This 12x20 Lofted Barn Cabin just got MORE affordable!
+
+Was: $9,995 → NOW: $8,495 ✅
+
+📐 12x20 of premium space
+📍 Located at West Monroe
+🚚 FREE delivery within 50 miles
+
+⏰ This price won't last - First come, first served!
+
+Can't pay cash? No problem!
+Rent-to-Own Options:
+• 36 months: $295.12/mo
+• 48 months: $236.09/mo
+• 60 months: $200.08/mo
+• 72 months: $176.07/mo
+*Plus your local sales tax
+
+📞 Text or call: 318-594-5909
+⚡ Move fast on this one!
+
+#DealAlert #LoftedBarnCabin #PriceDrop #LimitedTime</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="copy-btn" onclick="useTemplate(this, 3)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
+                        <button class="copy-btn" onclick="copyTemplate(this, 3)" style="flex: 1;">📋 Copy Template</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 4: Social Proof -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-number">Template #4</div>
+                    <div class="template-title">⭐ Customer Favorite</div>
+                    <div class="template-strategy">
+                        <span class="strategy-tag social-proof">SOCIAL PROOF</span>
+                        <span class="strategy-tag value">VALUE</span>
+                    </div>
+                </div>
+                <div class="template-body">
+                    <div class="template-code">⭐⭐⭐⭐⭐ OUR BEST SELLER!
+
+The {{name}} - loved by dozens of happy customers! 🎉
+
+Why people choose this model:
+✅ Perfect {{size}} size
+✅ Quality construction that lasts
+✅ Versatile for ANY use
+✅ Affordable at {{price}}
+
+📍 In stock at {{location}}
+🚚 We deliver & set up for FREE
+
+"Best investment I made for my property!" - Recent Customer
+
+{{rtoAll}}
+
+📞 Join our happy customers! Call {{phone}}
+💬 Or message us to schedule a visit
+
+#CustomerFavorite #{{type}} #BestSeller #5Star</div>
+
+                    <div class="preview-label">Mock Facebook Post Preview:</div>
+                    <div class="fb-post-preview">
+                        <div class="fb-post-header">
+                            <div class="fb-avatar">🏠</div>
+                            <div class="fb-post-info">
+                                <div class="fb-page-name">Your Business Name</div>
+                                <div class="fb-post-time">5 hours ago · 🌎</div>
+                            </div>
+                        </div>
+                        <div class="fb-post-content">⭐⭐⭐⭐⭐ OUR BEST SELLER!
+
+The 10x12 Lofted Barn - loved by dozens of happy customers! 🎉
+
+Why people choose this model:
+✅ Perfect 10x12 size
+✅ Quality construction that lasts
+✅ Versatile for ANY use
+✅ Affordable at $5,295
+
+📍 In stock at Bastrop, LA
+🚚 We deliver & set up for FREE
+
+"Best investment I made for my property!" - Recent Customer
+
+Rent-to-Own Options:
+• 36 months: $184.01/mo
+• 48 months: $147.21/mo
+• 60 months: $124.68/mo
+• 72 months: $109.80/mo
+*Plus your local sales tax
+
+📞 Join our happy customers! Call 318-594-5909
+💬 Or message us to schedule a visit
+
+#CustomerFavorite #LoftedBarn #BestSeller #5Star</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="copy-btn" onclick="useTemplate(this, 4)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
+                        <button class="copy-btn" onclick="copyTemplate(this, 4)" style="flex: 1;">📋 Copy Template</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 5: Weekend Special -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-number">Template #5</div>
+                    <div class="template-title">🎯 Weekend Deal</div>
+                    <div class="template-strategy">
+                        <span class="strategy-tag urgency">URGENCY</span>
+                        <span class="strategy-tag scarcity">SCARCITY</span>
+                    </div>
+                </div>
+                <div class="template-body">
+                    <div class="template-code">🎯 WEEKEND SPECIAL - This Weekend ONLY! 🎯
+
+{{name}} - {{size}}
+
+💰 Special Price: {{price}}
+⏰ Offer expires Sunday at midnight!
+
+🎁 BONUS: Order this weekend and get:
+✅ FREE delivery
+✅ FREE setup
+✅ FREE anchoring
+
+📍 {{location}} location
+🚀 Can deliver as early as next week!
+
+Low monthly payments available:
+{{rto48}}
+
+⚠️ Don't miss out - only this weekend!
+
+📞 Call or text: {{phone}}
+💬 Comment "WEEKEND DEAL" to claim
+
+#WeekendSpecial #{{type}} #LimitedTime #FreebiesFriday</div>
+
+                    <div class="preview-label">Mock Facebook Post Preview:</div>
+                    <div class="fb-post-preview">
+                        <div class="fb-post-header">
+                            <div class="fb-avatar">🏠</div>
+                            <div class="fb-post-info">
+                                <div class="fb-page-name">Your Business Name</div>
+                                <div class="fb-post-time">Friday 9:00 AM · 🌎</div>
+                            </div>
+                        </div>
+                        <div class="fb-post-content">🎯 WEEKEND SPECIAL - This Weekend ONLY! 🎯
+
+8x12 Mini Shed - 8x12
+
+💰 Special Price: $3,295
+⏰ Offer expires Sunday at midnight!
+
+🎁 BONUS: Order this weekend and get:
+✅ FREE delivery
+✅ FREE setup
+✅ FREE anchoring
+
+📍 Pineville location
+🚀 Can deliver as early as next week!
+
+Low monthly payments available:
+48 months: $91.12/mo
+
+⚠️ Don't miss out - only this weekend!
+
+📞 Call or text: 318-594-5909
+💬 Comment "WEEKEND DEAL" to claim
+
+#WeekendSpecial #MiniShed #LimitedTime #FreebiesFriday</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="copy-btn" onclick="useTemplate(this, 5)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
+                        <button class="copy-btn" onclick="copyTemplate(this, 5)" style="flex: 1;">📋 Copy Template</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 6: Problem/Solution -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-number">Template #6</div>
+                    <div class="template-title">🔧 Problem Solver</div>
+                    <div class="template-strategy">
+                        <span class="strategy-tag question">ENGAGEMENT</span>
+                        <span class="strategy-tag value">VALUE</span>
+                    </div>
+                </div>
+                <div class="template-body">
+                    <div class="template-code">🔧 Tired of clutter in your garage?
+🏡 Need a workshop but don't want to build?
+💼 Want a home office away from distractions?
+
+👉 Meet the {{name}}!
+
+Your perfect solution:
+📏 Spacious {{size}}
+💪 Built tough to last decades
+💵 Surprisingly affordable: {{price}}
+🚚 We deliver & install - you do NOTHING
+
+No more excuses! Get organized TODAY.
+
+{{rtoAll}}
+
+📍 Visit us at {{location}} OR
+📞 Call {{phone}} for FREE quote
+
+Transform your property this month! 🎯
+
+#ProblemSolved #{{type}} #Organization #ExtraSpace</div>
+
+                    <div class="preview-label">Mock Facebook Post Preview:</div>
+                    <div class="fb-post-preview">
+                        <div class="fb-post-header">
+                            <div class="fb-avatar">🏠</div>
+                            <div class="fb-post-info">
+                                <div class="fb-page-name">Your Business Name</div>
+                                <div class="fb-post-time">Yesterday · 🌎</div>
+                            </div>
+                        </div>
+                        <div class="fb-post-content">🔧 Tired of clutter in your garage?
+🏡 Need a workshop but don't want to build?
+💼 Want a home office away from distractions?
+
+👉 Meet the 12x16 Utility Building!
+
+Your perfect solution:
+📏 Spacious 12x16
+💪 Built tough to last decades
+💵 Surprisingly affordable: $6,295
+🚚 We deliver & install - you do NOTHING
+
+No more excuses! Get organized TODAY.
+
+Rent-to-Own Options:
+• 36 months: $218.80/mo
+• 48 months: $175.04/mo
+• 60 months: $148.28/mo
+• 72 months: $130.58/mo
+*Plus your local sales tax
+
+📍 Visit us at Shreveport OR
+📞 Call 318-594-5909 for FREE quote
+
+Transform your property this month! 🎯
+
+#ProblemSolved #UtilityBuilding #Organization #ExtraSpace</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="copy-btn" onclick="useTemplate(this, 6)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
+                        <button class="copy-btn" onclick="copyTemplate(this, 6)" style="flex: 1;">📋 Copy Template</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 7: Last One Alert -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-number">Template #7</div>
+                    <div class="template-title">🔥 Last One!</div>
+                    <div class="template-strategy">
+                        <span class="strategy-tag scarcity">SCARCITY</span>
+                        <span class="strategy-tag urgency">URGENCY</span>
+                    </div>
+                </div>
+                <div class="template-body">
+                    <div class="template-code">🔥 LAST ONE IN STOCK! 🔥
+
+This is THE ONLY {{name}} we have left!
+
+📐 Size: {{size}}
+💰 Price: {{price}}
+📍 Location: {{location}}
+
+⚠️ Once it's gone, it's GONE!
+Next shipment not expected for 4-6 weeks.
+
+✅ Perfect for storage, workshop, or extra space
+✅ Quality built - made to last
+✅ Ready for immediate delivery
+
+Don't wait and regret it!
+
+As low as {{rto60}}/month with RTO
+
+📞 CALL NOW: {{phone}}
+💬 Or DM "LAST ONE" - First response gets it!
+
+#LastChance #{{type}} #OnlyOneLeft #ActFast</div>
+
+                    <div class="preview-label">Mock Facebook Post Preview:</div>
+                    <div class="fb-post-preview">
+                        <div class="fb-post-header">
+                            <div class="fb-avatar">🏠</div>
+                            <div class="fb-post-info">
+                                <div class="fb-page-name">Your Business Name</div>
+                                <div class="fb-post-time">1 hour ago · 🌎</div>
+                            </div>
+                        </div>
+                        <div class="fb-post-content">🔥 LAST ONE IN STOCK! 🔥
+
+This is THE ONLY 10x20 Side Lofted Barn we have left!
+
+📐 Size: 10x20
+💰 Price: $7,495
+📍 Location: Alexandria
+
+⚠️ Once it's gone, it's GONE!
+Next shipment not expected for 4-6 weeks.
+
+✅ Perfect for storage, workshop, or extra space
+✅ Quality built - made to last
+✅ Ready for immediate delivery
+
+Don't wait and regret it!
+
+As low as 60 months: $158.23/mo/month with RTO
+
+📞 CALL NOW: 318-594-5909
+💬 Or DM "LAST ONE" - First response gets it!
+
+#LastChance #SideLoftedBarn #OnlyOneLeft #ActFast</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="copy-btn" onclick="useTemplate(this, 7)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
+                        <button class="copy-btn" onclick="copyTemplate(this, 7)" style="flex: 1;">📋 Copy Template</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 8: Feature Focus -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-number">Template #8</div>
+                    <div class="template-title">✨ Feature Spotlight</div>
+                    <div class="template-strategy">
+                        <span class="strategy-tag value">VALUE</span>
+                        <span class="strategy-tag social-proof">QUALITY</span>
+                    </div>
+                </div>
+                <div class="template-body">
+                    <div class="template-code">✨ FEATURE SPOTLIGHT: {{name}}
+
+What makes this {{type}} special? Let us show you! 👇
+
+🏆 Premium Features:
+✅ Heavy-duty floor joists
+✅ High-quality siding
+✅ Extra tall sidewalls ({{size}})
+✅ Reinforced door frames
+✅ Weather-resistant construction
+
+💰 All this for just {{price}}!
+
+📍 See it in person at {{location}}
+
+🎯 Perfect for:
+• Tool storage
+• Workshop
+• Man cave/She shed
+• Home gym
+• Art studio
+
+Can't afford cash? We got you!
+{{rtoAll}}
+
+📞 Schedule your visit: {{phone}}
+📸 More photos in comments!
+
+#QualityBuilt #{{type}} #PremiumFeatures #BuiltToLast</div>
+
+                    <div class="preview-label">Mock Facebook Post Preview:</div>
+                    <div class="fb-post-preview">
+                        <div class="fb-post-header">
+                            <div class="fb-avatar">🏠</div>
+                            <div class="fb-post-info">
+                                <div class="fb-page-name">Your Business Name</div>
+                                <div class="fb-post-time">4 hours ago · 🌎</div>
+                            </div>
+                        </div>
+                        <div class="fb-post-content">✨ FEATURE SPOTLIGHT: 14x28 Lofted Barn Cabin
+
+What makes this Lofted Barn Cabin special? Let us show you! 👇
+
+🏆 Premium Features:
+✅ Heavy-duty floor joists
+✅ High-quality siding
+✅ Extra tall sidewalls (14x28)
+✅ Reinforced door frames
+✅ Weather-resistant construction
+
+💰 All this for just $12,995!
+
+📍 See it in person at Lake Charles
+
+🎯 Perfect for:
+• Tool storage
+• Workshop
+• Man cave/She shed
+• Home gym
+• Art studio
+
+Can't afford cash? We got you!
+Rent-to-Own Options:
+• 36 months: $451.73/mo
+• 48 months: $361.38/mo
+• 60 months: $306.17/mo
+• 72 months: $269.63/mo
+*Plus your local sales tax
+
+📞 Schedule your visit: 318-594-5909
+📸 More photos in comments!
+
+#QualityBuilt #LoftedBarnCabin #PremiumFeatures #BuiltToLast</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="copy-btn" onclick="useTemplate(this, 8)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
+                        <button class="copy-btn" onclick="copyTemplate(this, 8)" style="flex: 1;">📋 Copy Template</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 9: Comparison Value -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-number">Template #9</div>
+                    <div class="template-title">💡 Smart Money</div>
+                    <div class="template-strategy">
+                        <span class="strategy-tag value">VALUE</span>
+                        <span class="strategy-tag question">LOGIC</span>
+                    </div>
+                </div>
+                <div class="template-body">
+                    <div class="template-code">💡 SMART MONEY COMPARISON 💡
+
+Building yourself? Think again! 👇
+
+DIY Cost:
+❌ Materials: $4,000-$6,000
+❌ Tools: $500-$1,000
+❌ Your time: 60+ hours
+❌ Permits & fees: $200-$500
+❌ Total: $5,000-$8,000+ 😰
+
+Our {{name}}:
+✅ Professionally built: {{price}}
+✅ FREE delivery & setup
+✅ Ready in DAYS not weeks
+✅ No stress, no sweat!
+
+📐 {{size}} - Perfect size!
+📍 {{location}}
+
+Why work harder when you can work smarter?
+
+Low as {{rto72}}/month
+
+📞 Get yours today: {{phone}}
+⏰ Don't waste another weekend!
+
+#SmartShopping #{{type}} #ValueBuy #WhyDIY</div>
+
+                    <div class="preview-label">Mock Facebook Post Preview:</div>
+                    <div class="fb-post-preview">
+                        <div class="fb-post-header">
+                            <div class="fb-avatar">🏠</div>
+                            <div class="fb-post-info">
+                                <div class="fb-page-name">Your Business Name</div>
+                                <div class="fb-post-time">6 hours ago · 🌎</div>
+                            </div>
+                        </div>
+                        <div class="fb-post-content">💡 SMART MONEY COMPARISON 💡
+
+Building yourself? Think again! 👇
+
+DIY Cost:
+❌ Materials: $4,000-$6,000
+❌ Tools: $500-$1,000
+❌ Your time: 60+ hours
+❌ Permits & fees: $200-$500
+❌ Total: $5,000-$8,000+ 😰
+
+Our 10x14 Utility Shed:
+✅ Professionally built: $5,495
+✅ FREE delivery & setup
+✅ Ready in DAYS not weeks
+✅ No stress, no sweat!
+
+📐 10x14 - Perfect size!
+📍 Natchitoches
+
+Why work harder when you can work smarter?
+
+Low as 72 months: $121.45/mo/month
+
+📞 Get yours today: 318-594-5909
+⏰ Don't waste another weekend!
+
+#SmartShopping #UtilityShed #ValueBuy #WhyDIY</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="copy-btn" onclick="useTemplate(this, 9)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
+                        <button class="copy-btn" onclick="copyTemplate(this, 9)" style="flex: 1;">📋 Copy Template</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 10: Seasonal/Holiday -->
+            <div class="template-card">
+                <div class="template-header">
+                    <div class="template-number">Template #10</div>
+                    <div class="template-title">🎄 Seasonal Special</div>
+                    <div class="template-strategy">
+                        <span class="strategy-tag urgency">URGENCY</span>
+                        <span class="strategy-tag value">SEASONAL</span>
+                    </div>
+                </div>
+                <div class="template-body">
+                    <div class="template-code">🎄 [SEASON] SPECIAL EVENT! 🎄
+
+Make room for [holiday/season] with extra storage!
+
+{{name}} - NOW AVAILABLE! 🎉
+
+📐 {{size}} - More space than you think!
+💰 Special [Season] Price: {{price}}
+📍 {{location}}
+
+🎁 [SEASON] BONUS INCLUDED:
+✅ FREE delivery
+✅ FREE setup
+✅ [Extra seasonal bonus]
+
+Perfect timing to:
+• Organize holiday decorations
+• Clear out the garage
+• Create that workshop you've wanted
+• [Seasonal use case]
+
+{{rtoAll}}
+
+⏰ [Season] special ends [Date]!
+
+📞 Reserve yours: {{phone}}
+💬 Comment "[SEASON]" for details
+
+#[Season]Sale #{{type}} #LimitedOffer #[Holiday]</div>
+
+                    <div class="preview-label">Mock Facebook Post Preview:</div>
+                    <div class="fb-post-preview">
+                        <div class="fb-post-header">
+                            <div class="fb-avatar">🏠</div>
+                            <div class="fb-post-info">
+                                <div class="fb-page-name">Your Business Name</div>
+                                <div class="fb-post-time">Today at 10:00 AM · 🌎</div>
+                            </div>
+                        </div>
+                        <div class="fb-post-content">🎄 CHRISTMAS SPECIAL EVENT! 🎄
+
+Make room for Christmas with extra storage!
+
+12x16 Lofted Barn - NOW AVAILABLE! 🎉
+
+📐 12x16 - More space than you think!
+💰 Special Christmas Price: $6,995
+📍 Bossier City
+
+🎁 CHRISTMAS BONUS INCLUDED:
+✅ FREE delivery
+✅ FREE setup
+✅ Red bow on delivery day!
+
+Perfect timing to:
+• Organize holiday decorations
+• Clear out the garage
+• Create that workshop you've wanted
+• Store lawn equipment for winter
+
+Rent-to-Own Options:
+• 36 months: $243.23/mo
+• 48 months: $194.58/mo
+• 60 months: $164.79/mo
+• 72 months: $145.15/mo
+*Plus your local sales tax
+
+⏰ Christmas special ends December 24th!
+
+📞 Reserve yours: 318-594-5909
+💬 Comment "CHRISTMAS" for details
+
+#ChristmasSale #LoftedBarn #LimitedOffer #HolidaySpecial</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="copy-btn" onclick="useTemplate(this, 10)" style="flex: 1; background: #28a745;">✨ Use This Template</button>
+                        <button class="copy-btn" onclick="copyTemplate(this, 10)" style="flex: 1;">📋 Copy Template</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const templates = {
+            1: `🚨 JUST ARRIVED! {{name}}
+
+📐 Size: {{size}}
+💰 Cash Price: {{price}}
+📍 Currently at: {{location}}
+
+⚡ Won't last long - buildings like this sell FAST!
+
+{{rtoAll}}
+
+📞 Call NOW: {{phone}}
+💬 DM us to reserve before it's gone!
+
+#PortableBuildings #{{type}} #NewArrival #LimitedAvailability`,
+
+            2: `❓ Need extra storage space but short on cash?
+
+✅ Here's your solution: {{name}}
+
+📏 Perfect {{size}} - ideal for tools, equipment, or hobby space
+💵 Only {{price}} cash OR flexible rent-to-own!
+
+📍 Ready for delivery to {{location}} area
+
+No credit check • Same day approval • FREE delivery available
+
+{{rtoAll}}
+
+👉 Call {{phone}} or comment "INTERESTED" below!
+
+#StorageSolution #{{type}} #RentToOwn #NoCredit`,
+
+            3: `💥 PRICE DROP ALERT! 💥
+
+This {{name}} just got MORE affordable!
+
+Was: $XX,XXX → NOW: {{price}} ✅
+
+📐 {{size}} of premium space
+📍 Located at {{location}}
+🚚 FREE delivery within 50 miles
+
+⏰ This price won't last - First come, first served!
+
+Can't pay cash? No problem!
+{{rtoAll}}
+
+📞 Text or call: {{phone}}
+⚡ Move fast on this one!
+
+#DealAlert #{{type}} #PriceDrop #LimitedTime`,
+
+            4: `⭐⭐⭐⭐⭐ OUR BEST SELLER!
+
+The {{name}} - loved by dozens of happy customers! 🎉
+
+Why people choose this model:
+✅ Perfect {{size}} size
+✅ Quality construction that lasts
+✅ Versatile for ANY use
+✅ Affordable at {{price}}
+
+📍 In stock at {{location}}
+🚚 We deliver & set up for FREE
+
+"Best investment I made for my property!" - Recent Customer
+
+{{rtoAll}}
+
+📞 Join our happy customers! Call {{phone}}
+💬 Or message us to schedule a visit
+
+#CustomerFavorite #{{type}} #BestSeller #5Star`,
+
+            5: `🎯 WEEKEND SPECIAL - This Weekend ONLY! 🎯
+
+{{name}} - {{size}}
+
+💰 Special Price: {{price}}
+⏰ Offer expires Sunday at midnight!
+
+🎁 BONUS: Order this weekend and get:
+✅ FREE delivery
+✅ FREE setup
+✅ FREE anchoring
+
+📍 {{location}} location
+🚀 Can deliver as early as next week!
+
+Low monthly payments available:
+{{rto48}}
+
+⚠️ Don't miss out - only this weekend!
+
+📞 Call or text: {{phone}}
+💬 Comment "WEEKEND DEAL" to claim
+
+#WeekendSpecial #{{type}} #LimitedTime #FreebiesFriday`,
+
+            6: `🔧 Tired of clutter in your garage?
+🏡 Need a workshop but don't want to build?
+💼 Want a home office away from distractions?
+
+👉 Meet the {{name}}!
+
+Your perfect solution:
+📏 Spacious {{size}}
+💪 Built tough to last decades
+💵 Surprisingly affordable: {{price}}
+🚚 We deliver & install - you do NOTHING
+
+No more excuses! Get organized TODAY.
+
+{{rtoAll}}
+
+📍 Visit us at {{location}} OR
+📞 Call {{phone}} for FREE quote
+
+Transform your property this month! 🎯
+
+#ProblemSolved #{{type}} #Organization #ExtraSpace`,
+
+            7: `🔥 LAST ONE IN STOCK! 🔥
+
+This is THE ONLY {{name}} we have left!
+
+📐 Size: {{size}}
+💰 Price: {{price}}
+📍 Location: {{location}}
+
+⚠️ Once it's gone, it's GONE!
+Next shipment not expected for 4-6 weeks.
+
+✅ Perfect for storage, workshop, or extra space
+✅ Quality built - made to last
+✅ Ready for immediate delivery
+
+Don't wait and regret it!
+
+As low as {{rto60}}/month with RTO
+
+📞 CALL NOW: {{phone}}
+💬 Or DM "LAST ONE" - First response gets it!
+
+#LastChance #{{type}} #OnlyOneLeft #ActFast`,
+
+            8: `✨ FEATURE SPOTLIGHT: {{name}}
+
+What makes this {{type}} special? Let us show you! 👇
+
+🏆 Premium Features:
+✅ Heavy-duty floor joists
+✅ High-quality siding
+✅ Extra tall sidewalls ({{size}})
+✅ Reinforced door frames
+✅ Weather-resistant construction
+
+💰 All this for just {{price}}!
+
+📍 See it in person at {{location}}
+
+🎯 Perfect for:
+• Tool storage
+• Workshop
+• Man cave/She shed
+• Home gym
+• Art studio
+
+Can't afford cash? We got you!
+{{rtoAll}}
+
+📞 Schedule your visit: {{phone}}
+📸 More photos in comments!
+
+#QualityBuilt #{{type}} #PremiumFeatures #BuiltToLast`,
+
+            9: `💡 SMART MONEY COMPARISON 💡
+
+Building yourself? Think again! 👇
+
+DIY Cost:
+❌ Materials: $4,000-$6,000
+❌ Tools: $500-$1,000
+❌ Your time: 60+ hours
+❌ Permits & fees: $200-$500
+❌ Total: $5,000-$8,000+ 😰
+
+Our {{name}}:
+✅ Professionally built: {{price}}
+✅ FREE delivery & setup
+✅ Ready in DAYS not weeks
+✅ No stress, no sweat!
+
+📐 {{size}} - Perfect size!
+📍 {{location}}
+
+Why work harder when you can work smarter?
+
+Low as {{rto72}}/month
+
+📞 Get yours today: {{phone}}
+⏰ Don't waste another weekend!
+
+#SmartShopping #{{type}} #ValueBuy #WhyDIY`,
+
+            10: `🎄 [SEASON] SPECIAL EVENT! 🎄
+
+Make room for [holiday/season] with extra storage!
+
+{{name}} - NOW AVAILABLE! 🎉
+
+📐 {{size}} - More space than you think!
+💰 Special [Season] Price: {{price}}
+📍 {{location}}
+
+🎁 [SEASON] BONUS INCLUDED:
+✅ FREE delivery
+✅ FREE setup
+✅ [Extra seasonal bonus]
+
+Perfect timing to:
+• Organize holiday decorations
+• Clear out the garage
+• Create that workshop you've wanted
+• [Seasonal use case]
+
+{{rtoAll}}
+
+⏰ [Season] special ends [Date]!
+
+📞 Reserve yours: {{phone}}
+💬 Comment "[SEASON]" for details
+
+#[Season]Sale #{{type}} #LimitedOffer #[Holiday]`
+        };
+
+        function copyTemplate(btn, templateNum) {
+            const template = templates[templateNum];
+            navigator.clipboard.writeText(template).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                btn.style.background = '#28a745';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#1877f2';
+                }, 2000);
+            });
+        }
+
+        function useTemplate(btn, templateNum) {
+            const template = templates[templateNum];
+
+            // If opened from admin panel, send template back to parent window
+            if (window.opener) {
+                window.opener.postMessage({
+                    type: 'use_facebook_template',
+                    template: template
+                }, window.location.origin);
+
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Template Loaded!';
+                btn.style.background = '#28a745';
+
+                // Close window after 1 second
+                setTimeout(() => {
+                    window.close();
+                }, 1000);
+            } else {
+                // No opener - just copy to clipboard
+                copyTemplate(btn, templateNum);
+            }
+        }
+    </script>
+</body>
+</html>

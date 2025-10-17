@@ -3656,7 +3656,19 @@ window.addEventListener('message', (event) => {
 
     if (event.data.type === 'facebook_connected') {
         showToast(`✅ Successfully connected to Facebook page: ${event.data.pageName}`);
-        loadFacebookConnectionStatus();
+        // Reload page to show connected status
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    }
+
+    if (event.data.type === 'use_facebook_template') {
+        // Load template into the post template textarea
+        const templateTextarea = document.getElementById('autoPostTemplate');
+        if (templateTextarea) {
+            templateTextarea.value = event.data.template;
+            showToast('✅ Template loaded! Remember to save your settings.');
+        }
     }
 });
 
