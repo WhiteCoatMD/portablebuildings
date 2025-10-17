@@ -20,6 +20,7 @@ const BUILDING_TYPES = {
     'SLB': 'Side Lofted Barn',
     'UB': 'Utility Barn',
     'UX': 'Utility Shed',
+    'UXS': 'Side Utility Building',
     'US': 'Urban Shed',
     'CB': 'Cabin',
     'C': 'Cabin',
