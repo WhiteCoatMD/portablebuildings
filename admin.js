@@ -3691,6 +3691,422 @@ window.openFeatureRequest = openFeatureRequest;
 window.closeFeatureRequest = closeFeatureRequest;
 window.submitFeatureRequest = submitFeatureRequest;
 
+// Facebook Template Library Functions
+const facebookTemplates = {
+    1: {
+        title: "🚨 New Arrival Alert",
+        strategy: ["URGENCY", "SCARCITY"],
+        template: `🚨 JUST ARRIVED! {{name}}
+
+📐 Size: {{size}}
+💰 Cash Price: {{price}}
+📍 Currently at: {{location}}
+
+⚡ Won't last long - buildings like this sell FAST!
+
+{{rtoAll}}
+
+📞 Call NOW: {{phone}}
+💬 DM us to reserve before it's gone!
+
+#PortableBuildings #{{type}} #NewArrival #LimitedAvailability`
+    },
+    2: {
+        title: "❓ Question Hook",
+        strategy: ["ENGAGEMENT", "VALUE"],
+        template: `❓ Need extra storage space but short on cash?
+
+✅ Here's your solution: {{name}}
+
+📏 Perfect {{size}} - ideal for tools, equipment, or hobby space
+💵 Only {{price}} cash OR flexible rent-to-own!
+
+📍 Ready for delivery to {{location}} area
+
+No credit check • Same day approval • FREE delivery available
+
+{{rtoAll}}
+
+👉 Call {{phone}} or comment "INTERESTED" below!
+
+#StorageSolution #{{type}} #RentToOwn #NoCredit`
+    },
+    3: {
+        title: "💥 Price Drop",
+        strategy: ["URGENCY", "VALUE"],
+        template: `💥 PRICE DROP ALERT! 💥
+
+This {{name}} just got MORE affordable!
+
+Was: $XX,XXX → NOW: {{price}} ✅
+
+📐 {{size}} of premium space
+📍 Located at {{location}}
+🚚 FREE delivery within 50 miles
+
+⏰ This price won't last - First come, first served!
+
+Can't pay cash? No problem!
+{{rtoAll}}
+
+📞 Text or call: {{phone}}
+⚡ Move fast on this one!
+
+#DealAlert #{{type}} #PriceDrop #LimitedTime`
+    },
+    4: {
+        title: "⭐ Customer Favorite",
+        strategy: ["SOCIAL PROOF", "VALUE"],
+        template: `⭐⭐⭐⭐⭐ OUR BEST SELLER!
+
+The {{name}} - loved by dozens of happy customers! 🎉
+
+Why people choose this model:
+✅ Perfect {{size}} size
+✅ Quality construction that lasts
+✅ Versatile for ANY use
+✅ Affordable at {{price}}
+
+📍 In stock at {{location}}
+🚚 We deliver & set up for FREE
+
+"Best investment I made for my property!" - Recent Customer
+
+{{rtoAll}}
+
+📞 Join our happy customers! Call {{phone}}
+💬 Or message us to schedule a visit
+
+#CustomerFavorite #{{type}} #BestSeller #5Star`
+    },
+    5: {
+        title: "🎯 Weekend Deal",
+        strategy: ["URGENCY", "SCARCITY"],
+        template: `🎯 WEEKEND SPECIAL - This Weekend ONLY! 🎯
+
+{{name}} - {{size}}
+
+💰 Special Price: {{price}}
+⏰ Offer expires Sunday at midnight!
+
+🎁 BONUS: Order this weekend and get:
+✅ FREE delivery
+✅ FREE setup
+✅ FREE anchoring
+
+📍 {{location}} location
+🚀 Can deliver as early as next week!
+
+Low monthly payments available:
+{{rto48}}
+
+⚠️ Don't miss out - only this weekend!
+
+📞 Call or text: {{phone}}
+💬 Comment "WEEKEND DEAL" to claim
+
+#WeekendSpecial #{{type}} #LimitedTime #FreebiesFriday`
+    },
+    6: {
+        title: "🔧 Problem Solver",
+        strategy: ["ENGAGEMENT", "VALUE"],
+        template: `🔧 Tired of clutter in your garage?
+🏡 Need a workshop but don't want to build?
+💼 Want a home office away from distractions?
+
+👉 Meet the {{name}}!
+
+Your perfect solution:
+📏 Spacious {{size}}
+💪 Built tough to last decades
+💵 Surprisingly affordable: {{price}}
+🚚 We deliver & install - you do NOTHING
+
+No more excuses! Get organized TODAY.
+
+{{rtoAll}}
+
+📍 Visit us at {{location}} OR
+📞 Call {{phone}} for FREE quote
+
+Transform your property this month! 🎯
+
+#ProblemSolved #{{type}} #Organization #ExtraSpace`
+    },
+    7: {
+        title: "🔥 Last One!",
+        strategy: ["SCARCITY", "URGENCY"],
+        template: `🔥 LAST ONE IN STOCK! 🔥
+
+This is THE ONLY {{name}} we have left!
+
+📐 Size: {{size}}
+💰 Price: {{price}}
+📍 Location: {{location}}
+
+⚠️ Once it's gone, it's GONE!
+Next shipment not expected for 4-6 weeks.
+
+✅ Perfect for storage, workshop, or extra space
+✅ Quality built - made to last
+✅ Ready for immediate delivery
+
+Don't wait and regret it!
+
+As low as {{rto60}}/month with RTO
+
+📞 CALL NOW: {{phone}}
+💬 Or DM "LAST ONE" - First response gets it!
+
+#LastChance #{{type}} #OnlyOneLeft #ActFast`
+    },
+    8: {
+        title: "✨ Feature Spotlight",
+        strategy: ["VALUE", "QUALITY"],
+        template: `✨ FEATURE SPOTLIGHT: {{name}}
+
+What makes this {{type}} special? Let us show you! 👇
+
+🏆 Premium Features:
+✅ Heavy-duty floor joists
+✅ High-quality siding
+✅ Extra tall sidewalls ({{size}})
+✅ Reinforced door frames
+✅ Weather-resistant construction
+
+💰 All this for just {{price}}!
+
+📍 See it in person at {{location}}
+
+🎯 Perfect for:
+• Tool storage
+• Workshop
+• Man cave/She shed
+• Home gym
+• Art studio
+
+Can't afford cash? We got you!
+{{rtoAll}}
+
+📞 Schedule your visit: {{phone}}
+📸 More photos in comments!
+
+#QualityBuilt #{{type}} #PremiumFeatures #BuiltToLast`
+    },
+    9: {
+        title: "💡 Smart Money",
+        strategy: ["VALUE", "LOGIC"],
+        template: `💡 SMART MONEY COMPARISON 💡
+
+Building yourself? Think again! 👇
+
+DIY Cost:
+❌ Materials: $4,000-$6,000
+❌ Tools: $500-$1,000
+❌ Your time: 60+ hours
+❌ Permits & fees: $200-$500
+❌ Total: $5,000-$8,000+ 😰
+
+Our {{name}}:
+✅ Professionally built: {{price}}
+✅ FREE delivery & setup
+✅ Ready in DAYS not weeks
+✅ No stress, no sweat!
+
+📐 {{size}} - Perfect size!
+📍 {{location}}
+
+Why work harder when you can work smarter?
+
+Low as {{rto72}}/month
+
+📞 Get yours today: {{phone}}
+⏰ Don't waste another weekend!
+
+#SmartShopping #{{type}} #ValueBuy #WhyDIY`
+    },
+    10: {
+        title: "🎄 Seasonal Special",
+        strategy: ["URGENCY", "SEASONAL"],
+        template: `🎄 [SEASON] SPECIAL EVENT! 🎄
+
+Make room for [holiday/season] with extra storage!
+
+{{name}} - NOW AVAILABLE! 🎉
+
+📐 {{size}} - More space than you think!
+💰 Special [Season] Price: {{price}}
+📍 {{location}}
+
+🎁 [SEASON] BONUS INCLUDED:
+✅ FREE delivery
+✅ FREE setup
+✅ [Extra seasonal bonus]
+
+Perfect timing to:
+• Organize holiday decorations
+• Clear out the garage
+• Create that workshop you've wanted
+• [Seasonal use case]
+
+{{rtoAll}}
+
+⏰ [Season] special ends [Date]!
+
+📞 Reserve yours: {{phone}}
+💬 Comment "[SEASON]" for details
+
+#[Season]Sale #{{type}} #LimitedOffer #[Holiday]`
+    }
+};
+
+function loadTemplateLibrary() {
+    const container = document.getElementById('template-library-container');
+    if (!container) return;
+
+    const strategyColors = {
+        'URGENCY': '#dc3545',
+        'SCARCITY': '#fd7e14',
+        'VALUE': '#28a745',
+        'SOCIAL PROOF': '#6f42c1',
+        'ENGAGEMENT': '#17a2b8',
+        'QUALITY': '#6f42c1',
+        'LOGIC': '#17a2b8',
+        'SEASONAL': '#fd7e14'
+    };
+
+    container.innerHTML = Object.keys(facebookTemplates).map(num => {
+        const template = facebookTemplates[num];
+        return `
+            <div style="background: white; border: 2px solid #dee2e6; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="background: linear-gradient(135deg, #1877f2 0%, #1465d8 100%); color: white; padding: 1.5rem;">
+                    <div style="display: inline-block; background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">
+                        Template #${num}
+                    </div>
+                    <div style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">
+                        ${template.title}
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        ${template.strategy.map(s => `
+                            <span style="display: inline-block; background: ${strategyColors[s] || '#28a745'}; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                ${s}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+                <div style="padding: 1.5rem;">
+                    <div style="background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-family: 'Courier New', monospace; font-size: 0.85rem; white-space: pre-wrap; color: #495057; line-height: 1.8; max-height: 300px; overflow-y: auto;">
+${template.template}</div>
+                    <button onclick="useTemplate(${num})" style="width: 100%; background: #28a745; color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease;">
+                        ✨ Use This Template
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function useTemplate(templateNum) {
+    const template = facebookTemplates[templateNum];
+    if (!template) return;
+
+    // Get the textarea in the Facebook tab
+    const textarea = document.getElementById('autoPostTemplate-2');
+    if (textarea) {
+        textarea.value = template.template;
+
+        // Auto-save the template
+        await saveFacebookTemplate(template.template);
+
+        // Scroll to the template textarea
+        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Flash the textarea to show it was updated
+        textarea.style.border = '3px solid #28a745';
+        setTimeout(() => {
+            textarea.style.border = '';
+        }, 1500);
+
+        showToast(`✅ Template #${templateNum} loaded and saved!`);
+    }
+}
+
+// Load template library when the Facebook tab is opened
+document.addEventListener('DOMContentLoaded', () => {
+    // Load templates immediately if on Facebook tab
+    if (document.getElementById('template-library-container')) {
+        loadTemplateLibrary();
+    }
+
+    // Also load when tab is switched to Facebook
+    const facebookTabBtn = document.querySelector('[data-tab="facebook"]');
+    if (facebookTabBtn) {
+        facebookTabBtn.addEventListener('click', () => {
+            setTimeout(loadTemplateLibrary, 100);
+        });
+    }
+
+    // Sync the duplicate Facebook settings fields
+    syncFacebookFields();
+});
+
+// Sync Facebook settings between original location and new tab
+function syncFacebookFields() {
+    // Sync checkboxes
+    const syncCheckbox = (id1, id2) => {
+        const el1 = document.getElementById(id1);
+        const el2 = document.getElementById(id2);
+        if (el1 && el2) {
+            el1.addEventListener('change', () => el2.checked = el1.checked);
+            el2.addEventListener('change', () => el1.checked = el2.checked);
+        }
+    };
+
+    syncCheckbox('enableAutoPost', 'enableAutoPost-2');
+    syncCheckbox('autoPostNewOnly', 'autoPostNewOnly-2');
+    syncCheckbox('autoPostWithImages', 'autoPostWithImages-2');
+    syncCheckbox('autoPostAvailableOnly', 'autoPostAvailableOnly-2');
+
+    // Sync textareas
+    const syncTextarea = (id1, id2) => {
+        const el1 = document.getElementById(id1);
+        const el2 = document.getElementById(id2);
+        if (el1 && el2) {
+            el1.addEventListener('input', () => el2.value = el1.value);
+            el2.addEventListener('input', () => el1.value = el2.value);
+        }
+    };
+
+    syncTextarea('autoPostTemplate', 'autoPostTemplate-2');
+
+    // Sync connection status
+    const syncConnectionStatus = () => {
+        const connected1 = document.getElementById('facebook-connected');
+        const notConnected1 = document.getElementById('facebook-not-connected');
+        const connected2 = document.getElementById('facebook-connected-2');
+        const notConnected2 = document.getElementById('facebook-not-connected-2');
+        const pageName1 = document.getElementById('connected-page-name');
+        const pageName2 = document.getElementById('connected-page-name-2');
+
+        if (connected1 && connected2 && notConnected1 && notConnected2) {
+            // Copy display state
+            connected2.style.display = connected1.style.display;
+            notConnected2.style.display = notConnected1.style.display;
+
+            // Copy page name
+            if (pageName1 && pageName2) {
+                pageName2.textContent = pageName1.textContent;
+            }
+        }
+    };
+
+    // Sync status periodically
+    setInterval(syncConnectionStatus, 500);
+}
+
+window.useTemplate = useTemplate;
+window.loadTemplateLibrary = loadTemplateLibrary;
+
 // Facebook OAuth Functions
 async function connectFacebookOAuth() {
     const token = localStorage.getItem('auth_token');

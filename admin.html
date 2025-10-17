@@ -36,6 +36,7 @@
         <div class="admin-tabs">
             <button class="tab-btn active" data-tab="customization">Site Customization</button>
             <button class="tab-btn" data-tab="inventory">Inventory Settings</button>
+            <button class="tab-btn" data-tab="facebook">Facebook Autoposting</button>
             <button class="tab-btn" data-tab="domain">Domain & Website</button>
             <button class="tab-btn" data-tab="leads">Leads</button>
             <button class="tab-btn" data-tab="payments">Payment Settings</button>
@@ -197,113 +198,6 @@
                 <p class="help-text" style="margin-top: 1rem; color: #bc9c22;">Check the days you're open and set the hours. Leave unchecked for closed days.</p>
             </div>
 
-            <div class="card" style="background: #1a1a2e; color: #bc9c22;">
-                <h2 style="color: #bc9c22;">Facebook Auto-Posting</h2>
-                <p class="help-text" style="color: #bc9c22;">Automatically post new building listings to your Facebook page</p>
-
-                <div class="info-box" style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem;">
-                    <p style="margin: 0; font-weight: 600; color: #856404;">⚠️ Auto-Posting Requirements</p>
-                    <p style="margin: 0.5rem 0 0 0; color: #856404; font-size: 0.9rem;">Buildings will <strong>only</strong> auto-post to Facebook if they have:</p>
-                    <ul style="margin: 0.5rem 0 0 1.5rem; color: #856404; font-size: 0.9rem;">
-                        <li>At least one uploaded image</li>
-                        <li>Valid pricing information</li>
-                        <li>Complete building description (from serial number decoder)</li>
-                    </ul>
-                </div>
-
-                <!-- Facebook Connection Status -->
-                <div id="facebook-connected" style="display: none; background: #d4edda; border-left: 4px solid #28a745; padding: 1.25rem; border-radius: 6px; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
-                        <span style="font-size: 2rem;">✅</span>
-                        <div style="flex: 1;">
-                            <strong style="color: #155724; font-size: 1.05rem;">Facebook Page Connected</strong>
-                            <p style="margin: 0.25rem 0 0 0; color: #155724; font-size: 0.9rem;">
-                                Connected to: <strong id="connected-page-name"></strong>
-                            </p>
-                        </div>
-                        <button class="btn btn-danger btn-sm" onclick="disconnectFacebook()">Disconnect</button>
-                    </div>
-                </div>
-
-                <div id="facebook-not-connected" style="background: #f8f9fa; border: 2px dashed #dee2e6; padding: 2rem; border-radius: 8px; text-align: center; margin-bottom: 1.5rem;">
-                    <h3 style="color: #495057; margin-bottom: 1rem;">Connect Your Facebook Page</h3>
-                    <p style="color: #6c757d; margin-bottom: 1.5rem;">Click the button below to securely connect your Facebook page. No manual setup required!</p>
-                    <button class="btn btn-primary" onclick="connectFacebookOAuth()" style="background: #1877f2; padding: 0.875rem 2rem; font-size: 1.05rem;">
-                        <svg style="width: 20px; height: 20px; margin-right: 0.5rem; vertical-align: middle;" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                        Connect with Facebook
-                    </button>
-                </div>
-
-                <div class="setting-group">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="enableAutoPost">
-                        <span class="toggle-slider"></span>
-                        <span class="toggle-text" style="color: #bc9c22;">Enable Auto-Posting to Facebook</span>
-                    </label>
-                </div>
-
-                <div class="form-group">
-                    <label style="color: #bc9c22;">Auto-Post Conditions</label>
-                    <div style="margin-top: 0.5rem; display: block;">
-                        <label class="toggle-label" style="margin-bottom: 0.75rem; display: inline-flex;">
-                            <input type="checkbox" id="autoPostNewOnly" checked>
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-text" style="color: #bc9c22;">Only post new inventory (not repos)</span>
-                        </label>
-                    </div>
-                    <div style="display: block;">
-                        <label class="toggle-label" style="margin-bottom: 0.75rem; display: inline-flex;">
-                            <input type="checkbox" id="autoPostWithImages" checked>
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-text" style="color: #bc9c22;">Only post buildings with uploaded images</span>
-                        </label>
-                    </div>
-                    <div style="display: block;">
-                        <label class="toggle-label" style="display: inline-flex;">
-                            <input type="checkbox" id="autoPostAvailableOnly" checked>
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-text" style="color: #bc9c22;">Only post available buildings (not sold/pending)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="autoPostTemplate" style="color: #bc9c22;">Post Template</label>
-                    <textarea id="autoPostTemplate" class="form-control" rows="6"
-                              placeholder="Use {{name}}, {{size}}, {{price}}, {{type}} as placeholders">🏠 New Arrival! {{name}}
-
-📐 Size: {{size}}
-💰 Cash Price: {{price}}
-📍 Location: {{location}}
-
-Call us at {{phone}} or visit our website to learn more!
-
-#PortableBuildings #{{type}} #ForSale</textarea>
-                    <p class="help-text" style="color: #bc9c22;">Customize the post message. Available placeholders: {{name}}, {{size}}, {{price}}, {{type}}, {{location}}, {{phone}}, {{rto36}}, {{rto48}}, {{rto60}}, {{rto72}}, {{rtoAll}}</p>
-
-                    <div style="background: rgba(255, 214, 10, 0.1); border: 2px solid #ffd60a; border-radius: 8px; padding: 1.25rem; margin-top: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
-                            <span style="font-size: 1.5rem;">📝</span>
-                            <div style="flex: 1;">
-                                <strong style="color: #ffd60a; font-size: 1rem;">Need template inspiration?</strong>
-                                <p style="margin: 0.25rem 0 0 0; color: #bc9c22; font-size: 0.9rem;">Browse 10 high-converting Facebook post templates with preview examples</p>
-                            </div>
-                        </div>
-                        <a href="facebook-post-templates.html" target="_blank" class="btn btn-secondary" style="background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%); color: #1a1a2e; border: none; font-weight: 700; padding: 0.75rem 1.5rem; display: inline-block; text-decoration: none;">
-                            📋 View Template Library
-                        </a>
-                    </div>
-                </div>
-
-                <div class="form-group" style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px; border: 2px solid #bc9c22;">
-                    <h3 style="margin-top: 0; color: #bc9c22; font-size: 1.1rem;">🧪 Test Facebook Posting</h3>
-                    <p class="help-text" style="margin-bottom: 1rem; color: #bc9c22;">Send a test post to your Facebook page using a sample building from your inventory.</p>
-                    <button class="btn btn-warning" onclick="testFacebookPost()" id="test-fb-btn">
-                        📤 Send Test Post to Facebook
-                    </button>
-                    <p id="test-fb-status" class="help-text" style="margin-top: 0.75rem; margin-bottom: 0; font-weight: 600; color: #bc9c22;"></p>
-                </div>
-            </div>
 
             <div class="card" style="background: #1a1a2e; color: #bc9c22;">
                 <h2 style="color: #bc9c22;">Color Scheme</h2>
@@ -765,6 +659,120 @@ Call us at {{phone}} or visit our website to learn more!
                 </div>
 
                 <button class="btn btn-primary" onclick="saveInventorySettings()" style="margin-top: 2rem;">Save Inventory Settings</button>
+            </div>
+        </div>
+
+        <!-- Facebook Autoposting Tab -->
+        <div class="tab-content" id="facebook-tab">
+            <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 1.25rem; border-radius: 8px; margin-bottom: 2rem;">
+                <p style="margin: 0; font-weight: 600; color: #1976d2;">📱 Facebook Autoposting & Templates</p>
+                <p style="margin: 0.5rem 0 0 0; color: #555;">Set up automatic Facebook posting and choose from 10 high-converting post templates.</p>
+            </div>
+
+            <!-- Facebook Settings Card -->
+            <div class="card" style="background: #1a1a2e; color: #bc9c22; margin-bottom: 2rem;">
+                <h2 style="color: #bc9c22;">Facebook Auto-Posting</h2>
+                <p class="help-text" style="color: #bc9c22;">Automatically post new building listings to your Facebook page</p>
+
+                <div class="info-box" style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem;">
+                    <p style="margin: 0; font-weight: 600; color: #856404;">⚠️ Auto-Posting Requirements</p>
+                    <p style="margin: 0.5rem 0 0 0; color: #856404; font-size: 0.9rem;">Buildings will <strong>only</strong> auto-post to Facebook if they have:</p>
+                    <ul style="margin: 0.5rem 0 0 1.5rem; color: #856404; font-size: 0.9rem;">
+                        <li>At least one uploaded image</li>
+                        <li>Valid pricing information</li>
+                        <li>Complete building description (from serial number decoder)</li>
+                    </ul>
+                </div>
+
+                <!-- Facebook Connection Status -->
+                <div id="facebook-connected-2" style="display: none; background: #d4edda; border-left: 4px solid #28a745; padding: 1.25rem; border-radius: 6px; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                        <span style="font-size: 2rem;">✅</span>
+                        <div style="flex: 1;">
+                            <strong style="color: #155724; font-size: 1.05rem;">Facebook Page Connected</strong>
+                            <p style="margin: 0.25rem 0 0 0; color: #155724; font-size: 0.9rem;">
+                                Connected to: <strong id="connected-page-name-2"></strong>
+                            </p>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="disconnectFacebook()">Disconnect</button>
+                    </div>
+                </div>
+
+                <div id="facebook-not-connected-2" style="background: #f8f9fa; border: 2px dashed #dee2e6; padding: 2rem; border-radius: 8px; text-align: center; margin-bottom: 1.5rem;">
+                    <h3 style="color: #495057; margin-bottom: 1rem;">Connect Your Facebook Page</h3>
+                    <p style="color: #6c757d; margin-bottom: 1.5rem;">Click the button below to securely connect your Facebook page. No manual setup required!</p>
+                    <button class="btn btn-primary" onclick="connectFacebookOAuth()" style="background: #1877f2; padding: 0.875rem 2rem; font-size: 1.05rem;">
+                        <svg style="width: 20px; height: 20px; margin-right: 0.5rem; vertical-align: middle;" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        Connect with Facebook
+                    </button>
+                </div>
+
+                <div class="setting-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="enableAutoPost-2">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text" style="color: #bc9c22;">Enable Auto-Posting to Facebook</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label style="color: #bc9c22;">Auto-Post Conditions</label>
+                    <div style="margin-top: 0.5rem; display: block;">
+                        <label class="toggle-label" style="margin-bottom: 0.75rem; display: inline-flex;">
+                            <input type="checkbox" id="autoPostNewOnly-2" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text" style="color: #bc9c22;">Only post new inventory (not repos)</span>
+                        </label>
+                    </div>
+                    <div style="display: block;">
+                        <label class="toggle-label" style="margin-bottom: 0.75rem; display: inline-flex;">
+                            <input type="checkbox" id="autoPostWithImages-2" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text" style="color: #bc9c22;">Only post buildings with uploaded images</span>
+                        </label>
+                    </div>
+                    <div style="display: block;">
+                        <label class="toggle-label" style="display: inline-flex;">
+                            <input type="checkbox" id="autoPostAvailableOnly-2" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text" style="color: #bc9c22;">Only post available buildings (not sold/pending)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="autoPostTemplate-2" style="color: #bc9c22;">Post Template</label>
+                    <textarea id="autoPostTemplate-2" class="form-control" rows="10"
+                              placeholder="Use {{name}}, {{size}}, {{price}}, {{type}} as placeholders">🏠 New Arrival! {{name}}
+
+📐 Size: {{size}}
+💰 Cash Price: {{price}}
+📍 Location: {{location}}
+
+Call us at {{phone}} or visit our website to learn more!
+
+#PortableBuildings #{{type}} #ForSale</textarea>
+                    <p class="help-text" style="color: #bc9c22;">Customize the post message. Available placeholders: {{name}}, {{size}}, {{price}}, {{type}}, {{location}}, {{phone}}, {{rto36}}, {{rto48}}, {{rto60}}, {{rto72}}, {{rtoAll}}</p>
+                </div>
+
+                <div class="form-group" style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px; border: 2px solid #bc9c22;">
+                    <h3 style="margin-top: 0; color: #bc9c22; font-size: 1.1rem;">🧪 Test Facebook Posting</h3>
+                    <p class="help-text" style="margin-bottom: 1rem; color: #bc9c22;">Send a test post to your Facebook page using a sample building from your inventory.</p>
+                    <button class="btn btn-warning" onclick="testFacebookPost()" id="test-fb-btn-2">
+                        📤 Send Test Post to Facebook
+                    </button>
+                    <p id="test-fb-status-2" class="help-text" style="margin-top: 0.75rem; margin-bottom: 0; font-weight: 600; color: #bc9c22;"></p>
+                </div>
+            </div>
+
+            <!-- Template Library Section -->
+            <div class="card" style="background: white; padding: 2rem;">
+                <h2 style="color: #1a1a2e; margin-bottom: 1rem;">📋 High-Converting Facebook Templates</h2>
+                <p style="color: #555; margin-bottom: 1.5rem;">Choose from 10 research-backed templates designed for maximum engagement. Click "Use This Template" to auto-fill the template box above.</p>
+
+                <div id="template-library-container" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <!-- Templates will be dynamically loaded here -->
+                </div>
             </div>
         </div>
 
