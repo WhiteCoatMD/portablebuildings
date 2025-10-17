@@ -570,7 +570,7 @@ class InventoryApp {
                         </div>
                     </div>
 
-                    <button class="inquire-btn" onclick="openInquiryModal('${building.serialNumber}')" style="width: 100%; padding: 0.875rem; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-bottom: 0.75rem;">
+                    <button class="inquire-btn" onclick="openInquiryModal('${building.serialNumber}')" style="width: 100%; padding: 1rem; background: #28a745; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 0.75rem; position: relative; z-index: 10; pointer-events: auto; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(40, 167, 69, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(40, 167, 69, 0.3)'">
                         📧 Inquire About This Building
                     </button>
 
