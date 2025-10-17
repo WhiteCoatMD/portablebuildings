@@ -2455,13 +2455,19 @@ function loadBackgroundSettings() {
             }
 
             if (settings.type === 'solid') {
-                document.getElementById('customBgColor').value = settings.color;
-                document.getElementById('customBgColorHex').value = settings.color;
+                const bgColor = document.getElementById('customBgColor');
+                const bgColorHex = document.getElementById('customBgColorHex');
+                if (bgColor) bgColor.value = settings.color;
+                if (bgColorHex) bgColorHex.value = settings.color;
             } else {
-                document.getElementById('gradientColor1').value = settings.color1;
-                document.getElementById('gradientColor1Hex').value = settings.color1;
-                document.getElementById('gradientColor2').value = settings.color2;
-                document.getElementById('gradientColor2Hex').value = settings.color2;
+                const grad1 = document.getElementById('gradientColor1');
+                const grad1Hex = document.getElementById('gradientColor1Hex');
+                const grad2 = document.getElementById('gradientColor2');
+                const grad2Hex = document.getElementById('gradientColor2Hex');
+                if (grad1) grad1.value = settings.color1;
+                if (grad1Hex) grad1Hex.value = settings.color1;
+                if (grad2) grad2.value = settings.color2;
+                if (grad2Hex) grad2Hex.value = settings.color2;
             }
 
             updateBackgroundPreview();
@@ -3620,6 +3626,9 @@ async function disconnectFacebook() {
 }
 
 async function loadFacebookConnectionStatus() {
+    // Reload settings from database to ensure we have latest Facebook config
+    await loadFromDatabase();
+
     const pageName = getSetting('cpb_facebook_page_name', null);
     const pageId = getSetting('cpb_facebook_page_id', null);
 
