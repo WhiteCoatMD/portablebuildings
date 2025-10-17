@@ -658,7 +658,8 @@
                 'pending': 'status-new',
                 'in-progress': 'status-trial',
                 'completed': 'status-active',
-                'declined': 'status-cancelled'
+                'declined': 'status-cancelled',
+                'archived': 'status-expired'
             };
 
             const tableHTML = `
@@ -670,6 +671,7 @@
                             <th>Description</th>
                             <th>Status</th>
                             <th>Submitted</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -681,7 +683,7 @@
                                 </td>
                                 <td><strong>${request.title}</strong></td>
                                 <td>
-                                    <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${request.description.replace(/"/g, '&quot;')}">
                                         ${request.description}
                                     </div>
                                 </td>
@@ -696,6 +698,23 @@
                                         ${new Date(request.created_at).toLocaleTimeString()}
                                     </small>
                                 </td>
+                                <td>
+                                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <select onchange="updateFeatureRequestStatus(${request.id}, this.value, this)"
+                                                style="padding: 0.4rem; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                                            <option value="">Update Status...</option>
+                                            <option value="pending" ${request.status === 'pending' ? 'disabled' : ''}>Pending</option>
+                                            <option value="in-progress" ${request.status === 'in-progress' ? 'disabled' : ''}>In Progress</option>
+                                            <option value="completed" ${request.status === 'completed' ? 'disabled' : ''}>Completed</option>
+                                            <option value="declined" ${request.status === 'declined' ? 'disabled' : ''}>Declined</option>
+                                            <option value="archived" ${request.status === 'archived' ? 'disabled' : ''}>Archived</option>
+                                        </select>
+                                        <button class="btn btn-secondary" onclick="viewFeatureRequestDetails(${request.id})"
+                                                style="font-size: 0.8rem; padding: 0.4rem 0.6rem; width: 100%;">
+                                            👁️ View Details
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -703,6 +722,65 @@
             `;
 
             content.innerHTML = tableHTML;
+        }
+
+        async function updateFeatureRequestStatus(requestId, newStatus, selectElement) {
+            if (!newStatus) return;
+
+            try {
+                const response = await fetch('/api/super-admin/update-feature-request', {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ requestId, status: newStatus })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showError(`✅ Feature request updated to: ${newStatus}`);
+                    loadFeatureRequests(); // Reload the table
+                } else {
+                    showError('❌ ' + (data.error || 'Failed to update status'));
+                    selectElement.value = ''; // Reset dropdown
+                }
+            } catch (error) {
+                console.error('Update feature request error:', error);
+                showError('❌ Failed to update feature request');
+                selectElement.value = ''; // Reset dropdown
+            }
+        }
+
+        function viewFeatureRequestDetails(requestId) {
+            // Find the request in the current data
+            fetch('/api/super-admin/feature-requests', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const request = data.requests.find(r => r.id === requestId);
+                    if (request) {
+                        alert(`Feature Request Details\n\n` +
+                            `From: ${request.business_name} (${request.user_email})\n\n` +
+                            `Title: ${request.title}\n\n` +
+                            `Description:\n${request.description}\n\n` +
+                            `Status: ${request.status}\n` +
+                            `Submitted: ${new Date(request.created_at).toLocaleString()}\n` +
+                            `${request.updated_at ? `Updated: ${new Date(request.updated_at).toLocaleString()}` : ''}\n` +
+                            `${request.admin_notes ? `\nAdmin Notes: ${request.admin_notes}` : ''}`
+                        );
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching request details:', error);
+                showError('❌ Failed to load request details');
+            });
         }
 
         async function loadUsers() {
