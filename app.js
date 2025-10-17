@@ -639,11 +639,15 @@ class InventoryApp {
 
     async loadBuildingImagesAsync(serialNumber) {
         try {
-            // Get image order from localStorage
+            // Get userId from SITE_CONFIG if available (for dealer websites)
+            const userId = window.SITE_CONFIG ? window.SITE_CONFIG.userId : null;
+            const userIdParam = userId ? `&userId=${userId}` : '';
+
+            // Get image order from localStorage (fallback for non-multi-tenant sites)
             const imageOrder = localStorage.getItem('cpb_image_order');
             const orderParam = imageOrder ? `&order=${encodeURIComponent(imageOrder)}` : '';
 
-            const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}${orderParam}`);
+            const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}${userIdParam}${orderParam}`);
             const data = await response.json();
 
             if (data.success && data.images.length > 0) {

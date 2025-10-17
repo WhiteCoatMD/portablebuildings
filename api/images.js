@@ -1,4 +1,7 @@
 const { list, del } = require('@vercel/blob');
+const { getPool } = require('../lib/db');
+
+const pool = getPool();
 
 module.exports = async function handler(req, res) {
   // CORS headers
@@ -13,9 +16,9 @@ module.exports = async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       // Get images for a specific building
-      const { serialNumber } = req.query;
+      const { serialNumber, userId } = req.query;
 
-      console.log('GET images for:', serialNumber);
+      console.log('GET images for:', serialNumber, 'userId:', userId);
 
       if (!serialNumber) {
         return res.status(400).json({ error: 'Missing serialNumber parameter' });
@@ -28,14 +31,34 @@ module.exports = async function handler(req, res) {
 
       console.log('Found blobs:', blobs.length);
 
-      // Get image order from query param (set from localStorage on client side)
-      const orderParam = req.query.order;
+      // Try to get image order from database if userId is provided
       let imageOrder = {};
-      if (orderParam) {
+      if (userId) {
         try {
-          imageOrder = JSON.parse(decodeURIComponent(orderParam));
+          const settingsResult = await pool.query(
+            `SELECT setting_value FROM user_settings
+             WHERE user_id = $1 AND setting_key = 'imageOrders'`,
+            [userId]
+          );
+
+          if (settingsResult.rows.length > 0) {
+            imageOrder = JSON.parse(settingsResult.rows[0].setting_value);
+            console.log('Loaded image order from database for user', userId);
+          }
         } catch (e) {
-          console.log('Failed to parse order param:', e);
+          console.log('Failed to load image order from database:', e.message);
+        }
+      }
+
+      // Fall back to query param (set from localStorage on client side)
+      if (Object.keys(imageOrder).length === 0) {
+        const orderParam = req.query.order;
+        if (orderParam) {
+          try {
+            imageOrder = JSON.parse(decodeURIComponent(orderParam));
+          } catch (e) {
+            console.log('Failed to parse order param:', e);
+          }
         }
       }
 
