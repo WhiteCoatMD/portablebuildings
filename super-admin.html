@@ -148,6 +148,7 @@
         .status-active { background: #d4edda; color: #155724; }
         .status-cancelled { background: #f8d7da; color: #721c24; }
         .status-expired { background: #e2e3e5; color: #383d41; }
+        .status-new { background: #e7f3ff; color: #004085; }
 
         .plan-badge {
             display: inline-block;
@@ -390,6 +391,20 @@
                 <h3>Total Buildings</h3>
                 <div class="value" id="stat-total-buildings">-</div>
             </div>
+            <div class="stat-card" style="grid-column: span 2;">
+                <h3>Demo Requests</h3>
+                <div class="value" id="stat-demo-leads">-</div>
+            </div>
+        </div>
+
+        <!-- Demo Leads Table -->
+        <div class="users-table-container" style="margin-bottom: 2rem;">
+            <div class="table-header">
+                <h2>📧 Demo Requests</h2>
+            </div>
+            <div id="demo-leads-table-content">
+                <div class="loading"></div>
+            </div>
         </div>
 
         <!-- Users Table -->
@@ -485,6 +500,7 @@
         // Load data on page load
         loadStats();
         loadUsers();
+        loadDemoLeads();
 
         async function loadStats() {
             try {
@@ -508,6 +524,89 @@
                 console.error('Load stats error:', error);
                 showError('Failed to load statistics');
             }
+        }
+
+        async function loadDemoLeads() {
+            try {
+                const response = await fetch('/api/super-admin/demo-leads', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update stat card
+                    document.getElementById('stat-demo-leads').textContent = data.leads.length;
+
+                    // Render table
+                    renderDemoLeadsTable(data.leads);
+                } else {
+                    showError(data.error || 'Failed to load demo leads');
+                    document.getElementById('demo-leads-table-content').innerHTML =
+                        '<div style="padding: 2rem; text-align: center; color: #666;">Failed to load demo leads</div>';
+                }
+            } catch (error) {
+                console.error('Load demo leads error:', error);
+                showError('Failed to load demo leads');
+                document.getElementById('demo-leads-table-content').innerHTML =
+                    '<div style="padding: 2rem; text-align: center; color: #666;">Error loading demo leads</div>';
+            }
+        }
+
+        function renderDemoLeadsTable(leads) {
+            const content = document.getElementById('demo-leads-table-content');
+
+            if (leads.length === 0) {
+                content.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">No demo requests yet</div>';
+                return;
+            }
+
+            const tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Location</th>
+                            <th>Contact</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${leads.map(lead => `
+                            <tr>
+                                <td><strong>${lead.name}</strong></td>
+                                <td>${lead.city}, ${lead.state}</td>
+                                <td>
+                                    <div style="font-size: 0.9rem;">
+                                        📧 ${lead.email}<br>
+                                        📱 ${lead.phone}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-${lead.status}">
+                                        ${lead.status}
+                                    </span>
+                                </td>
+                                <td>
+                                    ${new Date(lead.createdAt).toLocaleDateString()}<br>
+                                    <small style="color: #666;">
+                                        ${new Date(lead.createdAt).toLocaleTimeString()}
+                                    </small>
+                                </td>
+                                <td>
+                                    ${lead.notes ? `<div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${lead.notes}</div>` : '<em style="color: #999;">No notes</em>'}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            content.innerHTML = tableHTML;
         }
 
         async function loadUsers() {
