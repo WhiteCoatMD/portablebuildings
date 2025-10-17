@@ -49,7 +49,7 @@ async function handler(req, res) {
         // Format and process inventory
         const inventory = scrapedData.map(item => {
             // Use decoder to get building details
-            const SerialNumberDecoder = require('../../decoder');
+            const { SerialNumberDecoder } = require('../../decoder');
             const decoder = new SerialNumberDecoder(item.serialNumber);
             const details = decoder.getFullDetails();
 
@@ -110,6 +110,7 @@ async function handler(req, res) {
                         updated_at = NOW()
                     WHERE user_inventory.user_id = EXCLUDED.user_id
                       AND user_inventory.serial_number = EXCLUDED.serial_number
+                      -- Note: images, status, and other user-customized fields are NOT updated during sync
                 `, [
                     req.user.id,
                     building.serialNumber,
