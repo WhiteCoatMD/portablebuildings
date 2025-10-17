@@ -4447,6 +4447,42 @@ async function testGoogleBusinessPost() {
     }
 }
 
+// Automated Marketing tab navigation functions
+function showMarketingPlatform(platform) {
+    // Hide platform selector
+    const selector = document.getElementById('marketing-platform-selector');
+    if (selector) {
+        selector.style.display = 'none';
+    }
+
+    // Hide both platform sections first
+    const facebookSection = document.getElementById('marketing-facebook-section');
+    const googleSection = document.getElementById('marketing-google-section');
+    if (facebookSection) facebookSection.style.display = 'none';
+    if (googleSection) googleSection.style.display = 'none';
+
+    // Show the selected platform section
+    if (platform === 'facebook' && facebookSection) {
+        facebookSection.style.display = 'block';
+    } else if (platform === 'google' && googleSection) {
+        googleSection.style.display = 'block';
+    }
+}
+
+function backToMarketingSelector() {
+    // Show platform selector
+    const selector = document.getElementById('marketing-platform-selector');
+    if (selector) {
+        selector.style.display = 'block';
+    }
+
+    // Hide both platform sections
+    const facebookSection = document.getElementById('marketing-facebook-section');
+    const googleSection = document.getElementById('marketing-google-section');
+    if (facebookSection) facebookSection.style.display = 'none';
+    if (googleSection) googleSection.style.display = 'none';
+}
+
 // Export new functions
 window.connectFacebookOAuth = connectFacebookOAuth;
 window.disconnectFacebook = disconnectFacebook;
@@ -4455,5 +4491,7 @@ window.connectGoogleBusinessOAuth = connectGoogleBusinessOAuth;
 window.disconnectGoogleBusiness = disconnectGoogleBusiness;
 window.loadGoogleBusinessConnectionStatus = loadGoogleBusinessConnectionStatus;
 window.testGoogleBusinessPost = testGoogleBusinessPost;
+window.showMarketingPlatform = showMarketingPlatform;
+window.backToMarketingSelector = backToMarketingSelector;
 
 // Simplified card layout - no expansion functionality needed
