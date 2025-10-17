@@ -780,6 +780,11 @@ async function loadBuildings() {
                 <div class="building-actions">
                     <button class="btn btn-sm btn-primary"
                             onclick="openImageModal('${building.serialNumber}')">📷 Images</button>
+                    <button class="btn btn-sm btn-primary"
+                            onclick="postBuildingToFacebook('${building.serialNumber}')"
+                            style="background: #1877f2;">
+                        📘 Post to Facebook
+                    </button>
                     <button class="btn btn-sm ${status === 'available' ? 'btn-success' : 'btn-secondary'}"
                             onclick="setBuildingStatus('${building.serialNumber}', 'available')">Available</button>
                     <button class="btn btn-sm ${status === 'pending' ? 'btn-warning' : 'btn-secondary'}"
@@ -2196,6 +2201,101 @@ async function testFacebookPost() {
     }
 }
 
+/**
+ * Post a specific building to Facebook manually
+ */
+async function postBuildingToFacebook(serialNumber) {
+    const config = getFacebookConfig();
+
+    if (!config || !config.pageId || !config.accessToken) {
+        showToast('❌ Please configure your Facebook Page connection first!', true);
+        return;
+    }
+
+    // Find the building in inventory
+    const inventory = window.PROCESSED_INVENTORY || [];
+    const building = inventory.find(b => b.serialNumber === serialNumber);
+
+    if (!building) {
+        showToast('❌ Building not found!', true);
+        return;
+    }
+
+    // Get building images
+    const images = await getBuildingImages(serialNumber);
+    if (!images || images.length === 0) {
+        const shouldPost = confirm(
+            `This building has no images uploaded yet.\n\n` +
+            `Facebook posts perform much better with images. Are you sure you want to post without images?`
+        );
+        if (!shouldPost) {
+            return;
+        }
+    }
+
+    const buildingWithImages = { ...building, images: images || [] };
+
+    // Show confirmation dialog with preview
+    const imageText = images && images.length > 0
+        ? `\n📷 ${images.length} image(s) will be included`
+        : '\n⚠️ No images will be included';
+
+    const shouldPost = confirm(
+        `Post this building to Facebook?\n\n` +
+        `🏠 ${building.title}\n` +
+        `📏 Size: ${building.sizeDisplay}\n` +
+        `💰 Price: $${building.price.toLocaleString()}\n` +
+        `📍 Location: ${building.location || 'Main Lot'}` +
+        imageText +
+        `\n\nThis will post immediately to your Facebook page.`
+    );
+
+    if (!shouldPost) {
+        return;
+    }
+
+    const businessPhone = getBusinessPhone();
+
+    // Show loading toast
+    showToast('⏳ Posting to Facebook...', false);
+
+    try {
+        const response = await fetch('/api/post-to-facebook', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            },
+            body: JSON.stringify({
+                building: buildingWithImages,
+                config,
+                businessPhone
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast(`✅ Successfully posted "${building.title}" to Facebook!`);
+
+            // Mark building as posted to prevent duplicate auto-posts
+            const postedBuildings = JSON.parse(localStorage.getItem(STORAGE_KEYS.POSTED_BUILDINGS) || '{}');
+            postedBuildings[serialNumber] = Date.now();
+            localStorage.setItem(STORAGE_KEYS.POSTED_BUILDINGS, JSON.stringify(postedBuildings));
+        } else if (result.requiresUpgrade) {
+            showToast(`⚠️ ${result.message}`, true);
+            if (confirm(`${result.message}\n\nWould you like to upgrade now?`)) {
+                upgradeToPremium();
+            }
+        } else {
+            showToast(`❌ Failed to post: ${result.error || 'Unknown error'}`, true);
+        }
+    } catch (error) {
+        console.error('Manual post error:', error);
+        showToast(`❌ Error posting to Facebook: ${error.message}`, true);
+    }
+}
+
 // Trigger auto-post when images are uploaded
 const originalHandleImageUpload = handleImageUpload;
 async function handleImageUploadWithAutoPost(event) {
@@ -3437,6 +3537,7 @@ window.triggerUserSync = triggerUserSync;
 window.resetButtonColor = resetButtonColor;
 window.checkAndPostToFacebook = checkAndPostToFacebook;
 window.testFacebookPost = testFacebookPost;
+window.postBuildingToFacebook = postBuildingToFacebook;
 window.toggleDayHours = toggleDayHours;
 window.syncUserInventory = syncUserInventory;
 window.showSyncModal = showSyncModal;
