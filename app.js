@@ -570,7 +570,7 @@ class InventoryApp {
                         </div>
                     </div>
 
-                    <button class="inquire-btn" onclick="openInquiryModal(event, '${building.serialNumber}')">
+                    <button class="inquire-btn" onclick="openInquiryModal('${building.serialNumber}')">
                         Inquire About This Building
                     </button>
 
