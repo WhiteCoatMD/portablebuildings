@@ -1158,62 +1158,40 @@ Call us at {{phone}} or visit our website to learn more!
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <h2 style="margin: 0;">📊 Sales Pipeline</h2>
-                    <button class="btn btn-secondary" onclick="loadLeads()">🔄 Refresh</button>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <div style="display: flex; gap: 0.75rem;">
+                            <span style="background: #2196f3; color: white; padding: 0.375rem 0.75rem; border-radius: 16px; font-size: 0.875rem; font-weight: 600;">🆕 <span id="new-count">0</span></span>
+                            <span style="background: #ff9800; color: white; padding: 0.375rem 0.75rem; border-radius: 16px; font-size: 0.875rem; font-weight: 600;">📞 <span id="contacted-count">0</span></span>
+                            <span style="background: #9c27b0; color: white; padding: 0.375rem 0.75rem; border-radius: 16px; font-size: 0.875rem; font-weight: 600;">💰 <span id="quoted-count">0</span></span>
+                            <span style="background: #4caf50; color: white; padding: 0.375rem 0.75rem; border-radius: 16px; font-size: 0.875rem; font-weight: 600;">✅ <span id="sold-count">0</span></span>
+                            <span style="background: #f44336; color: white; padding: 0.375rem 0.75rem; border-radius: 16px; font-size: 0.875rem; font-weight: 600;">❌ <span id="lost-count">0</span></span>
+                        </div>
+                        <button class="btn btn-secondary" onclick="loadLeads()">🔄 Refresh</button>
+                    </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                    <!-- New Leads Column -->
-                    <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
-                        <h3 style="color: #2196f3; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                            🆕 New <span id="new-count" style="background: #2196f3; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.875rem;">0</span>
-                        </h3>
-                        <div id="new-leads-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <!-- Lead cards will be inserted here -->
-                        </div>
-                    </div>
-
-                    <!-- Contacted Leads Column -->
-                    <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
-                        <h3 style="color: #ff9800; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                            📞 Contacted <span id="contacted-count" style="background: #ff9800; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.875rem;">0</span>
-                        </h3>
-                        <div id="contacted-leads-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <!-- Lead cards will be inserted here -->
-                        </div>
-                    </div>
-
-                    <!-- Quoted Leads Column -->
-                    <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
-                        <h3 style="color: #9c27b0; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                            💰 Quoted <span id="quoted-count" style="background: #9c27b0; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.875rem;">0</span>
-                        </h3>
-                        <div id="quoted-leads-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <!-- Lead cards will be inserted here -->
-                        </div>
-                    </div>
-
-                    <!-- Sold Leads Column -->
-                    <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
-                        <h3 style="color: #4caf50; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                            ✅ Sold <span id="sold-count" style="background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.875rem;">0</span>
-                        </h3>
-                        <div id="sold-leads-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <!-- Lead cards will be inserted here -->
-                        </div>
-                    </div>
+                <div style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: #666; font-size: 0.875rem;">Status</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: #666; font-size: 0.875rem;">Name</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: #666; font-size: 0.875rem;">Contact</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: #666; font-size: 0.875rem;">Building</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: #666; font-size: 0.875rem;">Date</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: #666; font-size: 0.875rem;">Source</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table-body">
+                            <!-- Lead rows will be inserted here -->
+                        </tbody>
+                    </table>
                 </div>
-            </div>
 
-            <!-- Lost Leads (Collapsed by default) -->
-            <div class="card" style="background: #f5f5f5;">
-                <details>
-                    <summary style="cursor: pointer; font-weight: 600; padding: 0.5rem; color: #666;">
-                        ❌ Lost Leads (<span id="lost-count">0</span>)
-                    </summary>
-                    <div id="lost-leads-list" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
-                        <!-- Lost lead cards will be inserted here -->
-                    </div>
-                </details>
+                <div id="empty-leads-message" style="display: none; padding: 3rem; text-align: center; color: #999;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+                    <p style="margin: 0;">No leads yet. Add your first lead above!</p>
+                </div>
             </div>
         </div>
 

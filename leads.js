@@ -116,73 +116,101 @@ async function loadLeads() {
 }
 
 /**
- * Render leads into pipeline columns
+ * Render leads into compact table view
  */
 function renderLeads() {
-    // Group leads by status
+    // Count leads by status
     const leadsByStatus = {
-        new: [],
-        contacted: [],
-        quoted: [],
-        sold: [],
-        lost: []
+        new: 0,
+        contacted: 0,
+        quoted: 0,
+        sold: 0,
+        lost: 0
     };
 
     currentLeads.forEach(lead => {
-        if (leadsByStatus[lead.status]) {
-            leadsByStatus[lead.status].push(lead);
+        if (leadsByStatus.hasOwnProperty(lead.status)) {
+            leadsByStatus[lead.status]++;
         }
     });
 
     // Update counts
-    document.getElementById('new-count').textContent = leadsByStatus.new.length;
-    document.getElementById('contacted-count').textContent = leadsByStatus.contacted.length;
-    document.getElementById('quoted-count').textContent = leadsByStatus.quoted.length;
-    document.getElementById('sold-count').textContent = leadsByStatus.sold.length;
-    document.getElementById('lost-count').textContent = leadsByStatus.lost.length;
+    document.getElementById('new-count').textContent = leadsByStatus.new;
+    document.getElementById('contacted-count').textContent = leadsByStatus.contacted;
+    document.getElementById('quoted-count').textContent = leadsByStatus.quoted;
+    document.getElementById('sold-count').textContent = leadsByStatus.sold;
+    document.getElementById('lost-count').textContent = leadsByStatus.lost;
 
-    // Render each column
-    document.getElementById('new-leads-list').innerHTML = leadsByStatus.new.map(renderLeadCard).join('');
-    document.getElementById('contacted-leads-list').innerHTML = leadsByStatus.contacted.map(renderLeadCard).join('');
-    document.getElementById('quoted-leads-list').innerHTML = leadsByStatus.quoted.map(renderLeadCard).join('');
-    document.getElementById('sold-leads-list').innerHTML = leadsByStatus.sold.map(renderLeadCard).join('');
-    document.getElementById('lost-leads-list').innerHTML = leadsByStatus.lost.map(renderLeadCard).join('');
+    // Render table rows
+    const tbody = document.getElementById('leads-table-body');
+    const emptyMessage = document.getElementById('empty-leads-message');
+
+    if (currentLeads.length === 0) {
+        tbody.innerHTML = '';
+        emptyMessage.style.display = 'block';
+    } else {
+        emptyMessage.style.display = 'none';
+        tbody.innerHTML = currentLeads.map(renderLeadRow).join('');
+    }
 }
 
 /**
- * Render a single lead card
+ * Render a single lead as a table row
  */
-function renderLeadCard(lead) {
+function renderLeadRow(lead) {
     const priorityColors = {
         high: '#f44336',
         medium: '#ff9800',
         low: '#4caf50'
     };
 
+    const statusConfig = {
+        new: { color: '#2196f3', icon: '🆕', label: 'New' },
+        contacted: { color: '#ff9800', icon: '📞', label: 'Contacted' },
+        quoted: { color: '#9c27b0', icon: '💰', label: 'Quoted' },
+        sold: { color: '#4caf50', icon: '✅', label: 'Sold' },
+        lost: { color: '#f44336', icon: '❌', label: 'Lost' }
+    };
+
     const priorityColor = priorityColors[lead.priority] || '#999';
+    const status = statusConfig[lead.status] || { color: '#999', icon: '●', label: lead.status };
 
     const contactInfo = [
         lead.customerPhone ? `📞 ${lead.customerPhone}` : null,
         lead.customerEmail ? `📧 ${lead.customerEmail}` : null
-    ].filter(Boolean).join('<br>');
+    ].filter(Boolean).join(' • ');
 
-    const createdDate = new Date(lead.createdAt).toLocaleDateString();
+    const createdDate = new Date(lead.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
     return `
-        <div class="lead-card" style="background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s;"
-             onclick="viewLeadDetails(${lead.id})">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                <strong style="font-size: 1.05rem; color: #333;">${lead.customerName}</strong>
-                <span style="width: 12px; height: 12px; border-radius: 50%; background: ${priorityColor}; display: inline-block;" title="${lead.priority} priority"></span>
-            </div>
-            <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">
-                ${contactInfo}
-            </div>
-            ${lead.buildingSerial ? `<div style="font-size: 0.75rem; color: #999; margin-bottom: 0.25rem;">🏠 ${lead.buildingSerial}</div>` : ''}
-            <div style="font-size: 0.75rem; color: #999; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eee;">
-                ${createdDate} • ${lead.source}
-            </div>
-        </div>
+        <tr style="border-bottom: 1px solid #e0e0e0; cursor: pointer; transition: background 0.2s;"
+            onclick="viewLeadDetails(${lead.id})"
+            onmouseover="this.style.background='#f8f9fa'"
+            onmouseout="this.style.background='white'">
+            <td style="padding: 0.875rem 1rem;">
+                <span style="display: inline-flex; align-items: center; gap: 0.375rem; background: ${status.color}; color: white; padding: 0.375rem 0.75rem; border-radius: 16px; font-size: 0.8rem; font-weight: 600;">
+                    ${status.icon} ${status.label}
+                </span>
+            </td>
+            <td style="padding: 0.875rem 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <strong style="color: #333; font-size: 0.95rem;">${lead.customerName}</strong>
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: ${priorityColor}; display: inline-block;" title="${lead.priority} priority"></span>
+                </div>
+            </td>
+            <td style="padding: 0.875rem 1rem; font-size: 0.875rem; color: #666;">
+                ${contactInfo || '—'}
+            </td>
+            <td style="padding: 0.875rem 1rem; font-size: 0.875rem; color: #666;">
+                ${lead.buildingSerial ? `🏠 ${lead.buildingSerial}` : '—'}
+            </td>
+            <td style="padding: 0.875rem 1rem; font-size: 0.875rem; color: #666;">
+                ${createdDate}
+            </td>
+            <td style="padding: 0.875rem 1rem; font-size: 0.875rem; color: #666; text-transform: capitalize;">
+                ${lead.source}
+            </td>
+        </tr>
     `;
 }
 
