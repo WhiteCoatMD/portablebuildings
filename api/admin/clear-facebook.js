@@ -34,15 +34,18 @@ module.exports = async (req, res) => {
 
         console.log('[Clear FB] Clearing Facebook tokens for user:', userId);
 
-        // Delete all Facebook-related settings for this user
+        // Delete ALL Facebook-related settings for this user
         const result = await pool.query(`
             DELETE FROM user_settings
             WHERE user_id = $1
-            AND setting_key IN (
-                'cpb_facebook_page_id',
-                'cpb_facebook_access_token',
-                'cpb_facebook_page_name',
-                'cpb_facebook_config'
+            AND (
+                setting_key IN (
+                    'cpb_facebook_page_id',
+                    'cpb_facebook_access_token',
+                    'cpb_facebook_page_name',
+                    'cpb_facebook_config'
+                )
+                OR setting_key LIKE '%facebook%'
             )
         `, [userId]);
 
