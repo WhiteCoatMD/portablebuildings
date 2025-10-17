@@ -369,30 +369,69 @@ function switchTab(tabName) {
     }
 }
 
+// Ticker settings state
+const tickerSettings = {
+    showCashPrice: { value: true, options: [true, false], labels: ['Enabled', 'Disabled'] },
+    showRtoOptions: { value: true, options: [true, false], labels: ['Enabled', 'Disabled'] },
+    repoSortOrder: { value: 'last', options: ['last', 'first'], labels: ['Show Last', 'Show First'] },
+    repoPriceDisplay: { value: 'strikethrough', options: ['strikethrough', 'discounted'], labels: ['Strikethrough', 'Discounted'] },
+    soldBuildingBehavior: { value: 'auto-delete', options: ['auto-delete', 'manual-delete'], labels: ['Auto-Delete', 'Manual Delete'] }
+};
+
+// Toggle ticker setting (for boolean options)
+function toggleTickerSetting(settingName) {
+    const setting = tickerSettings[settingName];
+    const currentIndex = setting.options.indexOf(setting.value);
+    const nextIndex = (currentIndex + 1) % setting.options.length;
+    setting.value = setting.options[nextIndex];
+
+    // Update display
+    const valueEl = document.getElementById(`${settingName}-value`);
+    if (valueEl) {
+        valueEl.textContent = setting.labels[nextIndex];
+    }
+}
+
+// Cycle ticker setting (for multi-option settings)
+function cycleTickerSetting(settingName) {
+    const setting = tickerSettings[settingName];
+    const currentIndex = setting.options.indexOf(setting.value);
+    const nextIndex = (currentIndex + 1) % setting.options.length;
+    setting.value = setting.options[nextIndex];
+
+    // Update display
+    const valueEl = document.getElementById(`${settingName}-value`);
+    if (valueEl) {
+        valueEl.textContent = setting.labels[nextIndex];
+    }
+}
+
 // Settings Management
 function loadSettings() {
     const settings = getSettings();
 
-    // Account Settings tab - Display toggles
-    document.getElementById('showCashPrice').checked = settings.showCashPrice;
-    document.getElementById('showRtoOptions').checked = settings.showRtoOptions;
+    // Load values into ticker settings state
+    tickerSettings.showCashPrice.value = settings.showCashPrice ?? true;
+    tickerSettings.showRtoOptions.value = settings.showRtoOptions ?? true;
+    tickerSettings.repoSortOrder.value = settings.repoSortOrder || 'last';
+    tickerSettings.repoPriceDisplay.value = settings.repoPriceDisplay || 'strikethrough';
+    tickerSettings.soldBuildingBehavior.value = settings.soldBuildingBehavior || 'auto-delete';
 
-    // Inventory Settings tab - Repo options (radio buttons)
-    const repoSortOrder = settings.repoSortOrder || 'last';
-    const repoPriceDisplay = settings.repoPriceDisplay || 'strikethrough';
-    const soldBuildingBehavior = settings.soldBuildingBehavior || 'auto-delete';
+    // Update UI displays
+    updateTickerDisplay('showCashPrice');
+    updateTickerDisplay('showRtoOptions');
+    updateTickerDisplay('repoSortOrder');
+    updateTickerDisplay('repoPriceDisplay');
+    updateTickerDisplay('soldBuildingBehavior');
+}
 
-    // Set radio buttons for repo sort order
-    const sortOrderRadio = document.querySelector(`input[name="repoSortOrder"][value="${repoSortOrder}"]`);
-    if (sortOrderRadio) sortOrderRadio.checked = true;
-
-    // Set radio buttons for repo price display
-    const priceDisplayRadio = document.querySelector(`input[name="repoPriceDisplay"][value="${repoPriceDisplay}"]`);
-    if (priceDisplayRadio) priceDisplayRadio.checked = true;
-
-    // Set radio buttons for sold building behavior
-    const soldBehaviorRadio = document.querySelector(`input[name="soldBuildingBehavior"][value="${soldBuildingBehavior}"]`);
-    if (soldBehaviorRadio) soldBehaviorRadio.checked = true;
+function updateTickerDisplay(settingName) {
+    const setting = tickerSettings[settingName];
+    const valueEl = document.getElementById(`${settingName}-value`);
+    if (valueEl && setting) {
+        const index = setting.options.indexOf(setting.value);
+        valueEl.textContent = setting.labels[index];
+    }
 }
 
 function getSettings() {
@@ -412,20 +451,18 @@ async function saveSettings() {
     showToast('Settings saved successfully!');
 }
 
-// Save Inventory Settings (Repo display options)
+// Save Inventory Settings (All display and inventory options)
 async function saveInventorySettings() {
     const currentSettings = getSettings();
 
-    // Get selected radio button values
-    const repoSortOrder = document.querySelector('input[name="repoSortOrder"]:checked')?.value || 'last';
-    const repoPriceDisplay = document.querySelector('input[name="repoPriceDisplay"]:checked')?.value || 'strikethrough';
-    const soldBuildingBehavior = document.querySelector('input[name="soldBuildingBehavior"]:checked')?.value || 'auto-delete';
-
+    // Get values from ticker settings
     const settings = {
         ...currentSettings,
-        repoSortOrder,
-        repoPriceDisplay,
-        soldBuildingBehavior
+        showCashPrice: tickerSettings.showCashPrice.value,
+        showRtoOptions: tickerSettings.showRtoOptions.value,
+        repoSortOrder: tickerSettings.repoSortOrder.value,
+        repoPriceDisplay: tickerSettings.repoPriceDisplay.value,
+        soldBuildingBehavior: tickerSettings.soldBuildingBehavior.value
     };
 
     await saveSetting(STORAGE_KEYS.SETTINGS, settings);
