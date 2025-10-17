@@ -38,6 +38,10 @@ module.exports = async (req, res) => {
             state: userId // Pass userId through OAuth flow
         })}`;
 
+        console.log('[GBP OAuth Init] Generated auth URL:', authUrl);
+        console.log('[GBP OAuth Init] Client ID:', clientId);
+        console.log('[GBP OAuth Init] Redirect URI:', redirectUri);
+
         return res.status(200).json({
             success: true,
             authUrl: authUrl
