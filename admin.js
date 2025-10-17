@@ -369,68 +369,60 @@ function switchTab(tabName) {
     }
 }
 
-// Ticker settings state
-const tickerSettings = {
-    showCashPrice: { value: true, options: [true, false], labels: ['Enabled', 'Disabled'] },
-    showRtoOptions: { value: true, options: [true, false], labels: ['Enabled', 'Disabled'] },
-    repoSortOrder: { value: 'last', options: ['last', 'first'], labels: ['Show Last', 'Show First'] },
-    repoPriceDisplay: { value: 'strikethrough', options: ['strikethrough', 'discounted'], labels: ['Strikethrough', 'Discounted'] },
-    soldBuildingBehavior: { value: 'auto-delete', options: ['auto-delete', 'manual-delete'], labels: ['Auto-Delete', 'Manual Delete'] }
+// Bubble button settings state
+const bubbleSettings = {
+    showCashPrice: true,
+    showRtoOptions: true,
+    repoSortOrder: 'last',
+    repoPriceDisplay: 'strikethrough',
+    soldBuildingBehavior: 'auto-delete'
 };
 
-// Toggle ticker setting (for boolean options)
-function toggleTickerSetting(settingName) {
-    const setting = tickerSettings[settingName];
-    const currentIndex = setting.options.indexOf(setting.value);
-    const nextIndex = (currentIndex + 1) % setting.options.length;
-    setting.value = setting.options[nextIndex];
+// Handle bubble button selection
+function selectBubble(buttonElement, settingName, value) {
+    // Update the state
+    bubbleSettings[settingName] = value;
 
-    // Update display
-    const valueEl = document.getElementById(`${settingName}-value`);
-    if (valueEl) {
-        valueEl.textContent = setting.labels[nextIndex];
-    }
-}
+    // Remove active class from all buttons in this group
+    const allButtons = document.querySelectorAll(`[data-setting="${settingName}"]`);
+    allButtons.forEach(btn => btn.classList.remove('active'));
 
-// Cycle ticker setting (for multi-option settings)
-function cycleTickerSetting(settingName) {
-    const setting = tickerSettings[settingName];
-    const currentIndex = setting.options.indexOf(setting.value);
-    const nextIndex = (currentIndex + 1) % setting.options.length;
-    setting.value = setting.options[nextIndex];
-
-    // Update display
-    const valueEl = document.getElementById(`${settingName}-value`);
-    if (valueEl) {
-        valueEl.textContent = setting.labels[nextIndex];
-    }
+    // Add active class to clicked button
+    buttonElement.classList.add('active');
 }
 
 // Settings Management
 function loadSettings() {
     const settings = getSettings();
 
-    // Load values into ticker settings state
-    tickerSettings.showCashPrice.value = settings.showCashPrice ?? true;
-    tickerSettings.showRtoOptions.value = settings.showRtoOptions ?? true;
-    tickerSettings.repoSortOrder.value = settings.repoSortOrder || 'last';
-    tickerSettings.repoPriceDisplay.value = settings.repoPriceDisplay || 'strikethrough';
-    tickerSettings.soldBuildingBehavior.value = settings.soldBuildingBehavior || 'auto-delete';
+    // Load values into bubble settings state
+    bubbleSettings.showCashPrice = settings.showCashPrice ?? true;
+    bubbleSettings.showRtoOptions = settings.showRtoOptions ?? true;
+    bubbleSettings.repoSortOrder = settings.repoSortOrder || 'last';
+    bubbleSettings.repoPriceDisplay = settings.repoPriceDisplay || 'strikethrough';
+    bubbleSettings.soldBuildingBehavior = settings.soldBuildingBehavior || 'auto-delete';
 
-    // Update UI displays
-    updateTickerDisplay('showCashPrice');
-    updateTickerDisplay('showRtoOptions');
-    updateTickerDisplay('repoSortOrder');
-    updateTickerDisplay('repoPriceDisplay');
-    updateTickerDisplay('soldBuildingBehavior');
+    // Update UI - set active states on bubble buttons
+    updateBubbleButtons();
 }
 
-function updateTickerDisplay(settingName) {
-    const setting = tickerSettings[settingName];
-    const valueEl = document.getElementById(`${settingName}-value`);
-    if (valueEl && setting) {
-        const index = setting.options.indexOf(setting.value);
-        valueEl.textContent = setting.labels[index];
+function updateBubbleButtons() {
+    // Update each setting's bubble buttons
+    for (const [settingName, value] of Object.entries(bubbleSettings)) {
+        const buttons = document.querySelectorAll(`[data-setting="${settingName}"]`);
+        buttons.forEach(btn => {
+            const btnValue = btn.getAttribute('data-value');
+            // Convert string values to proper types for comparison
+            let compareValue = value;
+            if (btnValue === 'true') compareValue = true;
+            else if (btnValue === 'false') compareValue = false;
+
+            if (btnValue == compareValue) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
     }
 }
 
@@ -455,14 +447,14 @@ async function saveSettings() {
 async function saveInventorySettings() {
     const currentSettings = getSettings();
 
-    // Get values from ticker settings
+    // Get values from bubble settings
     const settings = {
         ...currentSettings,
-        showCashPrice: tickerSettings.showCashPrice.value,
-        showRtoOptions: tickerSettings.showRtoOptions.value,
-        repoSortOrder: tickerSettings.repoSortOrder.value,
-        repoPriceDisplay: tickerSettings.repoPriceDisplay.value,
-        soldBuildingBehavior: tickerSettings.soldBuildingBehavior.value
+        showCashPrice: bubbleSettings.showCashPrice,
+        showRtoOptions: bubbleSettings.showRtoOptions,
+        repoSortOrder: bubbleSettings.repoSortOrder,
+        repoPriceDisplay: bubbleSettings.repoPriceDisplay,
+        soldBuildingBehavior: bubbleSettings.soldBuildingBehavior
     };
 
     await saveSetting(STORAGE_KEYS.SETTINGS, settings);
