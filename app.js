@@ -570,6 +570,10 @@ class InventoryApp {
                         </div>
                     </div>
 
+                    <button class="inquire-btn" onclick="openInquiryModal('${building.serialNumber}')" style="width: 100%; padding: 0.875rem; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-bottom: 0.75rem;">
+                        📧 Inquire About This Building
+                    </button>
+
                     <div class="share-buttons">
                         <button class="share-btn" onclick="shareBuilding(event, 'facebook', '${building.serialNumber}')" title="Share on Facebook">
                             <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">

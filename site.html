@@ -212,9 +212,132 @@
         </div>
     </footer>
 
+    <!-- Lead Inquiry Modal -->
+    <div class="modal" id="inquiry-modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="inquiry-modal-title">Inquire About This Building</h2>
+                <button class="modal-close" onclick="closeInquiryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: #666; margin-bottom: 1.5rem;">Fill out the form below and we'll be in touch soon!</p>
+
+                <form id="inquiry-form" onsubmit="submitInquiry(event)">
+                    <input type="hidden" id="inquiry-building-serial" name="buildingSerial">
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="inquiry-name" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Your Name *</label>
+                        <input type="text" id="inquiry-name" name="customerName" class="form-control" placeholder="John Smith" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="inquiry-phone" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Phone Number *</label>
+                        <input type="tel" id="inquiry-phone" name="customerPhone" class="form-control" placeholder="318-555-1234" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="inquiry-email" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email</label>
+                        <input type="email" id="inquiry-email" name="customerEmail" class="form-control" placeholder="john@example.com" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label for="inquiry-notes" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Message (optional)</label>
+                        <textarea id="inquiry-notes" name="notes" class="form-control" rows="3" placeholder="Let us know if you have any questions..." style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; resize: vertical;"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                        Send Inquiry
+                    </button>
+                </form>
+
+                <div id="inquiry-success" style="display: none; text-align: center; padding: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+                    <h3 style="margin-bottom: 0.5rem;">Thank You!</h3>
+                    <p style="color: #666;">We received your inquiry and will be in touch soon.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="decoder.js"></script>
     <script src="site-loader.js"></script>
     <!-- inventory.js removed - site-loader.js now loads user-specific inventory from API -->
     <script src="app.js"></script>
+    <script>
+    // Lead Inquiry Functions
+    let currentInquiryBuilding = null;
+
+    function openInquiryModal(serialNumber) {
+        const building = window.PROCESSED_INVENTORY.find(b => b.serialNumber === serialNumber);
+        if (!building) return;
+
+        currentInquiryBuilding = building;
+        document.getElementById('inquiry-building-serial').value = serialNumber;
+        document.getElementById('inquiry-modal-title').textContent = `Inquire About: ${building.title}`;
+
+        // Reset form
+        document.getElementById('inquiry-form').reset();
+        document.getElementById('inquiry-form').style.display = 'block';
+        document.getElementById('inquiry-success').style.display = 'none';
+
+        // Show modal
+        document.getElementById('inquiry-modal').style.display = 'flex';
+    }
+
+    function closeInquiryModal() {
+        document.getElementById('inquiry-modal').style.display = 'none';
+        currentInquiryBuilding = null;
+    }
+
+    async function submitInquiry(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        const data = {
+            customerName: formData.get('customerName'),
+            customerPhone: formData.get('customerPhone'),
+            customerEmail: formData.get('customerEmail'),
+            buildingSerial: formData.get('buildingSerial'),
+            notes: formData.get('notes'),
+            subdomain: window.SITE_CONFIG ? window.SITE_CONFIG.subdomain : null
+        };
+
+        try {
+            const response = await fetch('/api/public/submit-lead', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Show success message
+                document.getElementById('inquiry-form').style.display = 'none';
+                document.getElementById('inquiry-success').style.display = 'block';
+
+                // Close modal after 3 seconds
+                setTimeout(() => {
+                    closeInquiryModal();
+                }, 3000);
+            } else {
+                alert('Sorry, there was an error submitting your inquiry. Please call us directly.');
+            }
+        } catch (error) {
+            console.error('Error submitting inquiry:', error);
+            alert('Sorry, there was an error submitting your inquiry. Please call us directly.');
+        }
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', (e) => {
+        const modal = document.getElementById('inquiry-modal');
+        if (modal && e.target === modal) {
+            closeInquiryModal();
+        }
+    });
+    </script>
 </body>
 </html>
