@@ -2184,6 +2184,12 @@ async function testFacebookPost() {
     const btn = document.getElementById('test-fb-btn');
     const status = document.getElementById('test-fb-status');
 
+    // First, save the current template value before testing
+    const templateTextarea = document.getElementById('autoPostTemplate');
+    if (templateTextarea && templateTextarea.value) {
+        await saveFacebookTemplate(templateTextarea.value);
+    }
+
     const config = getFacebookConfig();
 
     if (!config || !config.pageId || !config.accessToken) {
@@ -3583,6 +3589,66 @@ async function updatePaymentMethod() {
     }
 }
 
+// Feature Request Functions
+function openFeatureRequest() {
+    const modal = document.getElementById('feature-request-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        // Clear previous values
+        document.getElementById('featureTitle').value = '';
+        document.getElementById('featureDescription').value = '';
+    }
+}
+
+function closeFeatureRequest() {
+    const modal = document.getElementById('feature-request-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+async function submitFeatureRequest() {
+    const title = document.getElementById('featureTitle').value.trim();
+    const description = document.getElementById('featureDescription').value.trim();
+
+    if (!title) {
+        showToast('Please enter a title for your feature request', true);
+        return;
+    }
+
+    if (!description) {
+        showToast('Please describe your feature request', true);
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('/api/feature-request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                title,
+                description
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('✅ Feature request submitted successfully!');
+            closeFeatureRequest();
+        } else {
+            showToast(`❌ Failed to submit: ${result.error}`, true);
+        }
+    } catch (error) {
+        console.error('Feature request error:', error);
+        showToast('❌ Failed to submit feature request', true);
+    }
+}
+
 // Export functions to global scope
 window.saveSettings = saveSettings;
 window.saveCustomization = saveCustomization;
@@ -3621,6 +3687,9 @@ window.copyDnsValue = copyDnsValue;
 window.updatePaymentMethod = updatePaymentMethod;
 window.checkSubdomainAvailability = checkSubdomainAvailability;
 window.saveSubdomain = saveSubdomain;
+window.openFeatureRequest = openFeatureRequest;
+window.closeFeatureRequest = closeFeatureRequest;
+window.submitFeatureRequest = submitFeatureRequest;
 
 // Facebook OAuth Functions
 async function connectFacebookOAuth() {

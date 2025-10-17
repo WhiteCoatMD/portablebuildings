@@ -1,0 +1,138 @@
+<!-- Leads Tab - INSERT THIS AFTER domain-tab and BEFORE payments-tab -->
+<div class="tab-content" id="leads-tab">
+    <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 1.25rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin: 0 0 0.5rem 0; color: #1976d2; font-size: 1.1rem;">Lead Management</h3>
+        <p style="margin: 0; color: #1565c0; line-height: 1.6;">Track customer inquiries and manage your sales pipeline. Add new leads, update status, add notes, and never miss a follow-up.</p>
+    </div>
+
+    <!-- Quick Add Lead Form -->
+    <div class="card" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 2px solid #ffd60a;">
+        <h2 style="color: #ffd60a;">➕ Add New Lead</h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+                <label style="color: #fff;">Customer Name *</label>
+                <input type="text" id="new-lead-name" class="form-control" placeholder="John Smith" required>
+            </div>
+            <div class="form-group">
+                <label style="color: #fff;">Phone</label>
+                <input type="tel" id="new-lead-phone" class="form-control" placeholder="318-555-1234">
+            </div>
+            <div class="form-group">
+                <label style="color: #fff;">Email</label>
+                <input type="email" id="new-lead-email" class="form-control" placeholder="john@example.com">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div class="form-group">
+                <label style="color: #fff;">Source</label>
+                <select id="new-lead-source" class="form-control">
+                    <option value="website">Website</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="phone">Phone Call</option>
+                    <option value="walk-in">Walk-in</option>
+                    <option value="referral">Referral</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label style="color: #fff;">Priority</label>
+                <select id="new-lead-priority" class="form-control">
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label style="color: #fff;">Interested Building (optional)</label>
+                <input type="text" id="new-lead-building" class="form-control" placeholder="Serial #">
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+            <label style="color: #fff;">Notes</label>
+            <textarea id="new-lead-notes" class="form-control" rows="2" placeholder="Customer notes..."></textarea>
+        </div>
+
+        <button class="btn btn-primary btn-lg" onclick="addNewLead()" style="background: linear-gradient(135deg, #ffd60a 0%, #ffea00 100%); color: #1a1a2e; margin-top: 1rem;">
+            ➕ Add Lead
+        </button>
+    </div>
+
+    <!-- Lead Pipeline -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0;">📊 Sales Pipeline</h2>
+            <button class="btn btn-secondary" onclick="loadLeads()">🔄 Refresh</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+            <!-- New Leads Column -->
+            <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+                <h3 style="color: #2196f3; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                    🆕 New <span id="new-count" style="background: #2196f3; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.875rem;">0</span>
+                </h3>
+                <div id="new-leads-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <!-- Lead cards will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Contacted Leads Column -->
+            <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+                <h3 style="color: #ff9800; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                    📞 Contacted <span id="contacted-count" style="background: #ff9800; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.875rem;">0</span>
+                </h3>
+                <div id="contacted-leads-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <!-- Lead cards will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Quoted Leads Column -->
+            <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+                <h3 style="color: #9c27b0; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                    💰 Quoted <span id="quoted-count" style="background: #9c27b0; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.875rem;">0</span>
+                </h3>
+                <div id="quoted-leads-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <!-- Lead cards will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Sold Leads Column -->
+            <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+                <h3 style="color: #4caf50; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                    ✅ Sold <span id="sold-count" style="background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.875rem;">0</span>
+                </h3>
+                <div id="sold-leads-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <!-- Lead cards will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lost Leads (Collapsed by default) -->
+    <div class="card" style="background: #f5f5f5;">
+        <details>
+            <summary style="cursor: pointer; font-weight: 600; padding: 0.5rem; color: #666;">
+                ❌ Lost Leads (<span id="lost-count">0</span>)
+            </summary>
+            <div id="lost-leads-list" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                <!-- Lost lead cards will be inserted here -->
+            </div>
+        </details>
+    </div>
+</div>
+
+<!-- Lead Detail Modal -->
+<div class="modal" id="lead-modal" style="display: none;">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h2 id="lead-modal-title">Lead Details</h2>
+            <button class="modal-close" onclick="closeLeadModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="lead-modal-content">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -24,6 +24,7 @@
             </div>
             <div class="header-actions">
                 <span id="user-email" style="margin-right: 1rem; color: #e0e0e0;"></span>
+                <button class="btn btn-warning" onclick="openFeatureRequest()" style="margin-right: 0.5rem;">💡 Request Feature</button>
                 <a href="super-admin.html" class="btn btn-secondary" id="super-admin-link" style="display: none; margin-right: 0.5rem;">Super Admin</a>
                 <a href="#" id="view-site-link" target="_blank" class="btn btn-secondary" onclick="viewSiteFromHeader(event)">View Site</a>
                 <button class="btn btn-secondary" onclick="logout()" style="margin-left: 0.5rem;">Logout</button>
@@ -1526,6 +1527,37 @@ Call us at {{phone}} or visit our website to learn more!
 
                 <div class="modal-footer">
                     <button class="btn btn-secondary" onclick="closeImageModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Request Modal -->
+    <div class="modal" id="feature-request-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💡 Request a Feature</h2>
+                <button class="modal-close" onclick="closeFeatureRequest()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="help-text" style="margin-bottom: 1.5rem;">
+                    Need a feature we don't have? Send us a message and we'll see what we can do!
+                </p>
+
+                <div class="form-group">
+                    <label for="featureTitle">Feature Title</label>
+                    <input type="text" id="featureTitle" class="form-control" placeholder="Brief title for your feature request" maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="featureDescription">Description</label>
+                    <textarea id="featureDescription" class="form-control" rows="6" placeholder="Describe the feature you'd like to see and how it would help you..." maxlength="1000"></textarea>
+                    <p class="help-text">Please be as detailed as possible so we can understand your needs.</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeFeatureRequest()">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitFeatureRequest()">Submit Request</button>
                 </div>
             </div>
         </div>
