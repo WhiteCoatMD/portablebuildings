@@ -570,9 +570,9 @@ class InventoryApp {
                         </div>
                     </div>
 
-                    <div style="display: flex; justify-content: center; margin-bottom: 0.75rem;">
-                        <button class="inquire-btn" onclick="event.stopPropagation(); openInquiryModal('${building.serialNumber}')" style="width: 75%; padding: 1rem; background: #28a745; color: white; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700; cursor: pointer; position: relative; z-index: 999; pointer-events: auto; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3); text-align: center; line-height: 1.3;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(40, 167, 69, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(40, 167, 69, 0.3)'" onmousedown="event.stopPropagation()">
-                            📧 Inquire About This Building
+                    <div style="display: flex; justify-content: center; margin-bottom: 0.75rem; position: relative; z-index: 1000;">
+                        <button class="inquire-btn" onclick="event.stopPropagation(); event.preventDefault(); openInquiryModal('${building.serialNumber}'); return false;" style="width: 75%; padding: 1rem; background: #28a745; color: white; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700; cursor: pointer !important; position: relative; z-index: 1001; pointer-events: all !important; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3); text-align: center; line-height: 1.3; display: block;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(40, 167, 69, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(40, 167, 69, 0.3)'" onmousedown="event.stopPropagation(); return false;" ontouchstart="event.stopPropagation();">
+                            <span style="color: #ff0000; font-size: 1.1rem;">❓</span> Inquire About This Building
                         </button>
                     </div>
 
