@@ -325,6 +325,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadSubscriptionInfo();
     loadFacebookConfig();
     loadFacebookConnectionStatus(); // Check Facebook OAuth connection status
+    loadGoogleBusinessConnectionStatus(); // Check Google Business Profile OAuth connection status
     loadButtonColor();
     initializeColorInputSync();
     initializeBackgroundColorPicker();
@@ -4243,9 +4244,205 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// ============================================
+// Google Business Profile OAuth Functions
+// ============================================
+
+async function connectGoogleBusinessOAuth() {
+    const token = localStorage.getItem('auth_token');
+    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+
+    if (!token || !userData.id) {
+        showToast('Please log in first', true);
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/auth/google-business/init?userId=${userData.id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.authUrl) {
+            // Open Google OAuth in a popup
+            const width = 600;
+            const height = 700;
+            const left = (screen.width / 2) - (width / 2);
+            const top = (screen.height / 2) - (height / 2);
+
+            window.open(
+                data.authUrl,
+                'Google Login',
+                `width=${width},height=${height},left=${left},top=${top}`
+            );
+
+            // Listen for the popup to close and reload data
+            const checkInterval = setInterval(() => {
+                // Check URL params for success/error from callback
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('gbp_success')) {
+                    clearInterval(checkInterval);
+                    showToast('Google Business Profile connected successfully!');
+                    loadGoogleBusinessConnectionStatus();
+                    // Clean up URL
+                    window.history.replaceState({}, document.title, window.location.pathname + '#customization');
+                } else if (urlParams.has('gbp_error')) {
+                    clearInterval(checkInterval);
+                    const error = urlParams.get('gbp_error');
+                    showToast(`Failed to connect: ${error}`, true);
+                    // Clean up URL
+                    window.history.replaceState({}, document.title, window.location.pathname + '#customization');
+                }
+            }, 1000);
+
+            // Stop checking after 5 minutes
+            setTimeout(() => clearInterval(checkInterval), 5 * 60 * 1000);
+
+        } else {
+            showToast(data.error || 'Failed to initiate Google Business Profile connection', true);
+        }
+    } catch (error) {
+        console.error('Error connecting Google Business Profile:', error);
+        showToast('Failed to connect Google Business Profile', true);
+    }
+}
+
+async function disconnectGoogleBusiness() {
+    const token = localStorage.getItem('auth_token');
+    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+
+    if (!token || !userData.id) {
+        showToast('Please log in first', true);
+        return;
+    }
+
+    if (!confirm('Are you sure you want to disconnect your Google Business Profile?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/google-business/connection?userId=${userData.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showToast('Google Business Profile disconnected');
+            loadGoogleBusinessConnectionStatus();
+        } else {
+            showToast(data.error || 'Failed to disconnect', true);
+        }
+    } catch (error) {
+        console.error('Error disconnecting Google Business Profile:', error);
+        showToast('Failed to disconnect Google Business Profile', true);
+    }
+}
+
+async function loadGoogleBusinessConnectionStatus() {
+    const token = localStorage.getItem('auth_token');
+    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+
+    if (!token || !userData.id) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/google-business/connection?userId=${userData.id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.connected && data.connection) {
+            // Show connected state
+            document.getElementById('gbp-connected').style.display = 'block';
+            document.getElementById('gbp-not-connected').style.display = 'none';
+
+            // Update connection details
+            document.getElementById('connected-gbp-account').textContent =
+                data.connection.accountName || 'Unknown Account';
+            document.getElementById('connected-gbp-location').textContent =
+                data.connection.locationName || 'Unknown Location';
+        } else {
+            // Show not connected state
+            document.getElementById('gbp-connected').style.display = 'none';
+            document.getElementById('gbp-not-connected').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error loading GBP connection status:', error);
+        // Default to not connected state
+        document.getElementById('gbp-connected').style.display = 'none';
+        document.getElementById('gbp-not-connected').style.display = 'block';
+    }
+}
+
+async function testGoogleBusinessPost() {
+    const token = localStorage.getItem('auth_token');
+    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+
+    if (!token || !userData.id) {
+        showToast('Please log in first', true);
+        return;
+    }
+
+    const btn = document.getElementById('test-gbp-btn');
+    const status = document.getElementById('test-gbp-status');
+
+    btn.disabled = true;
+    btn.textContent = '📤 Sending...';
+    status.textContent = 'Creating test post...';
+    status.style.color = '#bc9c22';
+
+    try {
+        const response = await fetch('/api/google-business/test-post', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                userId: userData.id
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            status.textContent = '✅ Test post sent successfully! Check your Google Business Profile.';
+            status.style.color = '#28a745';
+            showToast('Test post sent to Google Business Profile!');
+        } else {
+            status.textContent = `❌ Error: ${data.error || 'Failed to send test post'}`;
+            status.style.color = '#dc3545';
+            showToast(data.error || 'Failed to send test post', true);
+        }
+    } catch (error) {
+        console.error('Error sending test post:', error);
+        status.textContent = '❌ Error: Network error or server unavailable';
+        status.style.color = '#dc3545';
+        showToast('Failed to send test post', true);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '📤 Send Test Post to Google Business';
+    }
+}
+
 // Export new functions
 window.connectFacebookOAuth = connectFacebookOAuth;
 window.disconnectFacebook = disconnectFacebook;
 window.loadFacebookConnectionStatus = loadFacebookConnectionStatus;
+window.connectGoogleBusinessOAuth = connectGoogleBusinessOAuth;
+window.disconnectGoogleBusiness = disconnectGoogleBusiness;
+window.loadGoogleBusinessConnectionStatus = loadGoogleBusinessConnectionStatus;
+window.testGoogleBusinessPost = testGoogleBusinessPost;
 
 // Simplified card layout - no expansion functionality needed

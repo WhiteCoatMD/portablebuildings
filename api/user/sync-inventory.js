@@ -6,6 +6,7 @@
 const { requireAuth } = require('../../lib/auth');
 const GPBScraper = require('../../gpb-scraper');
 const { getPool } = require('../../lib/db');
+const { autoPostToGBP } = require('../../lib/autopost-google-business');
 
 const pool = getPool();
 
@@ -82,6 +83,7 @@ async function handler(req, res) {
         let insertedCount = 0;
         let updatedCount = 0;
         let skippedCount = 0;
+        const newBuildings = []; // Track newly inserted buildings for autoposting
 
         for (const building of inventory) {
             try {
@@ -143,6 +145,7 @@ async function handler(req, res) {
                         const timeDiff = Math.abs(new Date(row.updated_at) - new Date(row.created_at));
                         if (timeDiff < 1000) {
                             insertedCount++;
+                            newBuildings.push(building); // Track for autoposting
                         } else {
                             updatedCount++;
                         }
@@ -155,6 +158,33 @@ async function handler(req, res) {
         }
 
         console.log(`Sync complete for user ${req.user.email}: ${insertedCount} new, ${updatedCount} updated, ${skippedCount} skipped`);
+
+        // Auto-post new buildings to Google Business Profile
+        if (newBuildings.length > 0) {
+            console.log(`[GBP Autopost] ${newBuildings.length} new buildings to potentially post`);
+
+            // Get user settings for autopost configuration
+            const settingsResult = await pool.query(
+                `SELECT setting_key, setting_value FROM user_settings WHERE user_id = $1`,
+                [req.user.id]
+            );
+
+            const settings = {};
+            settingsResult.rows.forEach(row => {
+                try {
+                    settings[row.setting_key] = JSON.parse(row.setting_value);
+                } catch (e) {
+                    settings[row.setting_key] = row.setting_value;
+                }
+            });
+
+            // Auto-post each new building (non-blocking)
+            for (const building of newBuildings) {
+                autoPostToGBP(req.user.id, building, settings).catch(error => {
+                    console.error(`[GBP Autopost] Failed for ${building.serialNumber}:`, error);
+                });
+            }
+        }
 
         return res.status(200).json({
             success: true,
