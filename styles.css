@@ -647,6 +647,29 @@ main {
     box-shadow: 0 4px 12px rgba(26, 84, 144, 0.3);
 }
 
+/* Inquire Button */
+.inquire-btn {
+    width: 75%;
+    padding: 1rem;
+    margin: 0.75rem auto;
+    display: block;
+    background: #28a745;
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.inquire-btn:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+}
+
 .rto-tooltip {
     display: none;
     background: #f8f9fa;
