@@ -658,15 +658,12 @@ main {
     background: #28a745;
     color: var(--white);
     border: none;
-    border-radius: 12px;
+    border-radius: 6px;
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-    position: relative;
-    z-index: 100;
-    pointer-events: auto;
 }
 
 .inquire-btn:hover {
