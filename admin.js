@@ -4761,24 +4761,28 @@ window.backToMarketingSelector = backToMarketingSelector;
 
 // Facebook Posting Schedule Functions
 function toggleCustomSchedule() {
-    const frequency = document.getElementById('postFrequency');
     const customSection = document.getElementById('customScheduleSection');
 
-    if (frequency && customSection) {
-        if (frequency.value === 'custom') {
-            customSection.style.display = 'block';
-        } else {
-            customSection.style.display = 'none';
-        }
+    if (!customSection) return;
+
+    // Check which radio button is selected
+    const selectedFrequency = document.querySelector('input[name="postFrequency"]:checked');
+
+    if (selectedFrequency && selectedFrequency.value === 'custom') {
+        customSection.style.display = 'block';
+    } else {
+        customSection.style.display = 'none';
     }
 }
 
 // Save Facebook schedule settings
 async function saveFacebookSchedule() {
     try {
-        const postFrequency = document.getElementById('postFrequency')?.value || 'immediate';
+        // Get selected radio button value
+        const selectedFrequency = document.querySelector('input[name="postFrequency"]:checked');
+        const postFrequency = selectedFrequency ? selectedFrequency.value : '3-5week'; // Default to 3-5 week
 
-        // Get selected days
+        // Get selected days (only for custom schedule)
         const scheduleDays = [];
         document.querySelectorAll('.schedule-day:checked').forEach(checkbox => {
             scheduleDays.push(checkbox.value);
@@ -4833,11 +4837,19 @@ async function loadFacebookSchedule() {
         const settings = getSettings();
         const scheduleSettings = settings?.facebookSchedule || {};
 
-        // Set frequency
-        const postFrequency = document.getElementById('postFrequency');
-        if (postFrequency) {
-            postFrequency.value = scheduleSettings.postFrequency || 'immediate';
+        // Set frequency radio button
+        const frequency = scheduleSettings.postFrequency || '3-5week'; // Default to 3-5 week
+        const radioButton = document.getElementById(`freq-${frequency.replace('week', 'week')}`);
+        if (radioButton) {
+            radioButton.checked = true;
             toggleCustomSchedule(); // Show/hide custom section based on value
+        } else {
+            // Fallback: check if it's an old value and default to 3-5week
+            const defaultRadio = document.getElementById('freq-3-5');
+            if (defaultRadio) {
+                defaultRadio.checked = true;
+                toggleCustomSchedule();
+            }
         }
 
         // Set selected days

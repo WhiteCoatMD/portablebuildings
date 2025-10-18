@@ -217,14 +217,50 @@
                     <p class="help-text" style="color: #bc9c22; margin-bottom: 1rem;">Control when new buildings are posted to Facebook</p>
 
                     <div style="margin-bottom: 1.5rem;">
-                        <label style="color: #bc9c22; font-weight: 600; display: block; margin-bottom: 0.5rem;">Post Frequency</label>
-                        <select id="postFrequency" class="form-control" onchange="toggleCustomSchedule()" style="background: #2a2a3e; color: #bc9c22; border: 1px solid #5a5a6a;">
-                            <option value="immediate">Post Immediately (as inventory syncs)</option>
-                            <option value="daily">Once Daily (optimal time)</option>
-                            <option value="3-5week">3-5 Times Per Week</option>
-                            <option value="custom">Custom Schedule</option>
-                        </select>
-                        <p class="help-text" style="color: #bc9c22; margin-top: 0.5rem;">Choose how often new buildings should be posted</p>
+                        <label style="color: #bc9c22; font-weight: 600; display: block; margin-bottom: 1rem;">Post Frequency</label>
+
+                        <!-- Bubble-style radio buttons -->
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <label class="schedule-bubble" style="display: flex; align-items: center; padding: 1.25rem; background: rgba(188, 156, 34, 0.1); border: 2px solid #5a5a6a; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;">
+                                <input type="radio" name="postFrequency" value="5-7week" id="freq-5-7" onchange="toggleCustomSchedule()" style="margin-right: 1rem; width: 20px; height: 20px; accent-color: #bc9c22; cursor: pointer;">
+                                <div>
+                                    <div style="color: #bc9c22; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem;">5-7 Days Per Week</div>
+                                    <div style="color: #999; font-size: 0.9rem;">Post almost daily (Monday-Sunday)</div>
+                                </div>
+                            </label>
+
+                            <label class="schedule-bubble" style="display: flex; align-items: center; padding: 1.25rem; background: rgba(188, 156, 34, 0.1); border: 2px solid #5a5a6a; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;">
+                                <input type="radio" name="postFrequency" value="3-5week" id="freq-3-5" onchange="toggleCustomSchedule()" style="margin-right: 1rem; width: 20px; height: 20px; accent-color: #bc9c22; cursor: pointer;">
+                                <div>
+                                    <div style="color: #bc9c22; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem;">3-5 Days Per Week</div>
+                                    <div style="color: #999; font-size: 0.9rem;">Post regularly (weekdays only)</div>
+                                </div>
+                            </label>
+
+                            <label class="schedule-bubble" style="display: flex; align-items: center; padding: 1.25rem; background: rgba(188, 156, 34, 0.1); border: 2px solid #5a5a6a; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;">
+                                <input type="radio" name="postFrequency" value="custom" id="freq-custom" onchange="toggleCustomSchedule()" style="margin-right: 1rem; width: 20px; height: 20px; accent-color: #bc9c22; cursor: pointer;">
+                                <div>
+                                    <div style="color: #bc9c22; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem;">Custom Schedule</div>
+                                    <div style="color: #999; font-size: 0.9rem;">Choose specific days and times</div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <style>
+                            .schedule-bubble:hover {
+                                border-color: #bc9c22;
+                                background: rgba(188, 156, 34, 0.15);
+                                transform: translateX(4px);
+                            }
+                            .schedule-bubble input[type="radio"]:checked {
+                                background: #bc9c22;
+                            }
+                            .schedule-bubble:has(input[type="radio"]:checked) {
+                                border-color: #bc9c22;
+                                background: rgba(188, 156, 34, 0.2);
+                                box-shadow: 0 0 0 3px rgba(188, 156, 34, 0.1);
+                            }
+                        </style>
                     </div>
 
                     <!-- Custom Schedule Section (Hidden by default) -->
@@ -291,6 +327,13 @@
                             </select>
                             <p class="help-text" style="color: #bc9c22; margin-top: 0.5rem;">Limit how many buildings can be posted in a single day</p>
                         </div>
+                    </div>
+
+                    <!-- Save Schedule Button -->
+                    <div style="margin-top: 1.5rem;">
+                        <button type="button" onclick="saveFacebookSchedule()" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.05rem; font-weight: 700; background: linear-gradient(135deg, #bc9c22 0%, #ffd60a 100%); border: none; border-radius: 8px; color: #1a1a2e; cursor: pointer; box-shadow: 0 4px 12px rgba(188, 156, 34, 0.3); transition: all 0.3s ease;">
+                            💾 Save Posting Schedule
+                        </button>
                     </div>
                 </div>
 
