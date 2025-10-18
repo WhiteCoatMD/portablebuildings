@@ -4452,10 +4452,44 @@ async function loadGoogleBusinessConnectionStatus() {
             document.getElementById('gbp-not-connected').style.display = 'none';
 
             // Update connection details
-            document.getElementById('connected-gbp-account').textContent =
-                data.connection.accountName || 'Unknown Account';
-            document.getElementById('connected-gbp-location').textContent =
-                data.connection.locationName || 'Unknown Location';
+            const accountElement = document.getElementById('connected-gbp-account');
+            const locationElement = document.getElementById('connected-gbp-location');
+
+            accountElement.textContent = data.connection.accountName || 'Unknown Account';
+            locationElement.textContent = data.connection.locationName || 'Unknown Location';
+
+            // If account info is missing, try to refresh it
+            if (!data.connection.accountName || !data.connection.locationName) {
+                console.log('[GBP] Account info missing, attempting to refresh...');
+                accountElement.textContent = 'Fetching account info...';
+                locationElement.textContent = 'Fetching location info...';
+
+                fetch('/api/google-business/refresh-account-info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ userId: user.id })
+                })
+                .then(res => res.json())
+                .then(refreshData => {
+                    if (refreshData.success && refreshData.connection) {
+                        accountElement.textContent = refreshData.connection.accountName || 'Unknown Account';
+                        locationElement.textContent = refreshData.connection.locationName || 'Unknown Location';
+                        console.log('[GBP] Account info refreshed successfully');
+                    } else {
+                        accountElement.textContent = 'Unknown Account';
+                        locationElement.textContent = 'Unknown Location';
+                        console.warn('[GBP] Failed to refresh account info:', refreshData.error);
+                    }
+                })
+                .catch(err => {
+                    accountElement.textContent = 'Unknown Account';
+                    locationElement.textContent = 'Unknown Location';
+                    console.error('[GBP] Error refreshing account info:', err);
+                });
+            }
         } else {
             // Show not connected state
             document.getElementById('gbp-connected').style.display = 'none';
