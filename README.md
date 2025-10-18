@@ -91,7 +91,7 @@ ShedSync is a B2B SaaS platform that helps portable building dealers:
 
 ---
 
-## 📋 Project Status (Ready for Launch!)
+## 📋 Project Status (Production Ready - October 2025)
 
 ### ✅ Completed Features
 
@@ -331,11 +331,74 @@ Already deployed on Vercel! The platform is live at:
 
 ---
 
-## 🔄 Current Status & Next Steps (January 2025)
+## 🔄 Current Status & Next Steps (October 2025)
 
 ### ✅ Recently Completed
 
-1. **Activity Tracking Fix** (January 18, 2025)
+1. **Critical Dealer Site Fixes** (October 18, 2025)
+   - **Problem**: Dealer sites showing no inventory or footer, cutting off after "About" section
+   - **Root Cause #1**: Missing closing `</div>` tag in site.html causing entire inventory section hidden inside `display: none` container
+   - **Root Cause #2**: Database connection pool exhaustion (max: 1 connection, 27 concurrent image requests)
+   - **Solution**:
+     - Fixed HTML structure - added missing closing div tag (site.html:114)
+     - Increased database pool from `max: 1` to `max: 10` with aggressive cleanup (lib/db.js)
+     - Added comprehensive error handling in site-loader.js to always show page even if errors occur
+     - Added event-driven initialization to fix script loading order
+   - **Result**: All dealer sites now display full content including inventory, filters, and footer
+   - **Files Modified**: site.html, lib/db.js, site-loader.js, app.js, api/images.js
+   - **Commits**: c737295, a1a9f66, 98e9d39, 4c6e738
+
+2. **Complete Activity Tracking Implementation** (October 18, 2025)
+   - **Problem**: Super admin dashboard showing 0 for both "Logins (30d)" and "Lead Checks (30d)"
+   - **Root Cause**:
+     - Login tracking was implemented but not visible due to database pool issues
+     - Lead view tracking was never implemented
+   - **Solution**:
+     - Added `logActivity('view_leads')` call when dealers click Leads tab (admin.js:437-442)
+     - Fixed database pool allowing activity logs to be written successfully
+   - **Result**: Super admin now accurately tracks dealer portal usage (logins, lead views, activity timeline)
+   - **Files Modified**: admin.js
+   - **Commit**: c80b4b7
+
+3. **Premier Portable Buildings Full Integration** (October 18, 2025)
+   - Added comprehensive Premier manufacturer content with 10 FAQ questions
+   - Updated Premier logo path to use premierlogo.png
+   - Created manufacturer template preview system
+   - **Premier Features**:
+     - Completely Customizable buildings
+     - No Credit Checks for Rent-to-Own (36-48 months)
+     - Wide Range of Sizes (6'x10' to 16'x54')
+     - Free Delivery (up to 50 miles)
+   - **Premier FAQ Topics**:
+     - Pricing and regional variations
+     - Free delivery radius and exceptions
+     - Building dimensions and measurements
+     - Customization options (doors, windows, roll-ups)
+     - Rent-to-own with no credit checks
+     - Delivery timeframes (20-25 days, currently 4-6 weeks)
+     - Foundation requirements (level location, 18" leveling)
+     - On-site builds for tight spaces
+     - Delivery space requirements (14' vertical clearance)
+     - Permit and zoning responsibilities
+   - **Manufacturer Template Preview Page**:
+     - Created manufacturer-preview.html for viewing all manufacturer templates
+     - Shows how each manufacturer's branding appears with dummy data
+     - Toggle between Graceland, Premier, and Stor-Mor
+     - Added "🏗️ View Manufacturer Templates" link in super admin header
+   - **Result**: Premier dealers get professional FAQ section, accurate features, and proper branding
+   - **Files Modified**: manufacturer-config.js, super-admin.html
+   - **Files Created**: manufacturer-preview.html
+   - **Commit**: 1267a02
+
+4. **Homepage Privacy & Terms Compliance** (October 18, 2025)
+   - Added Privacy Policy and Terms of Service links to homepage footer
+   - Required by Google for compliance
+   - Links styled consistently with existing footer navigation
+   - **Footer now includes**: Dealer Login | Support | Privacy Policy | Terms of Service
+   - **Files Modified**: index.html
+   - **Commit**: 31265dc
+
+5. **Activity Tracking Fix** (January 18, 2025)
    - **Problem**: Super admin portal showed 0 activity/traffic for dealers despite them actively using the platform
    - **Root Cause**: `/api/log-activity` endpoint existed but was never being called from dealer portal
    - **Solution**:
@@ -719,5 +782,5 @@ To test the PayPal flow in sandbox mode:
 
 **Built with ❤️ for portable building dealers**
 
-Last Updated: January 2025
-Version: 1.0 (Pre-Launch)
+Last Updated: October 18, 2025
+Version: 1.0 (Production Ready)
