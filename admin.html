@@ -87,7 +87,11 @@
                     </div>
 
                     <!-- Google Business Profile Card -->
-                    <div class="card" style="background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onclick="showMarketingPlatform('google')">
+                    <div class="card" style="background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); color: white; position: relative; opacity: 0.7; cursor: not-allowed;">
+                        <!-- Coming Soon Banner -->
+                        <div style="position: absolute; top: 20px; right: -10px; background: #dc3545; color: white; padding: 0.5rem 2rem; font-weight: bold; font-size: 0.9rem; transform: rotate(15deg); box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 10;">
+                            COMING SOON
+                        </div>
                         <div style="text-align: center; padding: 2rem 1rem;">
                             <svg style="width: 80px; height: 80px; margin-bottom: 1rem;" fill="white" viewBox="0 0 24 24">
                                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -97,7 +101,7 @@
                             </svg>
                             <h2 style="margin: 0 0 0.5rem 0; color: white;">Google Business Profile</h2>
                             <p style="margin: 0; color: rgba(255,255,255,0.9); font-size: 0.95rem;">Post updates that appear in Google Search and Google Maps</p>
-                            <button class="btn" style="background: white; color: #4285f4; margin-top: 1.5rem; font-weight: 600;">Configure Google →</button>
+                            <button class="btn" style="background: white; color: #4285f4; margin-top: 1.5rem; font-weight: 600; opacity: 0.6; cursor: not-allowed;" disabled>Configure Google →</button>
                         </div>
                     </div>
                 </div>
@@ -357,10 +361,14 @@ Call us at {{phone}} or visit our website to learn more!
                         </div>
                     </div>
 
-                    <div id="gbp-not-connected" style="background: #f8f9fa; border: 2px dashed #dee2e6; padding: 2rem; border-radius: 8px; text-align: center; margin-bottom: 1.5rem;">
+                    <div id="gbp-not-connected" style="background: #f8f9fa; border: 2px dashed #dee2e6; padding: 2rem; border-radius: 8px; text-align: center; margin-bottom: 1.5rem; position: relative;">
+                        <!-- Coming Soon Badge -->
+                        <div style="position: absolute; top: 1rem; right: 1rem; background: #dc3545; color: white; padding: 0.4rem 1rem; font-weight: bold; font-size: 0.85rem; border-radius: 4px;">
+                            COMING SOON
+                        </div>
                         <h3 style="color: #495057; margin-bottom: 1rem;">Connect Your Google Business Profile</h3>
                         <p style="color: #6c757d; margin-bottom: 1.5rem;">Click the button below to securely connect your Google Business Profile. Your posts will appear in Google Search and Maps!</p>
-                        <button class="btn btn-primary" onclick="connectGoogleBusinessOAuth()" style="background: #4285f4; padding: 0.875rem 2rem; font-size: 1.05rem;">
+                        <button class="btn btn-primary" style="background: #6c757d; padding: 0.875rem 2rem; font-size: 1.05rem; cursor: not-allowed; opacity: 0.6;" disabled>
                             <svg style="width: 20px; height: 20px; margin-right: 0.5rem; vertical-align: middle;" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
