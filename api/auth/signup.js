@@ -48,7 +48,7 @@ module.exports = async function handler(req, res) {
         }
 
         // Validate manufacturer value
-        if (manufacturer !== 'graceland' && manufacturer !== 'premier') {
+        if (manufacturer !== 'graceland' && manufacturer !== 'premier' && manufacturer !== 'stormor') {
             return res.status(400).json({
                 success: false,
                 error: 'Invalid manufacturer selection'

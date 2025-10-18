@@ -110,6 +110,60 @@ const MANUFACTURERS = {
             primary: '#bc9c22',  // Gold (same as Graceland by default, can be changed)
             secondary: '#8b7a1e'
         }
+    },
+
+    stormor: {
+        name: 'Stor-Mor Portable Buildings',
+        logo: '/public/stormor_logo.png',
+        dealerText: 'Authorized Stor-Mor Portable Buildings Dealer',
+
+        // Hero gallery images (will be added later)
+        heroImages: [
+            { src: 'stormor-cabin-1.jpg', alt: 'Stor-Mor Cabin' },
+            { src: 'stormor-barn-1.jpg', alt: 'Stor-Mor Barn' },
+            { src: 'stormor-shed-1.jpg', alt: 'Stor-Mor Shed' },
+            { src: 'stormor-garage-1.jpg', alt: 'Stor-Mor Garage' },
+            { src: 'stormor-cabin-2.jpg', alt: 'Stor-Mor Cabin Style 2' },
+            { src: 'stormor-utility-1.jpg', alt: 'Stor-Mor Utility Building' }
+        ],
+
+        // Features section
+        features: {
+            title: 'Why Choose Stor-Mor Portable Buildings?',
+            items: [
+                {
+                    title: 'Exceptional Craftsmanship',
+                    description: 'Stor-Mor buildings are built with superior craftsmanship and attention to detail that sets them apart from the competition.'
+                },
+                {
+                    title: 'Versatile Designs',
+                    description: 'From storage sheds to custom cabins, Stor-Mor offers a wide range of designs to fit any need or budget.'
+                },
+                {
+                    title: 'Proven Durability',
+                    description: 'Built to withstand the elements and last for decades, Stor-Mor structures are an investment in quality.'
+                },
+                {
+                    title: 'Value Pricing',
+                    description: 'Get the quality you deserve at prices that fit your budget, with flexible financing options available.'
+                }
+            ]
+        },
+
+        // About section
+        about: {
+            title: 'About Stor-Mor Portable Buildings',
+            description: 'Stor-Mor Portable Buildings has built a reputation for creating high-quality, affordable portable structures. With a focus on customer satisfaction and innovative designs, Stor-Mor delivers exceptional value.'
+        },
+
+        // Footer text
+        footerText: 'Authorized Stor-Mor Portable Buildings Dealer',
+
+        // Color scheme (optional, can be customized per dealer)
+        colors: {
+            primary: '#bc9c22',  // Gold
+            secondary: '#8b7a1e'
+        }
     }
 };
 

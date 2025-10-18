@@ -285,8 +285,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Update manufacturer display in header
         const userManufacturerEl = document.getElementById('user-manufacturer');
         if (userManufacturerEl && user.manufacturer) {
-            const manufacturerName = user.manufacturer === 'graceland' ? 'Graceland Dealer' : 'Premier Dealer';
-            userManufacturerEl.textContent = manufacturerName;
+            const manufacturerNames = {
+                'graceland': 'Graceland Dealer',
+                'premier': 'Premier Dealer',
+                'stormor': 'Stor-Mor Dealer'
+            };
+            userManufacturerEl.textContent = manufacturerNames[user.manufacturer] || 'Dealer';
         }
 
         // Update profile information in Account Settings tab
@@ -299,10 +303,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (profileEmail) profileEmail.textContent = user.email;
         if (profilePhone) profilePhone.textContent = user.phone || 'Not set';
         if (profileManufacturer) {
-            const fullManufacturerName = user.manufacturer === 'graceland'
-                ? 'Graceland Portable Buildings'
-                : 'Premier Portable Buildings';
-            profileManufacturer.textContent = fullManufacturerName;
+            const fullManufacturerNames = {
+                'graceland': 'Graceland Portable Buildings',
+                'premier': 'Premier Portable Buildings',
+                'stormor': 'Stor-Mor Portable Buildings'
+            };
+            profileManufacturer.textContent = fullManufacturerNames[user.manufacturer] || 'Unknown';
         }
 
         // Update View Site link
