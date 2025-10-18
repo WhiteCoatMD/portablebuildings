@@ -66,7 +66,7 @@ module.exports = async (req, res) => {
         // Fetch account and location information
         console.log('[GBP OAuth Callback] Fetching accounts...');
         const accountsResponse = await fetch(
-            'https://mybusinessbusinessinformation.googleapis.com/v1/accounts',
+            'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
             {
                 headers: {
                     'Authorization': `Bearer ${access_token}`,
