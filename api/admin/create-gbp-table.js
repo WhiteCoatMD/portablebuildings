@@ -8,22 +8,8 @@ const { getPool } = require('../../lib/db');
 const pool = getPool();
 
 module.exports = async (req, res) => {
-    // Only allow POST
-    if (req.method !== 'POST') {
-        return res.status(405).json({
-            success: false,
-            error: 'Method not allowed'
-        });
-    }
-
-    // Simple authentication - require a secret key
-    const { secret } = req.body;
-
-    if (secret !== process.env.ADMIN_SECRET) {
-        return res.status(401).json({
-            success: false,
-            error: 'Unauthorized'
-        });
+    if (req.method !== 'GET') {
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
     try {
