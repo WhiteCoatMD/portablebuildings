@@ -79,6 +79,12 @@ module.exports = async (req, res) => {
             console.error('[GBP OAuth Callback] Failed to fetch accounts');
             console.error('[GBP OAuth Callback] Status:', accountsResponse.status);
             console.error('[GBP OAuth Callback] Response:', errorText);
+
+            // Handle rate limiting
+            if (accountsResponse.status === 429) {
+                return res.redirect('/admin.html?gbp_error=rate_limit');
+            }
+
             return res.redirect(`/admin.html?gbp_error=failed_to_fetch_accounts&status=${accountsResponse.status}`);
         }
 
