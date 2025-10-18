@@ -77,6 +77,36 @@ async function checkAuth() {
     }
 }
 
+/**
+ * Log dealer portal activity for analytics
+ * @param {string} activityType - Type of activity (e.g., 'login', 'view_leads', 'sync_inventory')
+ * @param {object} details - Optional additional details about the activity
+ */
+async function logActivity(activityType, details = {}) {
+    try {
+        const token = localStorage.getItem('auth_token');
+        if (!token) return;
+
+        await fetch('/api/log-activity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                activityType,
+                details
+            })
+        });
+    } catch (error) {
+        // Fail silently - don't interrupt user experience for analytics
+        console.debug('Activity logging failed:', error);
+    }
+}
+
+// Make logActivity globally available for other scripts (like leads.js)
+window.logActivity = logActivity;
+
 function logout() {
     // Clear ALL localStorage to prevent data leaking between users
     localStorage.clear();
@@ -276,6 +306,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             // First login - store the user
             localStorage.setItem('cpb_last_user', user.email);
         }
+
+        // Log dealer portal login activity for analytics
+        logActivity('login', {
+            email: user.email,
+            manufacturer: user.manufacturer || 'graceland'
+        });
 
         const userEmailEl = document.getElementById('user-email');
         if (userEmailEl) {

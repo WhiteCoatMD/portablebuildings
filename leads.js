@@ -106,6 +106,11 @@ async function loadLeads() {
         if (data.success) {
             currentLeads = data.leads;
             renderLeads();
+
+            // Log activity for analytics (view_leads)
+            if (window.logActivity) {
+                window.logActivity('view_leads', { count: currentLeads.length });
+            }
         } else {
             showToast(`❌ Error loading leads: ${data.error}`);
         }
