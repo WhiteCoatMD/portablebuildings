@@ -94,6 +94,8 @@ class InventoryApp {
     }
 
     init() {
+        console.log('[InventoryApp] Initializing with', this.inventory.length, 'buildings');
+
         // Only load from localStorage if we're not on a multi-tenant site (no SITE_CONFIG)
         if (!window.SITE_CONFIG) {
             this.loadBusinessInfo();
@@ -839,14 +841,24 @@ function navigateGallery(serialNumber, direction) {
     });
 }
 
+// Listen for inventory data ready event from site-loader.js
+window.addEventListener('inventoryDataReady', () => {
+    console.log('[InventoryApp] Inventory data ready event received');
+    if (!window.app && window.PROCESSED_INVENTORY) {
+        window.app = new InventoryApp();
+    }
+});
+
 // App will be initialized by site-loader.js after data is loaded
 // For backwards compatibility (non-multi-tenant sites), initialize if PROCESSED_INVENTORY exists
 if (window.PROCESSED_INVENTORY && window.PROCESSED_INVENTORY.length > 0 && !window.app) {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('[InventoryApp] Initializing from DOMContentLoaded');
             window.app = new InventoryApp();
         });
     } else {
+        console.log('[InventoryApp] Initializing immediately');
         window.app = new InventoryApp();
     }
 }

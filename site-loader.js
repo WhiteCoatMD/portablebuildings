@@ -76,6 +76,8 @@ window.PROCESSED_INVENTORY = [];
         window.dispatchEvent(new Event('siteConfigLoaded'));
 
         // Trigger app initialization after data is loaded
+        // Note: InventoryApp class is defined in app.js which loads after this script
+        // So we dispatch an event and let app.js create the instance
         if (window.app) {
             // App already exists, reload it with new data
             window.app.inventory = window.PROCESSED_INVENTORY;
@@ -84,8 +86,9 @@ window.PROCESSED_INVENTORY = [];
             window.app.populateLocationFilter();
             window.app.renderBuildings();
         } else {
-            // Create the app now that data is loaded
-            window.app = new InventoryApp();
+            // App will be created by app.js once it loads
+            // Dispatch event to signal that data is ready
+            window.dispatchEvent(new Event('inventoryDataReady'));
         }
 
     } catch (error) {
