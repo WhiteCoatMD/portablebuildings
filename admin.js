@@ -4490,6 +4490,25 @@ async function loadGoogleBusinessConnectionStatus() {
                     console.error('[GBP] Error refreshing account info:', err);
                 });
             }
+
+            // Check if there are multiple locations to show "Change Location" button
+            fetch(`/api/google-business/list-locations?userId=${user.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(locationData => {
+                const changeBtn = document.getElementById('change-location-btn');
+                if (changeBtn && locationData.success && locationData.locations && locationData.locations.length > 1) {
+                    changeBtn.style.display = 'inline-block';
+                } else if (changeBtn) {
+                    changeBtn.style.display = 'none';
+                }
+            })
+            .catch(err => {
+                console.error('[GBP] Error checking locations:', err);
+            });
         } else {
             // Show not connected state
             document.getElementById('gbp-connected').style.display = 'none';

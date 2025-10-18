@@ -353,7 +353,10 @@ Call us at {{phone}} or visit our website to learn more!
                                     Location: <strong id="connected-gbp-location"></strong>
                                 </p>
                             </div>
-                            <button class="btn btn-danger btn-sm" onclick="disconnectGoogleBusiness()">Disconnect</button>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-secondary btn-sm" onclick="openLocationSelector()" id="change-location-btn" style="display: none;">Change Location</button>
+                                <button class="btn btn-danger btn-sm" onclick="disconnectGoogleBusiness()">Disconnect</button>
+                            </div>
                         </div>
                     </div>
 
@@ -1866,10 +1869,41 @@ Call {{phone}} or visit our website to learn more!
         </div>
     </div>
 
+    <!-- Google Business Location Selector Modal -->
+    <div class="modal" id="location-selector-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📍 Select Your Google Business Location</h2>
+                <button class="modal-close" onclick="closeLocationSelector()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="help-text" style="margin-bottom: 1.5rem;">
+                    Select which location you want to use for auto-posting to Google Business Profile. Posts will appear for this location in Google Search and Google Maps.
+                </p>
+
+                <div id="location-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- Locations will be populated here -->
+                </div>
+
+                <div id="location-loading" style="text-align: center; padding: 2rem;">
+                    <p style="color: #6c757d;">Loading locations...</p>
+                </div>
+
+                <div id="location-error" style="display: none; background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 6px; margin-top: 1rem;">
+                    <strong>Error:</strong> <span id="location-error-message"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeLocationSelector()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
     <script src="decoder.js?v=4"></script>
     <script src="inventory.js?v=4"></script>
     <script src="leads.js?v=1"></script>
     <script src="admin.js?v=4"></script>
+    <script src="location-selector.js?v=1"></script>
 </body>
 </html>

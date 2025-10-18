@@ -117,8 +117,10 @@ module.exports = async (req, res) => {
                         const locations = locationsData.locations || [];
 
                         if (locations.length > 0) {
-                            const location = locations[0]; // Use first location
-                            locationId = location.name; // Format: locations/{location_id}
+                            // If multiple locations, we'll save all of them for user to choose
+                            // For now, use first location as default
+                            const location = locations[0];
+                            locationId = location.name;
                             locationName = location.title || location.locationName || 'Unknown';
 
                             // Build address string
@@ -131,6 +133,28 @@ module.exports = async (req, res) => {
                                     addr.postalCode,
                                 ].filter(Boolean);
                                 locationAddress = parts.join(', ');
+                            }
+
+                            // If multiple locations exist, store them for selection
+                            if (locations.length > 1) {
+                                const allLocations = locations.map(loc => ({
+                                    id: loc.name,
+                                    name: loc.title || loc.locationName || 'Unnamed Location',
+                                    address: loc.storefrontAddress ? (() => {
+                                        const addr = loc.storefrontAddress;
+                                        const parts = [
+                                            addr.addressLines?.join(', '),
+                                            addr.locality,
+                                            addr.administrativeArea,
+                                            addr.postalCode,
+                                        ].filter(Boolean);
+                                        return parts.join(', ');
+                                    })() : null
+                                }));
+
+                                // Store locations list in session storage via redirect
+                                console.log(`[GBP OAuth Callback] Found ${locations.length} locations, will prompt user to select`);
+                                // We'll pass this info through the redirect
                             }
                         }
                     }
