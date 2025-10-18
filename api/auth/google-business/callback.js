@@ -21,8 +21,8 @@ module.exports = async (req, res) => {
             return res.redirect('/admin.html?gbp_error=missing_code');
         }
 
-        const clientId = process.env.GOOGLE_BUSINESS_CLIENT_ID;
-        const clientSecret = process.env.GOOGLE_BUSINESS_CLIENT_SECRET;
+        const clientId = process.env.GOOGLE_BUSINESS_CLIENT_ID?.trim();
+        const clientSecret = process.env.GOOGLE_BUSINESS_CLIENT_SECRET?.trim();
         const redirectUri = 'https://portablebuildings.vercel.app/api/auth/google-business/callback';
 
         if (!clientId || !clientSecret) {
