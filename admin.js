@@ -4040,6 +4040,177 @@ Perfect timing to:
 💬 Comment "[SEASON]" for details
 
 #[Season]Sale #{{type}} #LimitedOffer #[Holiday]`
+    },
+    11: {
+        title: "💬 Real Customer Story",
+        strategy: ["SOCIAL PROOF", "ENGAGEMENT"],
+        template: `💬 "Best decision I made this year!" - Mike T.
+
+Here's what Mike bought: {{name}}
+
+Mike's story:
+"I was storing everything in my garage. Couldn't even park my truck anymore! Got this {{size}} building and it changed EVERYTHING."
+
+✅ Now his garage is clean
+✅ All his tools organized
+✅ Even made a small workshop area
+✅ Wife is happy (that's the real win! 😂)
+
+His total cost? Just {{price}}
+
+📍 Same model available at {{location}}
+🚚 We deliver & set up just like we did for Mike
+
+Want the same results?
+
+{{rtoAll}}
+
+📞 Call {{phone}} and mention "Mike's story"
+💬 Comment "INTERESTED" below!
+
+Join 100+ happy customers this year! ⭐⭐⭐⭐⭐
+
+#CustomerStory #{{type}} #RealResults #HappyCustomers`
+    },
+    12: {
+        title: "🏆 Beat The Competition",
+        strategy: ["VALUE", "SCARCITY"],
+        template: `🏆 PRICE MATCH CHALLENGE!
+
+We dare you to find a better deal on a {{size}} {{type}}! 💪
+
+Our {{name}}:
+✅ Price: {{price}}
+✅ FREE delivery & setup
+✅ Built with premium materials
+✅ Ready NOW at {{location}}
+✅ Flexible financing available
+
+Other dealers?
+❌ Higher prices
+❌ Charge for delivery
+❌ Lower quality materials
+❌ Long wait times
+❌ Cash only
+
+We're SO confident you won't find better that we'll match ANY legitimate competitor price! 📋
+
+⚡ But hurry - only 3 of these left in stock!
+
+Can't pay cash? No problem!
+{{rtoAll}}
+
+📞 Call {{phone}} to verify our price
+💬 Tag a friend who needs this deal!
+
+#BeatTheCompetition #{{type}} #BestPrice #PriceMatch`
+    },
+    13: {
+        title: "⏰ 48-Hour Flash Sale",
+        strategy: ["URGENCY", "SCARCITY"],
+        template: `⏰ 48-HOUR FLASH SALE! ⏰
+
+Starting NOW! {{name}} on special pricing!
+
+📐 Size: {{size}}
+💥 Flash Sale Price: {{price}}
+⏱️ Expires in 48 hours!
+
+⚠️ Why so cheap? We need to make room for incoming inventory!
+
+🎯 YOUR GAIN:
+✅ Save $XXX off regular price
+✅ FREE delivery (normally $350)
+✅ FREE setup (normally $250)
+✅ Same quality, HUGE savings!
+
+📍 {{location}} - Ready to go!
+🚀 We can deliver THIS WEEK
+
+Clock is ticking! ⏰
+⌛ Sale ends [Day] at [Time]
+
+Low payments available:
+{{rto36}}
+
+📞 CALL NOW: {{phone}}
+💬 DM "FLASH SALE" to reserve!
+
+First 5 callers get an extra bonus! 🎁
+
+#FlashSale #{{type}} #48Hours #ActFast`
+    },
+    14: {
+        title: "💎 Property Value Booster",
+        strategy: ["VALUE", "LOGIC"],
+        template: `💎 ADD VALUE TO YOUR PROPERTY!
+
+Did you know? A quality shed can increase property value by $3,000-$7,000! 📈
+
+This {{name}} is an investment, not an expense!
+
+The Math:
+💰 Your investment: {{price}}
+📊 Added property value: $5,000+ average
+🏠 Net gain: $2,000-$4,000!
+
+PLUS the benefits:
+✅ Extra storage (no more clutter!)
+✅ Workshop space (your projects)
+✅ Organized property (better curb appeal)
+✅ Tax deduction potential (ask your accountant!)
+
+📐 {{size}} - Perfect for most properties
+📍 See it at {{location}}
+
+Smart homeowners are calling this a "no-brainer investment"
+
+Don't have cash on hand?
+{{rtoAll}}
+
+📞 Invest in your property today: {{phone}}
+💬 Comment "VALUE" for free property assessment
+
+Your neighbors will be jealous! 😎
+
+#PropertyValue #{{type}} #SmartInvestment #HomeImprovement`
+    },
+    15: {
+        title: "🎁 Bundle Deal Special",
+        strategy: ["VALUE", "URGENCY"],
+        template: `🎁 MEGA BUNDLE DEAL! 🎁
+
+Get MORE for your money! Buy this {{name}} and receive:
+
+📦 INCLUDED FREE:
+✅ Shelving unit ($150 value)
+✅ Work bench ($200 value)
+✅ LED lighting kit ($120 value)
+✅ Premium door lock ($80 value)
+✅ Delivery & setup ($600 value!)
+
+💰 Total Bundle Value: $1,150 in FREE extras!
+
+Your price? Just {{price}} for EVERYTHING! 🎉
+
+📐 {{size}} building
+📍 In stock at {{location}}
+⚡ Can be delivered next week!
+
+⏰ Bundle offer ends [Date]!
+
+Why this deal?
+We want to move this unit FAST to make room. Your gain = our need for space!
+
+Can't swing full payment?
+{{rtoAll}}
+
+📞 Claim your bundle: {{phone}}
+💬 Type "BUNDLE" to reserve!
+
+⚠️ Only ONE bundle available at this price!
+
+#BundleDeal #{{type}} #FreeExtras #MegaDeal`
     }
 };
 
@@ -4069,7 +4240,12 @@ function loadTemplateLibrary() {
         7: { name: '10x20 Side Lofted Barn', size: '10x20', price: '$7,495', location: 'Alexandria', type: 'SideLoftedBarn', rto: '60 months: $158.23/mo' },
         8: { name: '14x28 Lofted Barn Cabin', size: '14x28', price: '$12,995', location: 'Lake Charles', type: 'LoftedBarnCabin', rto: '• 36 months: $451.73/mo\n• 48 months: $361.38/mo\n• 60 months: $306.17/mo\n• 72 months: $269.63/mo' },
         9: { name: '10x14 Utility Shed', size: '10x14', price: '$5,495', location: 'Natchitoches', type: 'UtilityShed', rto: '72 months: $121.45/mo' },
-        10: { name: '12x16 Lofted Barn', size: '12x16', price: '$6,995', location: 'Bossier City', type: 'LoftedBarn', rto: '• 36 months: $243.23/mo\n• 48 months: $194.58/mo\n• 60 months: $164.79/mo\n• 72 months: $145.15/mo' }
+        10: { name: '12x16 Lofted Barn', size: '12x16', price: '$6,995', location: 'Bossier City', type: 'LoftedBarn', rto: '• 36 months: $243.23/mo\n• 48 months: $194.58/mo\n• 60 months: $164.79/mo\n• 72 months: $145.15/mo' },
+        11: { name: '12x20 Lofted Barn', size: '12x20', price: '$7,895', location: 'Minden', type: 'LoftedBarn', rto: '• 36 months: $274.48/mo\n• 48 months: $219.58/mo\n• 60 months: $186.01/mo\n• 72 months: $163.82/mo' },
+        12: { name: '10x16 Side Lofted Barn', size: '10x16', price: '$6,495', location: 'Jonesboro', type: 'SideLoftedBarn', rto: '• 36 months: $225.80/mo\n• 48 months: $180.64/mo\n• 60 months: $153.04/mo\n• 72 months: $134.79/mo' },
+        13: { name: '12x24 Utility Building', size: '12x24', price: '$8,295', location: 'Columbia', type: 'UtilityBuilding', rto: '• 36 months: $288.42/mo\n• 48 months: $230.74/mo\n• 60 months: $195.45/mo\n• 72 months: $172.11/mo' },
+        14: { name: '14x24 Lofted Barn Cabin', size: '14x24', price: '$11,495', location: 'Farmerville', type: 'LoftedBarnCabin', rto: '• 36 months: $399.62/mo\n• 48 months: $319.70/mo\n• 60 months: $270.84/mo\n• 72 months: $238.57/mo' },
+        15: { name: '10x20 Utility Shed', size: '10x20', price: '$6,995', location: 'Winnsboro', type: 'UtilityShed', rto: '• 36 months: $243.23/mo\n• 48 months: $194.58/mo\n• 60 months: $164.79/mo\n• 72 months: $145.15/mo' }
     };
 
     container.innerHTML = Object.keys(facebookTemplates).map(num => {
