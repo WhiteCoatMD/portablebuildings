@@ -4174,43 +4174,6 @@ Don't have cash on hand?
 Your neighbors will be jealous! 😎
 
 #PropertyValue #{{type}} #SmartInvestment #HomeImprovement`
-    },
-    15: {
-        title: "🎁 Bundle Deal Special",
-        strategy: ["VALUE", "URGENCY"],
-        template: `🎁 MEGA BUNDLE DEAL! 🎁
-
-Get MORE for your money! Buy this {{name}} and receive:
-
-📦 INCLUDED FREE:
-✅ Shelving unit ($150 value)
-✅ Work bench ($200 value)
-✅ LED lighting kit ($120 value)
-✅ Premium door lock ($80 value)
-✅ Delivery & setup ($600 value!)
-
-💰 Total Bundle Value: $1,150 in FREE extras!
-
-Your price? Just {{price}} for EVERYTHING! 🎉
-
-📐 {{size}} building
-📍 In stock at {{location}}
-⚡ Can be delivered next week!
-
-⏰ Bundle offer ends [Date]!
-
-Why this deal?
-We want to move this unit FAST to make room. Your gain = our need for space!
-
-Can't swing full payment?
-{{rtoAll}}
-
-📞 Claim your bundle: {{phone}}
-💬 Type "BUNDLE" to reserve!
-
-⚠️ Only ONE bundle available at this price!
-
-#BundleDeal #{{type}} #FreeExtras #MegaDeal`
     }
 };
 
@@ -4244,8 +4207,7 @@ function loadTemplateLibrary() {
         11: { name: '12x20 Lofted Barn', size: '12x20', price: '$7,895', location: 'Minden', type: 'LoftedBarn', rto: '• 36 months: $274.48/mo\n• 48 months: $219.58/mo\n• 60 months: $186.01/mo\n• 72 months: $163.82/mo' },
         12: { name: '10x16 Side Lofted Barn', size: '10x16', price: '$6,495', location: 'Jonesboro', type: 'SideLoftedBarn', rto: '• 36 months: $225.80/mo\n• 48 months: $180.64/mo\n• 60 months: $153.04/mo\n• 72 months: $134.79/mo' },
         13: { name: '12x24 Utility Building', size: '12x24', price: '$8,295', location: 'Columbia', type: 'UtilityBuilding', rto: '• 36 months: $288.42/mo\n• 48 months: $230.74/mo\n• 60 months: $195.45/mo\n• 72 months: $172.11/mo' },
-        14: { name: '14x24 Lofted Barn Cabin', size: '14x24', price: '$11,495', location: 'Farmerville', type: 'LoftedBarnCabin', rto: '• 36 months: $399.62/mo\n• 48 months: $319.70/mo\n• 60 months: $270.84/mo\n• 72 months: $238.57/mo' },
-        15: { name: '10x20 Utility Shed', size: '10x20', price: '$6,995', location: 'Winnsboro', type: 'UtilityShed', rto: '• 36 months: $243.23/mo\n• 48 months: $194.58/mo\n• 60 months: $164.79/mo\n• 72 months: $145.15/mo' }
+        14: { name: '14x24 Lofted Barn Cabin', size: '14x24', price: '$11,495', location: 'Farmerville', type: 'LoftedBarnCabin', rto: '• 36 months: $399.62/mo\n• 48 months: $319.70/mo\n• 60 months: $270.84/mo\n• 72 months: $238.57/mo' }
     };
 
     container.innerHTML = Object.keys(facebookTemplates).map(num => {
