@@ -6,8 +6,19 @@
 // Temporarily disable SSL verification for local testing (ONLY for development)
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const CLIENT_ID = 'ASrPuLELj3KGaVCXey5vpevgIvF7UFkXTQfQM0MHw1_hlk9MZy0Wq2jt9S0xrpNWb80ZEyzu0K_x5KKG';
-const CLIENT_SECRET = 'ECgBbuTdDBqtCwidlQ7qx64q76Kj94GANY5VONg28pbIcpZYwkFaM5oQeZow-tNYFoTBeUCGCUBEiLWh';
+// Load credentials from environment variables
+require('dotenv').config({ path: '.env.local' });
+
+const CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
+const CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
+
+if (!CLIENT_ID || !CLIENT_SECRET) {
+    console.error('❌ ERROR: PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET must be set in environment variables');
+    console.log('\n📝 Add these to your .env.local file:');
+    console.log('   PAYPAL_CLIENT_ID=your_client_id_here');
+    console.log('   PAYPAL_CLIENT_SECRET=your_client_secret_here');
+    process.exit(1);
+}
 
 const PAYPAL_API = 'https://api-m.paypal.com'; // PRODUCTION API
 

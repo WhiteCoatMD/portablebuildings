@@ -6,8 +6,20 @@
 // Temporarily disable SSL verification for local testing (ONLY for development)
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const CLIENT_ID = 'AQrxr0jj7_pJyW_Lf__auoXgWU6YWeAedR6NYfgtk51RX1wHFwiVxKm4dqMB-MBpLZK2VvkJmLNdG6h7';
-const CLIENT_SECRET = 'EJceCcwDab3kB5APsMk7EEqKDHkVDinOwxO5mX07cr9y5iDHZlKLHF_PETPVQRxmITv5nb4bZi4fYfD1';
+// Load credentials from environment variables
+require('dotenv').config({ path: '.env.local' });
+
+const CLIENT_ID = process.env.PAYPAL_SANDBOX_CLIENT_ID;
+const CLIENT_SECRET = process.env.PAYPAL_SANDBOX_CLIENT_SECRET;
+
+if (!CLIENT_ID || !CLIENT_SECRET) {
+    console.error('❌ ERROR: PAYPAL_SANDBOX_CLIENT_ID and PAYPAL_SANDBOX_CLIENT_SECRET must be set in environment variables');
+    console.log('\n📝 Add these to your .env.local file:');
+    console.log('   PAYPAL_SANDBOX_CLIENT_ID=your_sandbox_client_id_here');
+    console.log('   PAYPAL_SANDBOX_CLIENT_SECRET=your_sandbox_client_secret_here');
+    console.log('\n🔗 Get credentials from: https://developer.paypal.com/dashboard/applications/sandbox');
+    process.exit(1);
+}
 
 const PAYPAL_API = 'https://api-m.sandbox.paypal.com'; // Sandbox API
 

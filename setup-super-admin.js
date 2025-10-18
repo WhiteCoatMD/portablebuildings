@@ -43,8 +43,17 @@ async function setupSuperAdmin() {
         } else {
             console.log('Creating new super admin account for sales@buytheshed.com...');
 
+            // Get password from environment variable
+            const password = process.env.ADMIN_PASSWORD;
+
+            if (!password) {
+                console.error('❌ ERROR: ADMIN_PASSWORD must be set in environment variables');
+                console.log('\n📝 Usage: ADMIN_PASSWORD="your_password" node setup-super-admin.js');
+                await client.end();
+                process.exit(1);
+            }
+
             // Generate password hash
-            const password = 'BuyTheShed2025!';
             const salt = await bcrypt.genSalt(10);
             const passwordHash = await bcrypt.hash(password, salt);
 
@@ -59,9 +68,9 @@ async function setupSuperAdmin() {
             console.log('\n✓ Super admin created successfully!');
             console.log(JSON.stringify(result.rows[0], null, 2));
             console.log('\n📧 Email: sales@buytheshed.com');
-            console.log('🔑 Password: BuyTheShed2025!');
+            console.log('🔑 Password: [hidden - check your environment variable]');
             console.log('🔐 Super Admin: YES');
-            console.log('\n⚠️  Change this password after first login!');
+            console.log('\n⚠️  Keep your password secure!');
         }
 
     } catch (error) {
