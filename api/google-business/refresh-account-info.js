@@ -73,10 +73,20 @@ module.exports = async (req, res) => {
             if (!accountsResponse.ok) {
                 const errorText = await accountsResponse.text();
                 console.error('[GBP Refresh] Failed to fetch accounts:', accountsResponse.status, errorText);
-                return res.status(400).json({
+
+                let errorDetails = errorText;
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    errorDetails = errorJson.error?.message || errorText;
+                } catch (e) {
+                    // Keep errorText as is
+                }
+
+                return res.status(accountsResponse.status).json({
                     success: false,
                     error: 'Failed to fetch Google Business accounts',
-                    details: errorText
+                    details: errorDetails,
+                    status: accountsResponse.status
                 });
             }
 
