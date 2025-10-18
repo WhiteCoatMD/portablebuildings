@@ -25,6 +25,8 @@ async function openLocationSelector() {
     locationLoading.style.display = 'block';
     locationError.style.display = 'none';
 
+    console.log('[Location Selector] Fetching locations for user:', user.id);
+
     try {
         const response = await fetch(`/api/google-business/list-locations?userId=${user.id}`, {
             headers: {
@@ -33,6 +35,7 @@ async function openLocationSelector() {
         });
 
         const data = await response.json();
+        console.log('[Location Selector] Response:', data);
 
         locationLoading.style.display = 'none';
 

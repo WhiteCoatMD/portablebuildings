@@ -4345,10 +4345,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // If location selector flag is present, open it after connection status loads
                 if (urlParams.get('show_location_selector') === 'true') {
+                    console.log('[Google OAuth] Location selector flag detected');
                     setTimeout(() => {
                         // Check if multiple locations exist before showing selector
                         const token = localStorage.getItem('auth_token');
                         const user = window.currentUser;
+
+                        console.log('[Google OAuth] Checking locations, user:', user);
 
                         if (token && user && user.id) {
                             fetch(`/api/google-business/list-locations?userId=${user.id}`, {
@@ -4356,18 +4359,31 @@ document.addEventListener('DOMContentLoaded', () => {
                             })
                             .then(res => res.json())
                             .then(data => {
+                                console.log('[Google OAuth] Locations data:', data);
                                 if (data.success && data.locations && data.locations.length > 1) {
+                                    console.log('[Google OAuth] Multiple locations found, opening selector');
                                     openLocationSelector();
                                 } else if (data.locations && data.locations.length === 1) {
+                                    console.log('[Google OAuth] Single location found');
                                     showToast('✅ Connected to your Google Business location');
+                                } else {
+                                    console.log('[Google OAuth] No locations or error:', data.error);
+                                    if (data.error) {
+                                        showToast(`⚠️ ${data.error}`, true);
+                                    }
                                 }
                             })
-                            .catch(err => console.error('Error checking locations:', err));
+                            .catch(err => {
+                                console.error('[Google OAuth] Error checking locations:', err);
+                                showToast('⚠️ Could not load locations. Try clicking "Change Location" button.', true);
+                            });
+                        } else {
+                            console.error('[Google OAuth] No token or user available');
                         }
 
                         // Clean up URL
                         window.history.replaceState({}, document.title, '/admin.html');
-                    }, 1000);
+                    }, 1500);
                 }
             }, 300);
         }, 100);
