@@ -127,6 +127,21 @@ ShedSync is a B2B SaaS platform that helps portable building dealers:
 - [x] Long-lived access tokens (60-day)
 - [x] Customizable post templates
 - [x] Manual test posting
+- [x] Facebook App Review approved
+
+#### Google Business Profile Integration
+- [x] OAuth 2.0 "Connect with Google" button
+- [x] Google Business Profile account/location detection
+- [x] Privacy Policy and Terms of Service pages created
+- [x] OAuth Consent Screen configured in Google Cloud
+- [x] Test user added: info@dunritemetalbuildings.com
+- [x] All required APIs enabled (Account Management, Business Information, Verification)
+- [x] Database table created (google_business_connections)
+- [x] Rate limit handling implemented
+- [ ] OAuth connection tested (waiting for rate limit reset)
+- [ ] Auto-posting to Google Business Profile
+- [ ] Google verification submitted
+- [ ] Google verification approved
 
 #### Payments & Subscriptions
 - [x] PayPal integration ($99/month) - CURRENTLY ACTIVE
@@ -313,6 +328,121 @@ Already deployed on Vercel! The platform is live at:
 - [ ] **Pricing Page** - Add pricing info to landing page
 - [ ] **Demo Video** - Create walkthrough video for dealers
 - [ ] **Beta Testing** - Get 2-3 dealers to test before launch
+
+---
+
+## 🔄 Current Status & Next Steps (January 2025)
+
+### ✅ Recently Completed
+1. **Google Business Profile OAuth Integration** (January 18, 2025)
+   - Fixed 400 error caused by newline in `GOOGLE_BUSINESS_CLIENT_ID` environment variable
+   - Created comprehensive privacy policy and terms of service pages
+   - Configured OAuth Consent Screen in Google Cloud Console
+   - Fixed API endpoint (changed from Business Information to Account Management API)
+   - Added rate limit handling for Google API calls
+   - Created `google_business_connections` database table
+
+2. **Technology Stack Documentation**
+   - Added comprehensive tech stack section to README
+   - Documented all APIs, services, and development tools
+
+### 🚧 In Progress
+1. **Google Business Profile OAuth Testing**
+   - Status: Waiting for Google API rate limit to reset (429 error)
+   - Next: Test OAuth connection flow once rate limit clears
+   - Issue: Hit rate limit during debugging (too many test requests)
+   - Solution: Wait 10-15 minutes, then test connection
+
+### 📋 Next Morning TODO List
+
+#### Immediate (High Priority)
+1. **Test Google Business Profile OAuth Connection**
+   - Go to admin panel → Automated Marketing tab
+   - Click "Connect with Google"
+   - Verify OAuth flow completes successfully
+   - Confirm connection saves to database
+   - Check that account/location info is fetched correctly
+
+2. **Implement Google Business Profile Auto-Posting**
+   - Create endpoint: `/api/google-business/post.js`
+   - Use Google Business Profile Posts API
+   - Test posting a building to Google Business Profile
+   - Add scheduling logic (similar to Facebook auto-posting)
+   - Update admin panel to show Google posting status
+
+3. **Record Google Verification Video**
+   - Follow script in `GOOGLE_VERIFICATION_GUIDE.md` (lines 99-136)
+   - Show complete OAuth flow
+   - Demonstrate posting a building to Google Business Profile
+   - Show revocation/disconnect functionality
+   - Upload to YouTube (unlisted)
+   - Length: 2-4 minutes
+
+4. **Submit for Google Verification**
+   - Go to Google Cloud Console → OAuth consent screen
+   - Click "PUBLISH APP" → "PREPARE FOR VERIFICATION"
+   - Fill out verification form with:
+     - Video URL
+     - Screenshots (7 prepared screenshots)
+     - Scope justification (template in guide lines 171-194)
+   - Submit application
+   - Expected timeline: 1-3 weeks for approval
+
+#### Medium Priority
+5. **Update Admin Panel UI**
+   - Add Google Business Profile connection status display
+   - Show last post timestamp
+   - Add "Test Post to Google" button
+   - Display connected location name/address
+
+6. **Error Handling & Edge Cases**
+   - Handle expired Google tokens (refresh token flow)
+   - Handle case where user has multiple Business Profile locations
+   - Add better error messages in admin panel
+   - Test disconnecting and reconnecting Google account
+
+7. **Documentation Updates**
+   - Update README with Google Business Profile setup instructions
+   - Add environment variables for Google to README
+   - Document Google verification process completion
+
+#### Low Priority
+8. **Testing & Optimization**
+   - Test Google posting with different building types
+   - Verify image uploads work with Google posts
+   - Test with multiple dealer accounts
+   - Monitor Google API quota usage
+
+### 🐛 Known Issues to Address
+- **Rate Limiting**: Implement exponential backoff for Google API calls
+- **Token Refresh**: Add automatic token refresh before expiration
+- **Multi-Location Support**: Currently only uses first location - may need to let user choose
+- **Error Messages**: Admin panel needs better user-facing error messages for Google connection failures
+
+### 📊 Key Files Modified Today
+- `api/auth/google-business/callback.js` - Fixed API endpoint, added rate limiting
+- `api/auth/google-business/init.js` - Fixed newline issue in client ID
+- `lib/google-business.js` - Token refresh utilities
+- `api/admin/create-gbp-table.js` - Database table creation
+- `privacy.html` - Created comprehensive privacy policy
+- `terms.html` - Created terms of service
+- `GOOGLE_VERIFICATION_GUIDE.md` - Step-by-step verification guide
+- `README.md` - Added tech stack and Google integration status
+
+### 🔑 Important Notes for Tomorrow
+- **Rate limit should be reset** - Safe to test OAuth connection
+- **All 3 Google APIs are enabled** in Google Cloud Console
+- **Test user email**: info@dunritemetalbuildings.com (already added to OAuth consent screen)
+- **OAuth Consent Screen**: Fully configured and ready
+- **Database table**: `google_business_connections` exists and ready
+- **Environment variables**: `GOOGLE_BUSINESS_CLIENT_ID` and `GOOGLE_BUSINESS_CLIENT_SECRET` are set correctly
+
+### 🎯 Success Criteria
+- [ ] Google OAuth connection completes without errors
+- [ ] User can post a building to Google Business Profile
+- [ ] Verification video recorded and uploaded
+- [ ] Verification application submitted to Google
+- [ ] Admin panel shows Google connection status
 
 ---
 
