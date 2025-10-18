@@ -998,13 +998,22 @@ async function loadBuildingImages(serialNumber) {
 
 async function getBuildingImages(serialNumber) {
     try {
-        const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}`);
+        // Include userId in request so API can load saved image order from database
+        const userId = user ? user.id : null;
+        const userIdParam = userId ? `&userId=${userId}` : '';
+
+        const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}${userIdParam}`);
         const data = await response.json();
 
         if (!data.success || !data.images.length) {
             return [];
         }
 
+        // The API already returns images in the correct order (main image first)
+        // when userId is provided, so we can just return them directly
+        return data.images;
+
+        // Legacy code below kept for backwards compatibility if API fails to order
         // Check for custom order (database cache first)
         let orderedImages = null;
         if (dbCache.imageOrders && dbCache.imageOrders[serialNumber]) {

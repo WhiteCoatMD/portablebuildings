@@ -1,6 +1,6 @@
 /**
  * Fix UXS Building Type Records
- * Updates all UXS records in the database to use 'Utility Building' instead of 'Side Utility Building'
+ * Updates all UXS records in the database to use 'Side Utility' as the correct building type
  */
 require('dotenv').config({ path: '.env.local' });
 
@@ -17,16 +17,16 @@ const pool = new Pool({
     try {
         console.log('Connecting to database...');
 
-        // Update all UXS records to use 'Utility Building' instead of 'Side Utility Building' or 'Unknown Type'
+        // Update all UXS records to use 'Side Utility' instead of 'Utility Building' or 'Unknown Type'
         const result = await pool.query(`
             UPDATE user_inventory
-            SET type_name = 'Utility Building',
-                title = CONCAT(size_display, ' Utility Building')
+            SET type_name = 'Side Utility',
+                title = CONCAT(size_display, ' Side Utility')
             WHERE type_code = 'UXS'
-              AND (type_name != 'Utility Building' OR title LIKE '%Unknown Type%' OR title LIKE '%Side Utility%')
+              AND (type_name != 'Side Utility' OR title LIKE '%Unknown Type%' OR title LIKE '%Utility Building%')
         `);
 
-        console.log(`✅ Updated ${result.rowCount} UXS records to 'Utility Building'`);
+        console.log(`✅ Updated ${result.rowCount} UXS records to 'Side Utility'`);
 
         // Show what we updated
         const check = await pool.query(`
