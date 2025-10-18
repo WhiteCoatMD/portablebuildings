@@ -3,6 +3,12 @@
   "devCommand": null,
   "installCommand": null,
   "outputDirectory": ".",
+  "crons": [
+    {
+      "path": "/api/facebook/process-queue",
+      "schedule": "*/15 * * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

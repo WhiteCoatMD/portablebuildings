@@ -4111,11 +4111,18 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTemplateLibrary();
     }
 
+    // Load Facebook schedule settings
+    loadFacebookSchedule();
+
+    // Initialize auto-save for schedule settings
+    initScheduleAutoSave();
+
     // Also load when tab is switched to Facebook
     const facebookTabBtn = document.querySelector('[data-tab="facebook"]');
     if (facebookTabBtn) {
         facebookTabBtn.addEventListener('click', () => {
             setTimeout(loadTemplateLibrary, 100);
+            setTimeout(loadFacebookSchedule, 100);
         });
     }
 
@@ -4572,6 +4579,130 @@ function toggleCustomSchedule() {
     }
 }
 
+// Save Facebook schedule settings
+async function saveFacebookSchedule() {
+    try {
+        const postFrequency = document.getElementById('postFrequency')?.value || 'immediate';
+
+        // Get selected days
+        const scheduleDays = [];
+        document.querySelectorAll('.schedule-day:checked').forEach(checkbox => {
+            scheduleDays.push(checkbox.value);
+        });
+
+        const schedStartTime = document.getElementById('schedStartTime')?.value || '09:00';
+        const schedEndTime = document.getElementById('schedEndTime')?.value || '17:00';
+        const maxPostsPerDay = document.getElementById('maxPostsPerDay')?.value || '1';
+
+        const scheduleSettings = {
+            postFrequency,
+            scheduleDays,
+            schedStartTime,
+            schedEndTime,
+            maxPostsPerDay
+        };
+
+        // Save to user settings
+        const currentSettings = getSettings();
+        const updatedSettings = {
+            ...currentSettings,
+            facebookSchedule: scheduleSettings
+        };
+
+        await saveSetting(STORAGE_KEYS.SETTINGS, updatedSettings);
+
+        // Also save to database via API
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            await fetch('/api/user/save-schedule-settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ scheduleSettings })
+            });
+        }
+
+        showToast('✅ Schedule settings saved successfully!');
+        return true;
+    } catch (error) {
+        console.error('Error saving schedule settings:', error);
+        showToast('❌ Error saving schedule settings', true);
+        return false;
+    }
+}
+
+// Load Facebook schedule settings
+async function loadFacebookSchedule() {
+    try {
+        const settings = getSettings();
+        const scheduleSettings = settings?.facebookSchedule || {};
+
+        // Set frequency
+        const postFrequency = document.getElementById('postFrequency');
+        if (postFrequency) {
+            postFrequency.value = scheduleSettings.postFrequency || 'immediate';
+            toggleCustomSchedule(); // Show/hide custom section based on value
+        }
+
+        // Set selected days
+        const scheduleDays = scheduleSettings.scheduleDays || [];
+        document.querySelectorAll('.schedule-day').forEach(checkbox => {
+            checkbox.checked = scheduleDays.includes(checkbox.value);
+        });
+
+        // Set time window
+        const schedStartTime = document.getElementById('schedStartTime');
+        if (schedStartTime) {
+            schedStartTime.value = scheduleSettings.schedStartTime || '09:00';
+        }
+
+        const schedEndTime = document.getElementById('schedEndTime');
+        if (schedEndTime) {
+            schedEndTime.value = scheduleSettings.schedEndTime || '17:00';
+        }
+
+        // Set max posts per day
+        const maxPostsPerDay = document.getElementById('maxPostsPerDay');
+        if (maxPostsPerDay) {
+            maxPostsPerDay.value = scheduleSettings.maxPostsPerDay || '1';
+        }
+    } catch (error) {
+        console.error('Error loading schedule settings:', error);
+    }
+}
+
+// Auto-save schedule settings when any field changes
+function initScheduleAutoSave() {
+    const postFrequency = document.getElementById('postFrequency');
+    if (postFrequency) {
+        postFrequency.addEventListener('change', saveFacebookSchedule);
+    }
+
+    document.querySelectorAll('.schedule-day').forEach(checkbox => {
+        checkbox.addEventListener('change', saveFacebookSchedule);
+    });
+
+    const schedStartTime = document.getElementById('schedStartTime');
+    if (schedStartTime) {
+        schedStartTime.addEventListener('change', saveFacebookSchedule);
+    }
+
+    const schedEndTime = document.getElementById('schedEndTime');
+    if (schedEndTime) {
+        schedEndTime.addEventListener('change', saveFacebookSchedule);
+    }
+
+    const maxPostsPerDay = document.getElementById('maxPostsPerDay');
+    if (maxPostsPerDay) {
+        maxPostsPerDay.addEventListener('change', saveFacebookSchedule);
+    }
+}
+
 window.toggleCustomSchedule = toggleCustomSchedule;
+window.saveFacebookSchedule = saveFacebookSchedule;
+window.loadFacebookSchedule = loadFacebookSchedule;
+window.initScheduleAutoSave = initScheduleAutoSave;
 
 // Simplified card layout - no expansion functionality needed

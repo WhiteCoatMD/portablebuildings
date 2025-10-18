@@ -34,7 +34,8 @@
       "Bash(nslookup:*)",
       "Bash(curl -k -s https://patriot-buildings.us)",
       "Bash(git rm:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

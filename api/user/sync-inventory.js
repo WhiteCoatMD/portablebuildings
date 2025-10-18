@@ -7,6 +7,7 @@ const { requireAuth } = require('../../lib/auth');
 const GPBScraper = require('../../gpb-scraper');
 const { getPool } = require('../../lib/db');
 const { autoPostToGBP } = require('../../lib/autopost-google-business');
+const { autoPostToFacebook } = require('../../lib/autopost-facebook');
 
 const pool = getPool();
 
@@ -159,28 +160,27 @@ async function handler(req, res) {
 
         console.log(`Sync complete for user ${req.user.email}: ${insertedCount} new, ${updatedCount} updated, ${skippedCount} skipped`);
 
-        // Auto-post new buildings to Google Business Profile
+        // Auto-post new buildings to Google Business Profile and Facebook
         if (newBuildings.length > 0) {
-            console.log(`[GBP Autopost] ${newBuildings.length} new buildings to potentially post`);
+            console.log(`[Autopost] ${newBuildings.length} new buildings to potentially post`);
 
             // Get user settings for autopost configuration
             const settingsResult = await pool.query(
-                `SELECT setting_key, setting_value FROM user_settings WHERE user_id = $1`,
+                `SELECT settings FROM user_settings WHERE user_id = $1`,
                 [req.user.id]
             );
 
-            const settings = {};
-            settingsResult.rows.forEach(row => {
-                try {
-                    settings[row.setting_key] = JSON.parse(row.setting_value);
-                } catch (e) {
-                    settings[row.setting_key] = row.setting_value;
-                }
-            });
+            const userSettings = settingsResult.rows.length > 0 ? settingsResult.rows[0] : {};
 
-            // Auto-post each new building (non-blocking)
+            // Auto-post each new building to both platforms (non-blocking)
             for (const building of newBuildings) {
-                autoPostToGBP(req.user.id, building, settings).catch(error => {
+                // Facebook auto-post
+                autoPostToFacebook(req.user.id, building, userSettings).catch(error => {
+                    console.error(`[Facebook Autopost] Failed for ${building.serialNumber}:`, error);
+                });
+
+                // Google Business Profile auto-post
+                autoPostToGBP(req.user.id, building, userSettings).catch(error => {
                     console.error(`[GBP Autopost] Failed for ${building.serialNumber}:`, error);
                 });
             }
