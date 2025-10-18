@@ -433,6 +433,13 @@ function switchTab(tabName) {
     if (tabName === 'domain') {
         loadDomainInfo();
     }
+
+    // Log activity when viewing leads tab
+    if (tabName === 'leads') {
+        logActivity('view_leads', {
+            timestamp: new Date().toISOString()
+        });
+    }
 }
 
 // Bubble button settings state
