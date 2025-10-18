@@ -46,7 +46,10 @@ module.exports = async function handler(req, res) {
             console.log('Loaded image order from database for user', userId);
           }
         } catch (e) {
-          console.log('Failed to load image order from database:', e.message);
+          // Database errors should not prevent image loading
+          // Just log and continue without custom order
+          console.error('Database error loading image order:', e.code, e.message);
+          // Continue with default sort order
         }
       }
 
@@ -120,12 +123,14 @@ module.exports = async function handler(req, res) {
     }
 
   } catch (error) {
-    console.error('API error:', error);
-    console.error('Error stack:', error.stack);
+    // Log the full error but don't expose internal details to client
+    console.error('Unexpected database error:', error);
+
+    // Return a generic error that won't break the frontend
     return res.status(500).json({
-      error: 'Failed to process request',
-      details: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      success: false,
+      error: 'Failed to load images',
+      images: [] // Return empty array so frontend can use placeholder
     });
   }
 }

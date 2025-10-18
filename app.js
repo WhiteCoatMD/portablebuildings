@@ -412,6 +412,13 @@ class InventoryApp {
     }
 
     renderBuildings() {
+        console.log('[InventoryApp] Rendering', this.filteredInventory.length, 'buildings');
+
+        if (!this.elements.buildingsGrid) {
+            console.error('[InventoryApp] ERROR: buildings-grid element not found!');
+            return;
+        }
+
         this.updateCount();
 
         if (this.filteredInventory.length === 0) {
@@ -437,8 +444,13 @@ class InventoryApp {
             });
         }
 
-        const html = sortedInventory.map(building => this.createBuildingCard(building)).join('');
-        this.elements.buildingsGrid.innerHTML = html;
+        try {
+            const html = sortedInventory.map(building => this.createBuildingCard(building)).join('');
+            this.elements.buildingsGrid.innerHTML = html;
+            console.log('[InventoryApp] Successfully rendered buildings to DOM');
+        } catch (error) {
+            console.error('[InventoryApp] Error rendering buildings:', error);
+        }
     }
 
     createBuildingCard(building) {
@@ -650,6 +662,12 @@ class InventoryApp {
             const orderParam = imageOrder ? `&order=${encodeURIComponent(imageOrder)}` : '';
 
             const response = await fetch(`/api/images?serialNumber=${encodeURIComponent(serialNumber)}${userIdParam}${orderParam}`);
+
+            if (!response.ok) {
+                console.warn(`[InventoryApp] Failed to load images for ${serialNumber}:`, response.status);
+                return; // Fail silently, building will show emoji placeholder
+            }
+
             const data = await response.json();
 
             if (data.success && data.images.length > 0) {
@@ -691,7 +709,9 @@ class InventoryApp {
                 }
             }
         } catch (error) {
-            console.error('Failed to load images for', serialNumber, error);
+            // Fail silently - don't log errors for image loading failures
+            // Building will display with emoji placeholder instead
+            console.debug('Image load failed for', serialNumber, '- using placeholder');
         }
     }
 }
