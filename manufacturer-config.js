@@ -60,7 +60,7 @@ const MANUFACTURERS = {
 
     premier: {
         name: 'Premier Portable Buildings',
-        logo: '/public/premier_logo.png',
+        logo: '/premierlogo.png',
         dealerText: 'Authorized Premier Portable Buildings Dealer',
 
         // Hero gallery images (will be added later)
@@ -78,20 +78,20 @@ const MANUFACTURERS = {
             title: 'Why Choose Premier Portable Buildings?',
             items: [
                 {
-                    title: 'Premium Quality',
-                    description: 'Built with the finest materials and attention to detail, Premier buildings are designed to exceed your expectations.'
+                    title: 'Completely Customizable',
+                    description: 'All of our buildings are completely customizable. We can add or take away just about anything you would want, as long as it doesn\'t compromise the integrity of the building.'
                 },
                 {
-                    title: 'Customizable Options',
-                    description: 'Extensive customization options allow you to create the perfect building for your specific needs.'
+                    title: 'No Credit Checks for Rent-to-Own',
+                    description: 'We offer an affordable alternative to buying your portable building with a 36 or 48 month rent-to-own contract. A small security deposit and/or your first month\'s rent is all that is due!'
                 },
                 {
-                    title: 'Trusted Nationwide',
-                    description: 'Thousands of satisfied customers across the country trust Premier for their portable building needs.'
+                    title: 'Wide Range of Sizes',
+                    description: 'We can build as small as a 6\'x10\' up to a 16\'x54\' building. All buildings feature quality construction and attention to detail.'
                 },
                 {
-                    title: 'American Made',
-                    description: 'Proudly manufactured in the USA, supporting American jobs and craftsmanship.'
+                    title: 'Free Delivery',
+                    description: 'We offer free delivery up to 50 miles from our closest dealer to the point of delivery. Contact your local dealer for pricing beyond 50 miles.'
                 }
             ]
         },
@@ -99,8 +99,52 @@ const MANUFACTURERS = {
         // About section
         about: {
             title: 'About Premier Portable Buildings',
-            description: 'Premier Portable Buildings has been a trusted name in portable structures, delivering quality and value to customers nationwide. Our commitment to excellence shows in every building we create.'
+            description: 'Premier Portable Buildings offers a wide range of building options and sizes to meet your needs. Our buildings are typically delivered within 20 to 25 days from order. We pride ourselves on quality construction, customization options, and flexible rent-to-own programs with no credit checks required.'
         },
+
+        // FAQ section
+        faq: [
+            {
+                question: 'How much are your buildings?',
+                answer: 'We offer a wide range of building options and sizes for each. Pricing varies by region and state because of regulations, hauling restrictions, shipping costs and associated material costs. Contact your local dealer for details on pricing in your area, or request a brochure.'
+            },
+            {
+                question: 'Your brochure states "Free Delivery", but I live far away from where I saw the buildings. How far is too far?',
+                answer: 'We offer free delivery up to 50 miles from our closest dealer to the point of delivery. You do not have to order the building from the closest dealer to qualify for free delivery. If you are beyond the 50 mile radius, please contact the sales rep for the state in which you live to give you an accurate cost.'
+            },
+            {
+                question: 'What are the dimensions of your buildings?',
+                answer: 'We can build as small as a 6\'x10\' up to a 16\'x54\' building. The length of our buildings are always measured from front to back along our floor platform. For width measurements, all 8\', 10\', and 14\' wide buildings are measured wall-to-wall, except 12\' wide buildings which are measured eave-to-eave.'
+            },
+            {
+                question: 'I would like to add a window to a building and change where the door is located. Can I customize the building?',
+                answer: 'Absolutely! All of our buildings are completely customizable. We have a standard placement for doors and windows, but if you would like an additional door, window, roll-up, etc., we can easily accommodate. We can add or take away just about anything you would want, as long as it doesn\'t compromise the integrity of the building.'
+            },
+            {
+                question: 'Do I need good credit for the Rent-to-Own option?',
+                answer: 'WE DO NOT DO CREDIT CHECKS! We offer an affordable alternative to buying your portable building by signing a 36 or 48 month rent-to-own contract. A small security deposit and/or your first month\'s rent is all that is due to get a building delivered to you!'
+            },
+            {
+                question: 'I ordered a building. When should I expect it to be delivered?',
+                answer: 'Our buildings are typically delivered within 20 to 25 days from the date we receive your order. Currently, due to increase in demand and in response to COVID-19, deliveries are between 4 and 6 weeks. Weather and ground conditions may also affect delivery.'
+            },
+            {
+                question: 'Do I need a specific foundation for my building?',
+                answer: 'The only requirement is a general level location for your building to sit on (we will level the building up to 18"). Our buildings are designed to rest directly on their skids. In order to level the building we use treated wood blocks. If you would like to have your building on concrete blocks, we only require that you provide the blocks.'
+            },
+            {
+                question: 'What if my new building will not fit through my gate or around my fence?',
+                answer: 'Premier Portable Buildings now offers custom built on-site options in most locations. If your limited on space, give us a call extension 2048 to request a custom build-on-site option. (additional fees apply for on-site builds)'
+            },
+            {
+                question: 'How much space should be allowed to deliver a building?',
+                answer: 'A vertical space of 14\', measured from the ground to the top of the building when it is on the trailer, is required. Be sure to take any tree branches and utility wires into account. While our drivers are very skilled with a Mule, he will still need a minimum of 1\' of space to maneuver the building through an opening. That is, a building 12\' wide will require a 14-foot wide space (1 foot on each side). If you would like to discuss an on-site build, please dial extension 2048.'
+            },
+            {
+                question: 'Do I need to have permits for my building?',
+                answer: 'You are responsible for contacting your local city and county agencies in regard to zoning, permits, setbacks, and covenants. Also, it is recommended that you contact your Home Owners Association (if applicable) to determine what neighborhood rules and regulations may be in place.'
+            }
+        ],
 
         // Footer text
         footerText: 'Authorized Premier Portable Buildings Dealer',

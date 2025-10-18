@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manufacturer Template Preview</title>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <link rel="stylesheet" href="color-schemes.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #f5f5f5;
+            padding: 2rem 0;
+        }
+
+        .preview-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .preview-header h1 {
+            margin: 0 0 1rem 0;
+            color: #ffd60a;
+        }
+
+        .manufacturer-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .manufacturer-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .manufacturer-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #ffd60a;
+        }
+
+        .manufacturer-btn.active {
+            background: #ffd60a;
+            color: #1a1a2e;
+            border-color: #ffd60a;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .preview-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .faq-section {
+            padding: 4rem 0;
+            background: #f8f9fa;
+        }
+
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .faq-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--primary-color);
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .faq-question {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .faq-answer {
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        .dummy-inventory {
+            padding: 3rem 2rem;
+            text-align: center;
+            background: #fff;
+        }
+
+        .dummy-inventory h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .dummy-inventory p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-header">
+        <div class="container">
+            <h1>🏗️ Manufacturer Template Preview</h1>
+            <p style="color: #e0e0e0; margin-bottom: 1.5rem;">View how each manufacturer's branding and content appears on dealer sites</p>
+
+            <div class="manufacturer-selector">
+                <button class="manufacturer-btn active" onclick="loadManufacturer('graceland')">Graceland</button>
+                <button class="manufacturer-btn" onclick="loadManufacturer('premier')">Premier</button>
+                <button class="manufacturer-btn" onclick="loadManufacturer('stormor')">Stor-Mor</button>
+            </div>
+
+            <a href="super-admin.html" class="back-link">← Back to Super Admin</a>
+        </div>
+    </div>
+
+    <div class="preview-container">
+        <!-- This will be populated by JavaScript -->
+        <div id="preview-content">
+            <div style="text-align: center; padding: 4rem 2rem;">
+                <p style="color: #666;">Loading manufacturer template...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="manufacturer-config.js"></script>
+    <script>
+        let currentManufacturer = 'graceland';
+
+        function loadManufacturer(manufacturer) {
+            currentManufacturer = manufacturer;
+
+            // Update button states
+            document.querySelectorAll('.manufacturer-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Get config
+            const config = getManufacturerConfig(manufacturer);
+
+            // Update CSS variables if colors defined
+            if (config.colors) {
+                document.documentElement.style.setProperty('--primary-color', config.colors.primary);
+                document.documentElement.style.setProperty('--secondary-color', config.colors.secondary);
+            }
+
+            // Build preview HTML
+            let html = `
+                <!-- Header -->
+                <header style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; padding: 2rem;">
+                    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h1 style="margin: 0 0 0.5rem 0; font-size: 2rem;">[Dealer Business Name]</h1>
+                            <p style="margin: 0; opacity: 0.95;">Call us at <a href="tel:5551234567" style="color: white; text-decoration: none; border-bottom: 2px solid rgba(255,255,255,0.5);">(555) 123-4567</a></p>
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="${config.logo}" alt="${config.name}" style="max-height: 80px; width: auto;">
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.95;">${config.dealerText}</p>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Hero Gallery -->
+                <section class="hero" style="position: relative; width: 100%; height: 400px; background: #000;">
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <img src="${config.heroImages[0].src}" alt="${config.heroImages[0].alt}" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </section>
+
+                <!-- Welcome Section -->
+                <section style="background: #f8f9fa; padding: 3rem 0; border-bottom: 1px solid #d0d0d0;">
+                    <div class="container" style="text-align: center; max-width: 900px; margin: 0 auto;">
+                        <h2 style="font-size: 1.75rem; color: var(--primary-color); margin-bottom: 1rem; font-weight: 700;">Welcome to Our Portable Buildings Showroom</h2>
+                        <p style="font-size: 1.15rem; color: #555; line-height: 1.6;">Browse our current inventory and find the perfect portable building for your needs!</p>
+                    </div>
+                </section>
+
+                <!-- Features Section -->
+                <section style="background: white; padding: 5rem 0;">
+                    <div class="container">
+                        <h2 style="text-align: center; font-size: 2.5rem; color: var(--text-dark); margin-bottom: 4rem; font-weight: 700;">${config.features.title}</h2>
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 2.5rem; max-width: 800px; margin: 0 auto;">
+                            ${config.features.items.map(feature => `
+                                <div style="background: white; padding: 2.5rem 2rem; border-left: 4px solid var(--primary-color); box-shadow: 0 2px 16px rgba(0,0,0,0.06);">
+                                    <div style="font-size: 3rem; font-weight: 700; color: #dc3545; line-height: 1; margin-bottom: 1rem; font-family: Arial, sans-serif;">✓</div>
+                                    <h3 style="font-size: 1.4rem; color: var(--text-dark); margin-bottom: 1rem; font-weight: 700;">${feature.title}</h3>
+                                    <p style="color: #555; line-height: 1.7; font-size: 0.95rem;">${feature.description}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- About Section -->
+                ${config.about ? `
+                <section style="background: #f8f9fa; padding: 4rem 0;">
+                    <div class="container">
+                        <h2 style="text-align: center; font-size: 2.5rem; color: var(--primary-color); margin-bottom: 2rem; font-weight: 700;">${config.about.title}</h2>
+                        <div style="max-width: 800px; margin: 0 auto; text-align: center; font-size: 1.1rem; line-height: 1.8; color: #333;">
+                            <p>${config.about.description}</p>
+                        </div>
+                    </div>
+                </section>
+                ` : ''}
+
+                <!-- FAQ Section (Premier Only) -->
+                ${config.faq ? `
+                <section class="faq-section">
+                    <div class="faq-container">
+                        <h2 class="faq-title">Frequently Asked Questions</h2>
+                        ${config.faq.map(item => `
+                            <div class="faq-item">
+                                <div class="faq-question">${item.question}</div>
+                                <div class="faq-answer">${item.answer}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
+                ` : ''}
+
+                <!-- Dummy Inventory Section -->
+                <section class="dummy-inventory">
+                    <h2>Current Inventory</h2>
+                    <p>Dealer's inventory will appear here with building cards, photos, pricing, and RTO options</p>
+                    <div style="background: #f8f9fa; padding: 4rem 2rem; margin-top: 2rem; border-radius: 8px;">
+                        <p style="color: #999; font-style: italic;">📦 Building cards with photos, specifications, and pricing will be displayed here</p>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <footer style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e0e0e0; padding: 3rem 2rem;">
+                    <div class="container" style="text-align: center;">
+                        <p style="margin-bottom: 0.5rem;">&copy; 2025 [Dealer Business Name]. All rights reserved.</p>
+                        <p style="font-size: 0.85rem; opacity: 0.7; font-style: italic;">${config.footerText}</p>
+                    </div>
+                </footer>
+            `;
+
+            document.getElementById('preview-content').innerHTML = html;
+        }
+
+        // Load Graceland by default
+        loadManufacturer('graceland');
+    </script>
+</body>
+</html>
