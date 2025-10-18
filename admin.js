@@ -4427,23 +4427,31 @@ async function connectGoogleBusinessOAuth() {
 
             // Listen for messages from the OAuth popup
             const messageHandler = (event) => {
+                console.log('[OAuth Message] Received message:', event.data, 'from origin:', event.origin);
+
                 // Verify origin for security
                 if (event.origin !== window.location.origin) {
+                    console.warn('[OAuth Message] Ignoring message from different origin');
                     return;
                 }
 
                 if (event.data && event.data.type === 'oauth_success' && event.data.platform === 'google') {
+                    console.log('[OAuth Message] Google OAuth success detected, redirecting...');
                     window.removeEventListener('message', messageHandler);
                     showToast('✅ Google Business Profile connected successfully!');
 
                     // Reload the page and navigate to Google section with a flag to show location selector
-                    window.location.href = '/admin.html?tab=marketing&platform=google&show_location_selector=true';
+                    setTimeout(() => {
+                        window.location.href = '/admin.html?tab=marketing&platform=google&show_location_selector=true';
+                    }, 500);
                 } else if (event.data && event.data.type === 'oauth_error' && event.data.platform === 'google') {
+                    console.log('[OAuth Message] Google OAuth error detected');
                     window.removeEventListener('message', messageHandler);
                     showToast(`❌ Failed to connect: ${event.data.error}`, true);
                 }
             };
 
+            console.log('[Google OAuth] Adding message listener');
             window.addEventListener('message', messageHandler);
 
             // Clean up listener after 5 minutes

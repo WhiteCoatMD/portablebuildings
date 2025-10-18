@@ -138,18 +138,23 @@
         // Notify parent window of success/error
         if (window.opener && !window.opener.closed) {
             if (isSuccess) {
+                console.log('[OAuth Callback] Sending success message to parent window');
                 window.opener.postMessage({
                     type: 'oauth_success',
                     platform: urlParams.has('gbp_success') ? 'google' : 'facebook'
                 }, window.location.origin);
+                console.log('[OAuth Callback] Message sent');
             } else if (isError) {
                 const errorType = urlParams.get('gbp_error') || urlParams.get('fb_error');
+                console.log('[OAuth Callback] Sending error message to parent window');
                 window.opener.postMessage({
                     type: 'oauth_error',
                     platform: urlParams.has('gbp_error') ? 'google' : 'facebook',
                     error: errorType
                 }, window.location.origin);
             }
+        } else {
+            console.warn('[OAuth Callback] No opener window found or window is closed');
         }
 
         // Try to close after countdown
