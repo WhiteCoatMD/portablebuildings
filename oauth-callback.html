@@ -136,32 +136,58 @@
         }
 
         // Notify parent window of success/error
+        console.log('[OAuth Callback] Window opener:', window.opener);
+        console.log('[OAuth Callback] Window opener closed?:', window.opener ? window.opener.closed : 'N/A');
+        console.log('[OAuth Callback] Current origin:', window.location.origin);
+
         if (window.opener && !window.opener.closed) {
             if (isSuccess) {
                 console.log('[OAuth Callback] Sending success message to parent window');
-                window.opener.postMessage({
-                    type: 'oauth_success',
-                    platform: urlParams.has('gbp_success') ? 'google' : 'facebook'
-                }, window.location.origin);
-                console.log('[OAuth Callback] Message sent');
+                try {
+                    window.opener.postMessage({
+                        type: 'oauth_success',
+                        platform: urlParams.has('gbp_success') ? 'google' : 'facebook'
+                    }, window.location.origin);
+                    console.log('[OAuth Callback] Message sent successfully');
+
+                    // Also try to call a function directly on the parent window as backup
+                    if (window.opener.handleOAuthSuccess) {
+                        console.log('[OAuth Callback] Calling direct function on parent');
+                        window.opener.handleOAuthSuccess();
+                    }
+                } catch (err) {
+                    console.error('[OAuth Callback] Error sending message:', err);
+                }
             } else if (isError) {
                 const errorType = urlParams.get('gbp_error') || urlParams.get('fb_error');
                 console.log('[OAuth Callback] Sending error message to parent window');
-                window.opener.postMessage({
-                    type: 'oauth_error',
-                    platform: urlParams.has('gbp_error') ? 'google' : 'facebook',
-                    error: errorType
-                }, window.location.origin);
+                try {
+                    window.opener.postMessage({
+                        type: 'oauth_error',
+                        platform: urlParams.has('gbp_error') ? 'google' : 'facebook',
+                        error: errorType
+                    }, window.location.origin);
+                    console.log('[OAuth Callback] Error message sent');
+                } catch (err) {
+                    console.error('[OAuth Callback] Error sending error message:', err);
+                }
             }
         } else {
             console.warn('[OAuth Callback] No opener window found or window is closed');
+            console.warn('[OAuth Callback] Will use localStorage as fallback');
+
+            // Fallback: Use localStorage to communicate
+            if (isSuccess) {
+                localStorage.setItem('google_oauth_success', Date.now().toString());
+            }
         }
 
-        // Try to close after countdown
+        // Try to close after countdown (increased to 3 seconds to ensure message is sent)
         if (isSuccess || isError) {
             setTimeout(() => {
+                console.log('[OAuth Callback] Attempting to close window');
                 window.close();
-            }, 2000);
+            }, 3000);
         }
     </script>
 </body>

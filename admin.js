@@ -4454,9 +4454,36 @@ async function connectGoogleBusinessOAuth() {
             console.log('[Google OAuth] Adding message listener');
             window.addEventListener('message', messageHandler);
 
-            // Clean up listener after 5 minutes
+            // Add direct function as backup for postMessage
+            window.handleOAuthSuccess = function() {
+                console.log('[Google OAuth] Direct function called by popup');
+                window.removeEventListener('message', messageHandler);
+                showToast('✅ Google Business Profile connected successfully!');
+                setTimeout(() => {
+                    window.location.href = '/admin.html?tab=marketing&platform=google&show_location_selector=true';
+                }, 500);
+            };
+
+            // Also poll localStorage as a fallback
+            const checkLocalStorage = setInterval(() => {
+                const success = localStorage.getItem('google_oauth_success');
+                if (success) {
+                    console.log('[Google OAuth] Success detected via localStorage');
+                    clearInterval(checkLocalStorage);
+                    localStorage.removeItem('google_oauth_success');
+                    window.removeEventListener('message', messageHandler);
+                    showToast('✅ Google Business Profile connected successfully!');
+                    setTimeout(() => {
+                        window.location.href = '/admin.html?tab=marketing&platform=google&show_location_selector=true';
+                    }, 500);
+                }
+            }, 500);
+
+            // Clean up listener and polling after 5 minutes
             setTimeout(() => {
                 window.removeEventListener('message', messageHandler);
+                clearInterval(checkLocalStorage);
+                delete window.handleOAuthSuccess;
             }, 5 * 60 * 1000);
 
         } else {
