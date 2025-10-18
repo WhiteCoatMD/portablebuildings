@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Inventory Render</title>
+    <style>
+        .buildings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            background: yellow; /* Debug color */
+            min-height: 200px;
+        }
+        .building-card {
+            border: 2px solid red;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inventory Test</h1>
+    <div id="buildings-grid" class="buildings-grid">
+        <!-- This should be populated -->
+    </div>
+    
+    <script>
+        // Simulate what app.js does
+        const html = '<div class="building-card">Test Building 1</div><div class="building-card">Test Building 2</div>';
+        document.getElementById('buildings-grid').innerHTML = html;
+        console.log('Rendered HTML:', html);
+        console.log('Grid element:', document.getElementById('buildings-grid'));
+    </script>
+</body>
+</html>

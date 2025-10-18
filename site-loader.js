@@ -70,7 +70,14 @@ window.PROCESSED_INVENTORY = [];
         console.log('[Site Loader] Inventory loaded:', window.PROCESSED_INVENTORY.length, 'buildings');
 
         // Apply site configuration to page
-        applySiteConfiguration();
+        try {
+            applySiteConfiguration();
+        } catch (error) {
+            console.error('[Site Loader] Error applying site configuration:', error);
+            // Still make page visible even if configuration fails
+            document.body.classList.remove('loading');
+            document.body.classList.add('loaded');
+        }
 
         // Dispatch event for manufacturer branding to load
         window.dispatchEvent(new Event('siteConfigLoaded'));
@@ -105,76 +112,99 @@ window.PROCESSED_INVENTORY = [];
 
 function applySiteConfiguration() {
     const config = window.SITE_CONFIG;
-    if (!config) return;
-
-    // Use placeholder text if businessName is not set
-    const displayName = config.businessName || '[Your Business Name]';
-
-    // Update page title
-    document.title = `${displayName} - Current Inventory`;
-
-    // Update business name in header
-    const businessNameHeader = document.getElementById('business-name-header');
-    if (businessNameHeader) {
-        businessNameHeader.textContent = displayName;
+    if (!config) {
+        console.warn('[Site Loader] No config found, using defaults');
+        // Still show the page
+        document.body.classList.remove('loading');
+        document.body.classList.add('loaded');
+        return;
     }
 
-    // Update phone number
-    const phone = config.phone || '(555) 123-4567';
-    const headerPhoneLink = document.getElementById('header-phone-link');
-    if (headerPhoneLink) {
-        headerPhoneLink.textContent = phone;
-        headerPhoneLink.href = `tel:${phone}`;
-    }
+    console.log('[Site Loader] Applying site configuration...');
 
-    // Update footer business name
-    const footerBusinessName = document.getElementById('footer-business-name');
-    if (footerBusinessName) {
-        footerBusinessName.textContent = displayName;
-    }
+    try {
+        // Use placeholder text if businessName is not set
+        const displayName = config.businessName || '[Your Business Name]';
 
-    // Update footer copyright
-    const footerCopyrightName = document.getElementById('footer-copyright-name');
-    if (footerCopyrightName) {
-        footerCopyrightName.textContent = displayName;
-    }
+        // Update page title
+        document.title = `${displayName} - Current Inventory`;
 
-    // Update footer phone
-    const footerPhoneLink = document.getElementById('footer-phone-link');
-    if (footerPhoneLink) {
-        footerPhoneLink.textContent = phone;
-        footerPhoneLink.href = `tel:${phone}`;
-    }
-
-    // Update footer address
-    if (config.address) {
-        const footerAddress = document.getElementById('footer-address');
-        if (footerAddress) {
-            footerAddress.textContent = config.address;
+        // Update business name in header
+        const businessNameHeader = document.getElementById('business-name-header');
+        if (businessNameHeader) {
+            businessNameHeader.textContent = displayName;
         }
-    }
 
-    // Update footer email
-    const email = config.bestContactEmail || config.email;
-    if (email) {
-        const footerEmailContainer = document.getElementById('footer-email-container');
-        const footerEmailLink = document.getElementById('footer-email-link');
-        if (footerEmailContainer && footerEmailLink) {
-            footerEmailLink.textContent = email;
-            footerEmailLink.href = `mailto:${email}`;
-            footerEmailContainer.style.display = 'block';
+        // Update phone number
+        const phone = config.phone || '(555) 123-4567';
+        const headerPhoneLink = document.getElementById('header-phone-link');
+        if (headerPhoneLink) {
+            headerPhoneLink.textContent = phone;
+            headerPhoneLink.href = `tel:${phone}`;
         }
+
+        // Update footer business name
+        const footerBusinessName = document.getElementById('footer-business-name');
+        if (footerBusinessName) {
+            footerBusinessName.textContent = displayName;
+        }
+
+        // Update footer copyright
+        const footerCopyrightName = document.getElementById('footer-copyright-name');
+        if (footerCopyrightName) {
+            footerCopyrightName.textContent = displayName;
+        }
+
+        // Update footer phone
+        const footerPhoneLink = document.getElementById('footer-phone-link');
+        if (footerPhoneLink) {
+            footerPhoneLink.textContent = phone;
+            footerPhoneLink.href = `tel:${phone}`;
+        }
+
+        // Update footer address
+        if (config.address) {
+            const footerAddress = document.getElementById('footer-address');
+            if (footerAddress) {
+                footerAddress.textContent = config.address;
+            }
+        }
+
+        // Update footer email
+        const email = config.bestContactEmail || config.email;
+        if (email) {
+            const footerEmailContainer = document.getElementById('footer-email-container');
+            const footerEmailLink = document.getElementById('footer-email-link');
+            if (footerEmailContainer && footerEmailLink) {
+                footerEmailLink.textContent = email;
+                footerEmailLink.href = `mailto:${email}`;
+                footerEmailContainer.style.display = 'block';
+            }
+        }
+
+        // Apply settings from database (with error handling)
+        try {
+            if (config.settings) {
+                applyCustomizationSettings(config.settings);
+            }
+        } catch (err) {
+            console.error('[Site Loader] Error applying customization settings:', err);
+        }
+
+        // Update location hours (with error handling)
+        try {
+            if (config.locationHours) {
+                updateLocationHours(config.locationHours);
+            }
+        } catch (err) {
+            console.error('[Site Loader] Error updating location hours:', err);
+        }
+
+    } catch (error) {
+        console.error('[Site Loader] Error in applySiteConfiguration:', error);
     }
 
-    // Apply settings from database
-    applyCustomizationSettings(config.settings);
-
-    // Update location hours
-    if (config.locationHours) {
-        updateLocationHours(config.locationHours);
-    }
-
-    // Show the page now that configuration is loaded
+    // ALWAYS show the page, even if errors occurred above
     document.body.classList.remove('loading');
     document.body.classList.add('loaded');
 
