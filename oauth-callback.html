@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connection Successful</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            color: #718096;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .error-container {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .error-container h1 {
+            color: #e53e3e;
+        }
+
+        .countdown {
+            color: #4299e1;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="content"></div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const isSuccess = urlParams.has('gbp_success') || urlParams.has('fb_success');
+        const isError = urlParams.has('gbp_error') || urlParams.has('fb_error');
+
+        const contentDiv = document.getElementById('content');
+        let countdown = 2;
+
+        if (isSuccess) {
+            contentDiv.innerHTML = `
+                <div class="success-container">
+                    <div class="success-icon">✅</div>
+                    <h1>Successfully Connected!</h1>
+                    <p>Your account has been connected successfully.</p>
+                    <p class="countdown">This window will close in <span id="timer">${countdown}</span> seconds...</p>
+                </div>
+            `;
+        } else if (isError) {
+            const errorType = urlParams.get('gbp_error') || urlParams.get('fb_error');
+            contentDiv.innerHTML = `
+                <div class="error-container">
+                    <div class="error-icon">❌</div>
+                    <h1>Connection Failed</h1>
+                    <p>Error: ${errorType || 'Unknown error occurred'}</p>
+                    <p class="countdown">This window will close in <span id="timer">${countdown}</span> seconds...</p>
+                </div>
+            `;
+        } else {
+            contentDiv.innerHTML = `
+                <div class="success-container">
+                    <div class="success-icon">⏳</div>
+                    <h1>Processing...</h1>
+                    <p>Please wait while we process your connection.</p>
+                </div>
+            `;
+        }
+
+        // Countdown timer
+        if (isSuccess || isError) {
+            const timer = setInterval(() => {
+                countdown--;
+                const timerElement = document.getElementById('timer');
+                if (timerElement) {
+                    timerElement.textContent = countdown;
+                }
+
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    window.close();
+                }
+            }, 1000);
+        }
+
+        // Notify parent window of success/error
+        if (window.opener && !window.opener.closed) {
+            if (isSuccess) {
+                window.opener.postMessage({
+                    type: 'oauth_success',
+                    platform: urlParams.has('gbp_success') ? 'google' : 'facebook'
+                }, window.location.origin);
+            } else if (isError) {
+                const errorType = urlParams.get('gbp_error') || urlParams.get('fb_error');
+                window.opener.postMessage({
+                    type: 'oauth_error',
+                    platform: urlParams.has('gbp_error') ? 'google' : 'facebook',
+                    error: errorType
+                }, window.location.origin);
+            }
+        }
+
+        // Try to close after countdown
+        if (isSuccess || isError) {
+            setTimeout(() => {
+                window.close();
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

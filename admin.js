@@ -4361,27 +4361,29 @@ async function connectGoogleBusinessOAuth() {
                 `width=${width},height=${height},left=${left},top=${top}`
             );
 
-            // Listen for the popup to close and reload data
-            const checkInterval = setInterval(() => {
-                // Check URL params for success/error from callback
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.has('gbp_success')) {
-                    clearInterval(checkInterval);
-                    showToast('Google Business Profile connected successfully!');
-                    loadGoogleBusinessConnectionStatus();
-                    // Clean up URL
-                    window.history.replaceState({}, document.title, window.location.pathname + '#customization');
-                } else if (urlParams.has('gbp_error')) {
-                    clearInterval(checkInterval);
-                    const error = urlParams.get('gbp_error');
-                    showToast(`Failed to connect: ${error}`, true);
-                    // Clean up URL
-                    window.history.replaceState({}, document.title, window.location.pathname + '#customization');
+            // Listen for messages from the OAuth popup
+            const messageHandler = (event) => {
+                // Verify origin for security
+                if (event.origin !== window.location.origin) {
+                    return;
                 }
-            }, 1000);
 
-            // Stop checking after 5 minutes
-            setTimeout(() => clearInterval(checkInterval), 5 * 60 * 1000);
+                if (event.data && event.data.type === 'oauth_success' && event.data.platform === 'google') {
+                    window.removeEventListener('message', messageHandler);
+                    showToast('✅ Google Business Profile connected successfully!');
+                    loadGoogleBusinessConnectionStatus();
+                } else if (event.data && event.data.type === 'oauth_error' && event.data.platform === 'google') {
+                    window.removeEventListener('message', messageHandler);
+                    showToast(`❌ Failed to connect: ${event.data.error}`, true);
+                }
+            };
+
+            window.addEventListener('message', messageHandler);
+
+            // Clean up listener after 5 minutes
+            setTimeout(() => {
+                window.removeEventListener('message', messageHandler);
+            }, 5 * 60 * 1000);
 
         } else {
             showToast(data.error || 'Failed to initiate Google Business Profile connection', true);

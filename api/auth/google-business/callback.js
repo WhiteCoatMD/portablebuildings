@@ -14,11 +14,11 @@ module.exports = async (req, res) => {
         // Handle OAuth errors
         if (error) {
             console.error('[GBP OAuth Callback] Error:', error);
-            return res.redirect(`/admin.html?gbp_error=${encodeURIComponent(error)}`);
+            return res.redirect(`/oauth-callback.html?gbp_error=${encodeURIComponent(error)}`);
         }
 
         if (!code) {
-            return res.redirect('/admin.html?gbp_error=missing_code');
+            return res.redirect('/oauth-callback.html?gbp_error=missing_code');
         }
 
         const clientId = process.env.GOOGLE_BUSINESS_CLIENT_ID?.trim();
@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
 
         if (!clientId || !clientSecret) {
             console.error('[GBP OAuth Callback] Missing credentials');
-            return res.redirect('/admin.html?gbp_error=missing_credentials');
+            return res.redirect('/oauth-callback.html?gbp_error=missing_credentials');
         }
 
         // Exchange authorization code for tokens
@@ -49,7 +49,7 @@ module.exports = async (req, res) => {
         if (!tokenResponse.ok) {
             const errorText = await tokenResponse.text();
             console.error('[GBP OAuth Callback] Token exchange failed:', errorText);
-            return res.redirect('/admin.html?gbp_error=token_exchange_failed');
+            return res.redirect('/oauth-callback.html?gbp_error=token_exchange_failed');
         }
 
         const tokens = await tokenResponse.json();
@@ -57,7 +57,7 @@ module.exports = async (req, res) => {
 
         if (!access_token) {
             console.error('[GBP OAuth Callback] No access token received');
-            return res.redirect('/admin.html?gbp_error=no_access_token');
+            return res.redirect('/oauth-callback.html?gbp_error=no_access_token');
         }
 
         // Calculate token expiration
@@ -68,7 +68,7 @@ module.exports = async (req, res) => {
 
         if (!userId) {
             console.error('[GBP OAuth Callback] No userId found');
-            return res.redirect('/admin.html?gbp_error=no_user_id');
+            return res.redirect('/oauth-callback.html?gbp_error=no_user_id');
         }
 
         // Initialize account/location variables
@@ -182,18 +182,18 @@ module.exports = async (req, res) => {
             );
 
             console.log('[GBP OAuth Callback] Connection stored successfully');
-            return res.redirect('/admin.html?gbp_success=true');
+            return res.redirect('/oauth-callback.html?gbp_success=true');
 
         } catch (dbError) {
             console.error('[GBP OAuth Callback] Database error:', dbError);
             console.error('Error details:', dbError.message);
             // Still redirect to success since OAuth completed, just log the DB issue
-            return res.redirect('/admin.html?gbp_success=true&db_warning=true');
+            return res.redirect('/oauth-callback.html?gbp_success=true&db_warning=true');
         }
 
     } catch (error) {
         console.error('[GBP OAuth Callback] Unexpected error:', error);
         console.error('Error stack:', error.stack);
-        return res.redirect(`/admin.html?gbp_error=${encodeURIComponent('unexpected_error')}`);
+        return res.redirect(`/oauth-callback.html?gbp_error=${encodeURIComponent('unexpected_error')}`);
     }
 };
