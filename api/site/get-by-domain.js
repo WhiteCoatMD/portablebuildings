@@ -166,6 +166,7 @@ async function handler(req, res) {
                 bestContactEmail: user.best_contact_email,
                 subdomain: user.subdomain,
                 customDomain: user.custom_domain,
+                manufacturer: user.manufacturer || 'graceland',
                 settings: settings,
                 locationHours: user.location_hours || {},
                 inventory: inventory.map(item => {

@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        const { email, password, businessName, fullName, phone, address, bestContactEmail } = req.body;
+        const { email, password, businessName, fullName, phone, address, bestContactEmail, manufacturer } = req.body;
 
         // Validate required fields
         if (!email || !password) {
@@ -37,6 +37,21 @@ module.exports = async function handler(req, res) {
             return res.status(400).json({
                 success: false,
                 error: 'Business name, full name, phone, and address are required'
+            });
+        }
+
+        if (!manufacturer) {
+            return res.status(400).json({
+                success: false,
+                error: 'Manufacturer selection is required'
+            });
+        }
+
+        // Validate manufacturer value
+        if (manufacturer !== 'graceland' && manufacturer !== 'premier') {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid manufacturer selection'
             });
         }
 
@@ -65,8 +80,8 @@ module.exports = async function handler(req, res) {
             });
         }
 
-        // Create user with all fields
-        const user = await createUser(email, password, businessName, fullName, phone, address, bestContactEmail);
+        // Create user with all fields including manufacturer
+        const user = await createUser(email, password, businessName, fullName, phone, address, bestContactEmail, manufacturer);
 
         return res.status(201).json({
             success: true,

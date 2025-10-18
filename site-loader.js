@@ -72,6 +72,9 @@ window.PROCESSED_INVENTORY = [];
         // Apply site configuration to page
         applySiteConfiguration();
 
+        // Dispatch event for manufacturer branding to load
+        window.dispatchEvent(new Event('siteConfigLoaded'));
+
         // Trigger app initialization after data is loaded
         if (window.app) {
             // App already exists, reload it with new data

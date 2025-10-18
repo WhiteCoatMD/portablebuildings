@@ -23,7 +23,10 @@
                 <h1>Admin Panel</h1>
             </div>
             <div class="header-actions">
-                <span id="user-email" style="margin-right: 1rem; color: #e0e0e0;"></span>
+                <div style="margin-right: 1rem; text-align: right;">
+                    <span id="user-email" style="color: #e0e0e0; display: block;"></span>
+                    <span id="user-manufacturer" style="color: #bc9c22; font-size: 0.85rem; display: block;"></span>
+                </div>
                 <button class="btn btn-warning" onclick="openFeatureRequest()" style="margin-right: 0.5rem;">💡 Request Feature</button>
                 <a href="super-admin.html" class="btn btn-secondary" id="super-admin-link" style="display: none; margin-right: 0.5rem;">Super Admin</a>
                 <a href="#" id="view-site-link" target="_blank" class="btn btn-secondary" onclick="viewSiteFromHeader(event)">View Site</a>
@@ -1686,6 +1689,33 @@ Call {{phone}} or visit our website to learn more!
             <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 1.25rem; border-radius: 8px; margin-bottom: 2rem;">
                 <h3 style="margin: 0 0 0.5rem 0; color: #1976d2; font-size: 1.1rem;">Account Settings</h3>
                 <p style="margin: 0; color: #1565c0; line-height: 1.6;">Manage your account security. Update your Shed-Sync login password to keep your account secure.</p>
+            </div>
+
+            <div class="card" style="background: #1a1a2e; color: #bc9c22; margin-bottom: 2rem;">
+                <h2 style="color: #bc9c22;">Dealer Profile</h2>
+                <p class="help-text" style="color: #bc9c22;">Your dealer account information</p>
+
+                <div style="background: rgba(188, 156, 34, 0.1); border: 2px solid #bc9c22; border-radius: 8px; padding: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div>
+                            <div style="font-weight: 600; color: #bc9c22; margin-bottom: 0.5rem;">Business Name:</div>
+                            <div style="color: #e0e0e0; font-size: 1.05rem;" id="profile-business-name">-</div>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: #bc9c22; margin-bottom: 0.5rem;">Email:</div>
+                            <div style="color: #e0e0e0; font-size: 1.05rem;" id="profile-email">-</div>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: #bc9c22; margin-bottom: 0.5rem;">Phone:</div>
+                            <div style="color: #e0e0e0; font-size: 1.05rem;" id="profile-phone">-</div>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: #bc9c22; margin-bottom: 0.5rem;">Manufacturer:</div>
+                            <div style="color: #e0e0e0; font-size: 1.05rem; text-transform: capitalize;" id="profile-manufacturer">-</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="help-text" style="margin-top: 1rem; color: #a0a0a0;">To update your profile information, please contact support.</p>
             </div>
 
             <div class="card" style="background: #1a1a2e; color: #bc9c22;">

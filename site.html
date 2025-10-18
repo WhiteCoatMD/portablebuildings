@@ -30,43 +30,21 @@
                 </p>
             </div>
             <div class="header-right">
-                <img src="public/graceland_logo.png" alt="Graceland Portable Buildings" class="header-logo">
-                <p class="dealer-text">Authorized Dealer</p>
+                <img src="public/graceland_logo.png" alt="Manufacturer Logo" class="header-logo" id="manufacturer-logo">
+                <p class="dealer-text" id="dealer-text">Authorized Dealer</p>
             </div>
         </div>
     </header>
 
     <!-- Hero Section with Photo Gallery -->
     <section class="hero">
-        <div class="hero-gallery">
-            <div class="gallery-slide active">
-                <img src="Cabin-12x24-Angle.jpg" alt="Cabin">
-            </div>
-            <div class="gallery-slide">
-                <img src="BARN-ANGLED-8x12.jpg" alt="Barn">
-            </div>
-            <div class="gallery-slide">
-                <img src="Corner-Porch-Cabin.png" alt="Corner Porch Cabin">
-            </div>
-            <div class="gallery-slide">
-                <img src="GHP-6307.jpg" alt="Portable Building">
-            </div>
-            <div class="gallery-slide">
-                <img src="Side-Lofted-Barn-10X16-Front-Angled.png" alt="Side Lofted Barn">
-            </div>
-            <div class="gallery-slide">
-                <img src="Mini-Closed.png" alt="Mini Shed">
-            </div>
+        <div class="hero-gallery" id="hero-gallery">
+            <!-- Will be populated by manufacturer config -->
         </div>
         <button class="gallery-prev" onclick="changeSlide(-1)">❮</button>
         <button class="gallery-next" onclick="changeSlide(1)">❯</button>
-        <div class="gallery-dots">
-            <span class="dot active" onclick="currentSlide(0)"></span>
-            <span class="dot" onclick="currentSlide(1)"></span>
-            <span class="dot" onclick="currentSlide(2)"></span>
-            <span class="dot" onclick="currentSlide(3)"></span>
-            <span class="dot" onclick="currentSlide(4)"></span>
-            <span class="dot" onclick="currentSlide(5)"></span>
+        <div class="gallery-dots" id="gallery-dots">
+            <!-- Will be populated by manufacturer config -->
         </div>
     </section>
 
@@ -84,29 +62,50 @@
         </div>
     </section>
 
-    <!-- Graceland Features Section -->
+    <!-- Features Section -->
     <section class="graceland-features">
         <div class="container">
-            <h2 class="section-title">Why Choose Graceland Portable Buildings?</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-number"></div>
-                    <h3>Unsurpassed Quality</h3>
-                    <p>Built to last for generations, not years. Our master-builders create durable structures designed to stand the test of time.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number"></div>
-                    <h3>Innovative Design</h3>
-                    <p>Featuring our patented soffit ventilation system that allows buildings to breathe, providing unique features not available from other manufacturers.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number"></div>
-                    <h3>Limitless Customization</h3>
-                    <p>Choose from a huge selection of building styles with limitless color combinations. Each building is custom-built to your exact specifications.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number"></div>
-                    <h3>7-Year Warranty</h3>
+            <h2 class="section-title" id="features-title">Why Choose Our Portable Buildings?</h2>
+            <div class="features-grid" id="features-grid">
+                <!-- Will be populated by manufacturer config -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about-section" style="background: #f8f9fa; padding: 4rem 0; display: none;">
+        <div class="container">
+            <h2 class="section-title" id="about-title">About Our Buildings</h2>
+            <div style="max-width: 800px; margin: 0 auto; text-align: center; font-size: 1.1rem; line-height: 1.8; color: #333;">
+                <p id="about-description"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Original features cards for reference (hidden) -->
+    <div style="display: none;">
+        <section class="graceland-features-original">
+            <div class="container">
+                <h2 class="section-title">Why Choose Graceland Portable Buildings?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-number"></div>
+                        <h3>Unsurpassed Quality</h3>
+                        <p>Built to last for generations, not years. Our master-builders create durable structures designed to stand the test of time.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-number"></div>
+                        <h3>Innovative Design</h3>
+                        <p>Featuring our patented soffit ventilation system that allows buildings to breathe, providing unique features not available from other manufacturers.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-number"></div>
+                        <h3>Limitless Customization</h3>
+                        <p>Choose from a huge selection of building styles with limitless color combinations. Each building is custom-built to your exact specifications.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-number"></div>
+                        <h3>7-Year Warranty</h3>
                     <p>Backed by comprehensive support and a 7-year warranty, ensuring your investment is protected for years to come.</p>
                 </div>
             </div>
@@ -268,10 +267,92 @@
         </div>
     </div>
 
+    <script src="manufacturer-config.js"></script>
     <script src="decoder.js"></script>
     <script src="site-loader.js"></script>
     <!-- inventory.js removed - site-loader.js now loads user-specific inventory from API -->
     <script src="app.js"></script>
+    <script>
+        // Load manufacturer-specific branding
+        function loadManufacturerBranding() {
+            if (!window.SITE_CONFIG || !window.SITE_CONFIG.manufacturer) {
+                console.log('No manufacturer config yet, using defaults');
+                return;
+            }
+
+            const manufacturer = window.SITE_CONFIG.manufacturer || 'graceland';
+            const config = getManufacturerConfig(manufacturer);
+
+            console.log(`Loading branding for: ${manufacturer}`, config);
+
+            // Update header logo and dealer text
+            const logo = document.getElementById('manufacturer-logo');
+            const dealerText = document.getElementById('dealer-text');
+            if (logo) {
+                logo.src = config.logo;
+                logo.alt = config.name;
+            }
+            if (dealerText) {
+                dealerText.textContent = config.dealerText;
+            }
+
+            // Update hero gallery
+            const heroGallery = document.getElementById('hero-gallery');
+            const galleryDots = document.getElementById('gallery-dots');
+            if (heroGallery && config.heroImages) {
+                heroGallery.innerHTML = config.heroImages.map((img, index) => `
+                    <div class="gallery-slide ${index === 0 ? 'active' : ''}">
+                        <img src="${img.src}" alt="${img.alt}">
+                    </div>
+                `).join('');
+            }
+            if (galleryDots && config.heroImages) {
+                galleryDots.innerHTML = config.heroImages.map((_, index) => `
+                    <span class="dot ${index === 0 ? 'active' : ''}" onclick="currentSlide(${index})"></span>
+                `).join('');
+            }
+
+            // Update features section
+            const featuresTitle = document.getElementById('features-title');
+            const featuresGrid = document.getElementById('features-grid');
+            if (featuresTitle && config.features) {
+                featuresTitle.textContent = config.features.title;
+            }
+            if (featuresGrid && config.features) {
+                featuresGrid.innerHTML = config.features.items.map(feature => `
+                    <div class="feature-card">
+                        <div class="feature-number"></div>
+                        <h3>${feature.title}</h3>
+                        <p>${feature.description}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Update about section (optional)
+            if (config.about) {
+                const aboutSection = document.getElementById('about-section');
+                const aboutTitle = document.getElementById('about-title');
+                const aboutDescription = document.getElementById('about-description');
+                if (aboutSection && aboutTitle && aboutDescription) {
+                    aboutTitle.textContent = config.about.title;
+                    aboutDescription.textContent = config.about.description;
+                    aboutSection.style.display = 'block';
+                }
+            }
+
+            // Update footer dealer text
+            const footerDealerText = document.querySelector('.footer-dealer');
+            if (footerDealerText) {
+                footerDealerText.textContent = config.footerText;
+            }
+
+            console.log('Manufacturer branding loaded successfully');
+        }
+
+        // Call this after SITE_CONFIG is loaded
+        // This will be triggered by site-loader.js
+        window.addEventListener('siteConfigLoaded', loadManufacturerBranding);
+    </script>
     <script>
     // Lead Inquiry Functions
     let currentInquiryBuilding = null;

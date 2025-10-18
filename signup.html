@@ -210,6 +210,21 @@
 
         <form id="signup-form">
             <div class="form-group">
+                <label for="manufacturer">I am a dealer for:</label>
+                <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                    <label style="display: flex; align-items: center; cursor: pointer; background: #0f1419; padding: 1rem; border-radius: 8px; border: 2px solid #2a2a3e; flex: 1; transition: all 0.3s;" onmouseover="this.style.borderColor='#ffd60a'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#2a2a3e'">
+                        <input type="radio" name="manufacturer" value="graceland" required style="width: auto; margin-right: 0.5rem;" onchange="document.querySelectorAll('label').forEach(l => l.style.borderColor='#2a2a3e'); this.parentElement.style.borderColor='#ffd60a';">
+                        <span style="color: #fff; font-weight: 600;">Graceland Portable Buildings</span>
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer; background: #0f1419; padding: 1rem; border-radius: 8px; border: 2px solid #2a2a3e; flex: 1; transition: all 0.3s;" onmouseover="this.style.borderColor='#ffd60a'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#2a2a3e'">
+                        <input type="radio" name="manufacturer" value="premier" required style="width: auto; margin-right: 0.5rem;" onchange="document.querySelectorAll('label').forEach(l => l.style.borderColor='#2a2a3e'); this.parentElement.style.borderColor='#ffd60a';">
+                        <span style="color: #fff; font-weight: 600;">Premier Portable Buildings</span>
+                    </label>
+                </div>
+                <p class="help-text">Your dealer site will be customized for this manufacturer</p>
+            </div>
+
+            <div class="form-group">
                 <label for="businessName">Business Name</label>
                 <input type="text" id="businessName" name="businessName" required placeholder="e.g., Joe's Portable Buildings">
             </div>
@@ -307,6 +322,12 @@
             e.preventDefault();
             hideMessages();
 
+            const manufacturer = document.querySelector('input[name="manufacturer"]:checked');
+            if (!manufacturer) {
+                showError('Please select which manufacturer you are a dealer for');
+                return;
+            }
+
             const businessName = document.getElementById('businessName').value.trim();
             const fullName = document.getElementById('fullName').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -339,7 +360,8 @@
                         fullName,
                         phone,
                         address,
-                        bestContactEmail: bestContactEmail || null
+                        bestContactEmail: bestContactEmail || null,
+                        manufacturer: manufacturer.value
                     })
                 });
 

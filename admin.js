@@ -282,6 +282,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             userEmailEl.textContent = user.email;
         }
 
+        // Update manufacturer display in header
+        const userManufacturerEl = document.getElementById('user-manufacturer');
+        if (userManufacturerEl && user.manufacturer) {
+            const manufacturerName = user.manufacturer === 'graceland' ? 'Graceland Dealer' : 'Premier Dealer';
+            userManufacturerEl.textContent = manufacturerName;
+        }
+
+        // Update profile information in Account Settings tab
+        const profileBusinessName = document.getElementById('profile-business-name');
+        const profileEmail = document.getElementById('profile-email');
+        const profilePhone = document.getElementById('profile-phone');
+        const profileManufacturer = document.getElementById('profile-manufacturer');
+
+        if (profileBusinessName) profileBusinessName.textContent = user.businessName || user.email;
+        if (profileEmail) profileEmail.textContent = user.email;
+        if (profilePhone) profilePhone.textContent = user.phone || 'Not set';
+        if (profileManufacturer) {
+            const fullManufacturerName = user.manufacturer === 'graceland'
+                ? 'Graceland Portable Buildings'
+                : 'Premier Portable Buildings';
+            profileManufacturer.textContent = fullManufacturerName;
+        }
+
         // Update View Site link
         updateViewSiteLink();
 
