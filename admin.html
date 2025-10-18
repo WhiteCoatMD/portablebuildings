@@ -76,31 +76,39 @@
 
             <!-- Platform Selection View -->
             <div id="marketing-platform-selector" style="display: block;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                     <!-- Facebook Card -->
-                    <div class="card" style="background: #1877f2; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onclick="showMarketingPlatform('facebook')">
-                        <div style="text-align: center; padding: 2rem 1rem;">
-                            <svg style="width: 80px; height: 80px; margin-bottom: 1rem;" fill="white" viewBox="0 0 24 24">
+                    <div class="card" style="background: white; border: 2px solid #1877f2; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;" onclick="showMarketingPlatform('facebook')" onmouseover="this.style.borderColor='#0d5dbf'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#1877f2'; this.style.transform='translateY(0)'">
+                        <div style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem;">
+                            <svg style="width: 40px; height: 40px; flex-shrink: 0;" fill="#1877f2" viewBox="0 0 24 24">
                                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                             </svg>
-                            <h2 style="margin: 0 0 0.5rem 0; color: white;">Facebook Marketing</h2>
-                            <p style="margin: 0; color: rgba(255,255,255,0.9); font-size: 0.95rem;">Auto-post new inventory to your Facebook page with customizable templates</p>
-                            <button class="btn" style="background: white; color: #1877f2; margin-top: 1.5rem; font-weight: 600;">Manage Settings →</button>
+                            <div style="flex: 1;">
+                                <h3 style="margin: 0 0 0.25rem 0; color: #1877f2; font-size: 1.1rem; font-weight: 600;">Facebook Marketing</h3>
+                                <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">Auto-post new inventory to your Facebook page</p>
+                            </div>
+                            <svg style="width: 20px; height: 20px; flex-shrink: 0;" fill="#1877f2" viewBox="0 0 24 24">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
                         </div>
                     </div>
 
                     <!-- Google Business Profile Card -->
-                    <div class="card" style="background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onclick="showMarketingPlatform('google')">
-                        <div style="text-align: center; padding: 2rem 1rem;">
-                            <svg style="width: 80px; height: 80px; margin-bottom: 1rem;" fill="white" viewBox="0 0 24 24">
+                    <div class="card" style="background: white; border: 2px solid #4285f4; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;" onclick="showMarketingPlatform('google')" onmouseover="this.style.borderColor='#1967d2'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#4285f4'; this.style.transform='translateY(0)'">
+                        <div style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem;">
+                            <svg style="width: 40px; height: 40px; flex-shrink: 0;" fill="#4285f4" viewBox="0 0 24 24">
                                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                             </svg>
-                            <h2 style="margin: 0 0 0.5rem 0; color: white;">Google Business Profile</h2>
-                            <p style="margin: 0; color: rgba(255,255,255,0.9); font-size: 0.95rem;">Post updates that appear in Google Search and Google Maps</p>
-                            <button class="btn" style="background: white; color: #4285f4; margin-top: 1.5rem; font-weight: 600;">Manage Settings →</button>
+                            <div style="flex: 1;">
+                                <h3 style="margin: 0 0 0.25rem 0; color: #4285f4; font-size: 1.1rem; font-weight: 600;">Google Business Profile</h3>
+                                <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">Post updates in Google Search and Maps</p>
+                            </div>
+                            <svg style="width: 20px; height: 20px; flex-shrink: 0;" fill="#4285f4" viewBox="0 0 24 24">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
                         </div>
                     </div>
                 </div>
@@ -117,18 +125,20 @@
                 </div>
             </div>
             <div id="marketing-facebook-section" style="display: none;">
-                <div style="margin-bottom: 2rem;">
-                    <button class="btn" style="background: #6c757d; color: white;" onclick="backToMarketingSelector()">
+                <div style="margin-bottom: 1.5rem;">
+                    <button class="btn" style="background: #6c757d; color: white; padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="backToMarketingSelector()">
                         ← Back to Platforms
                     </button>
                 </div>
 
-                <div style="background: #1877f2; color: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; text-align: center;">
-                    <svg style="width: 60px; height: 60px; margin-bottom: 1rem;" fill="white" viewBox="0 0 24 24">
+                <div style="background: white; border: 2px solid #1877f2; border-radius: 8px; margin-bottom: 2rem; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+                    <svg style="width: 36px; height: 36px; flex-shrink: 0;" fill="#1877f2" viewBox="0 0 24 24">
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                     </svg>
-                    <h1 style="margin: 0 0 0.5rem 0; color: white;">Facebook Marketing</h1>
-                    <p style="margin: 0; color: rgba(255,255,255,0.9);">Configure auto-posting and templates for your Facebook page</p>
+                    <div>
+                        <h2 style="margin: 0 0 0.25rem 0; color: #1877f2; font-size: 1.3rem;">Facebook Marketing</h2>
+                        <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">Configure auto-posting and templates for your Facebook page</p>
+                    </div>
                 </div>
 
             <!-- Facebook Settings Card -->
@@ -323,21 +333,23 @@ Call us at {{phone}} or visit our website to learn more!
 
             <!-- Google Business Profile Marketing Section (Hidden by default) -->
             <div id="marketing-google-section" style="display: none;">
-                <div style="margin-bottom: 2rem;">
-                    <button class="btn" style="background: #6c757d; color: white;" onclick="backToMarketingSelector()">
+                <div style="margin-bottom: 1.5rem;">
+                    <button class="btn" style="background: #6c757d; color: white; padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="backToMarketingSelector()">
                         ← Back to Platforms
                     </button>
                 </div>
 
-                <div style="background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); color: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; text-align: center;">
-                    <svg style="width: 60px; height: 60px; margin-bottom: 1rem;" fill="white" viewBox="0 0 24 24">
+                <div style="background: white; border: 2px solid #4285f4; border-radius: 8px; margin-bottom: 2rem; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+                    <svg style="width: 36px; height: 36px; flex-shrink: 0;" fill="#4285f4" viewBox="0 0 24 24">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    <h1 style="margin: 0 0 0.5rem 0; color: white;">Google Business Profile Marketing</h1>
-                    <p style="margin: 0; color: rgba(255,255,255,0.9);">Post updates that appear in Google Search and Google Maps</p>
+                    <div>
+                        <h2 style="margin: 0 0 0.25rem 0; color: #4285f4; font-size: 1.3rem;">Google Business Profile Marketing</h2>
+                        <p style="margin: 0; color: #6c757d; font-size: 0.95rem;">Post updates that appear in Google Search and Google Maps</p>
+                    </div>
                 </div>
 
                 <!-- Google Business Profile Settings -->
