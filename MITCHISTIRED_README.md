@@ -1,5 +1,52 @@
 # ShedSync - Portable Buildings Inventory & Lead Management Platform
 
+## 🆕 Latest Updates (January 18, 2025)
+
+### ✅ Activity Tracking Fixed
+**Problem**: Super admin portal showed 0 logins/traffic despite dealers actively using the platform.
+
+**Solution**: Added activity logging throughout dealer portal:
+- Logs 'login' when dealer accesses admin panel
+- Logs 'view_leads' when dealer checks their leads
+- Super admin can now see real-time dealer activity and engagement
+
+**Files Modified**: `admin.js`, `leads.js`
+
+### ✅ Multi-Manufacturer Support Added
+**What Changed**: Platform now supports 3 manufacturers instead of just Graceland:
+1. **Graceland Portable Buildings** (existing - all 3 current dealers)
+2. **Premier Portable Buildings** (ready for new signups)
+3. **Stor-Mor Portable Buildings** (ready for new signups)
+
+**Features**:
+- Signup form lets dealers choose their manufacturer
+- Each manufacturer has unique site branding (logo, colors, features, hero images)
+- Admin panel displays manufacturer name in header
+- Manufacturer-specific serial number decoder architecture
+
+**⚠️ IMPORTANT - Adding Custom Decoders**:
+
+When a **Premier** or **Stor-Mor** dealer signs up, you'll need to implement their serial number decoder:
+
+1. **Read the Guide**: `ADDING_MANUFACTURER_DECODERS.md` has step-by-step instructions
+2. **Get Example Serial Numbers**: Ask the dealer for 5-10 example serial numbers with what each part means
+3. **Create Decoder File**: Follow the pattern in `decoder.js` (Graceland decoder)
+4. **Update Factory**: Modify `decoder-factory.js` to use the new decoder instead of placeholder
+5. **Test**: Create test file like `test-premier-decoder.js` to verify it works
+
+**Current Status**:
+- ✅ Graceland decoder: Fully functional
+- ⏳ Premier decoder: Placeholder (returns "Unknown Type", "Unknown Size")
+- ⏳ Stor-Mor decoder: Placeholder (returns "Unknown Type", "Unknown Size")
+
+**Backwards Compatibility**: All 3 existing dealers verified to remain on Graceland with no changes to their sites. See `BACKWARDS_COMPATIBILITY_VERIFIED.md` for proof.
+
+**Files Created**: `decoder-factory.js`, `manufacturer-config.js`, `ADDING_MANUFACTURER_DECODERS.md`, `BACKWARDS_COMPATIBILITY_VERIFIED.md`
+
+**Files Modified**: `signup.html`, `api/auth/signup.js`, `admin.js`
+
+---
+
 ## 🛠️ Complete Tech Stack
 
 ### Frontend

@@ -334,7 +334,33 @@ Already deployed on Vercel! The platform is live at:
 ## 🔄 Current Status & Next Steps (January 2025)
 
 ### ✅ Recently Completed
-1. **Google Business Profile OAuth Integration** (January 18, 2025)
+
+1. **Activity Tracking Fix** (January 18, 2025)
+   - **Problem**: Super admin portal showed 0 activity/traffic for dealers despite them actively using the platform
+   - **Root Cause**: `/api/log-activity` endpoint existed but was never being called from dealer portal
+   - **Solution**:
+     - Added `logActivity()` helper function to admin.js
+     - Track 'login' activity when dealer accesses admin panel (admin.js:307-311)
+     - Track 'view_leads' activity when dealer checks leads (leads.js:110-113)
+     - Made logActivity globally available for other scripts
+   - **Result**: Super admin can now see dealer logins, lead views, and other activity in real-time
+   - **Files Modified**: admin.js, leads.js
+
+2. **Multi-Manufacturer Support** (January 18, 2025)
+   - Added support for 3 manufacturers: Graceland, Premier, Stor-Mor
+   - Each manufacturer has unique site branding (logo, colors, features, hero images)
+   - Signup form lets dealers choose their manufacturer
+   - Admin panel displays manufacturer info in header
+   - **Decoder Architecture**:
+     - Created `decoder-factory.js` for manufacturer-specific serial number decoding
+     - Graceland decoder fully functional
+     - Premier & Stor-Mor have placeholder decoders (ready for implementation)
+     - See `ADDING_MANUFACTURER_DECODERS.md` for guide on adding custom decoders
+   - **Backwards Compatibility**: All 3 existing dealers remain on Graceland manufacturer
+   - **Files Created**: decoder-factory.js, manufacturer-config.js (Stor-Mor section), ADDING_MANUFACTURER_DECODERS.md, BACKWARDS_COMPATIBILITY_VERIFIED.md
+   - **Files Modified**: signup.html, api/auth/signup.js, admin.js
+
+3. **Google Business Profile OAuth Integration** (January 18, 2025)
    - Fixed 400 error caused by newline in `GOOGLE_BUSINESS_CLIENT_ID` environment variable
    - Created comprehensive privacy policy and terms of service pages
    - Configured OAuth Consent Screen in Google Cloud Console
@@ -342,7 +368,7 @@ Already deployed on Vercel! The platform is live at:
    - Added rate limit handling for Google API calls
    - Created `google_business_connections` database table
 
-2. **Technology Stack Documentation**
+4. **Technology Stack Documentation**
    - Added comprehensive tech stack section to README
    - Documented all APIs, services, and development tools
 
