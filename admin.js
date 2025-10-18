@@ -4559,57 +4559,21 @@ async function loadGoogleBusinessConnectionStatus() {
             accountElement.textContent = data.connection.accountName || 'Unknown Account';
             locationElement.textContent = data.connection.locationName || 'Unknown Location';
 
-            // If account info is missing, try to refresh it
+            // If account info is missing, show message instead of auto-fetching (to avoid rate limits)
             if (!data.connection.accountName || !data.connection.locationName) {
-                console.log('[GBP] Account info missing, attempting to refresh...');
-                accountElement.textContent = 'Fetching account info...';
-                locationElement.textContent = 'Fetching location info...';
+                console.log('[GBP] Account info missing - user can click Refresh button');
+                accountElement.textContent = 'Click Refresh button >';
+                locationElement.textContent = 'Click Refresh button >';
 
-                fetch('/api/google-business/refresh-account-info', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ userId: user.id })
-                })
-                .then(res => res.json())
-                .then(refreshData => {
-                    if (refreshData.success && refreshData.connection) {
-                        accountElement.textContent = refreshData.connection.accountName || 'Unknown Account';
-                        locationElement.textContent = refreshData.connection.locationName || 'Unknown Location';
-                        console.log('[GBP] Account info refreshed successfully');
-                    } else {
-                        accountElement.textContent = 'Unknown Account';
-                        locationElement.textContent = 'Unknown Location';
-                        console.warn('[GBP] Failed to refresh account info:', refreshData.error);
-                    }
-                })
-                .catch(err => {
-                    accountElement.textContent = 'Unknown Account';
-                    locationElement.textContent = 'Unknown Location';
-                    console.error('[GBP] Error refreshing account info:', err);
-                });
+                // Show a helpful toast
+                setTimeout(() => {
+                    showToast('💡 Click the 🔄 Refresh button to load your business info', false);
+                }, 1000);
             }
 
-            // Check if there are multiple locations to show "Change Location" button
-            fetch(`/api/google-business/list-locations?userId=${user.id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(res => res.json())
-            .then(locationData => {
-                const changeBtn = document.getElementById('change-location-btn');
-                if (changeBtn && locationData.success && locationData.locations && locationData.locations.length > 1) {
-                    changeBtn.style.display = 'inline-block';
-                } else if (changeBtn) {
-                    changeBtn.style.display = 'none';
-                }
-            })
-            .catch(err => {
-                console.error('[GBP] Error checking locations:', err);
-            });
+            // Don't auto-check locations to avoid rate limits
+            // User can click "Change Location" button if they have multiple locations
+            console.log('[GBP] Skipping auto-location check to avoid rate limits');
         } else {
             // Show not connected state
             document.getElementById('gbp-connected').style.display = 'none';
