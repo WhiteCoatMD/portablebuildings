@@ -76,8 +76,10 @@ module.exports = async (req, res) => {
 
         if (!accountsResponse.ok) {
             const errorText = await accountsResponse.text();
-            console.error('[GBP OAuth Callback] Failed to fetch accounts:', errorText);
-            return res.redirect('/admin.html?gbp_error=failed_to_fetch_accounts');
+            console.error('[GBP OAuth Callback] Failed to fetch accounts');
+            console.error('[GBP OAuth Callback] Status:', accountsResponse.status);
+            console.error('[GBP OAuth Callback] Response:', errorText);
+            return res.redirect(`/admin.html?gbp_error=failed_to_fetch_accounts&status=${accountsResponse.status}`);
         }
 
         const accountsData = await accountsResponse.json();
