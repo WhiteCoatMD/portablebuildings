@@ -6,6 +6,7 @@
 
 const { getPool } = require('../../lib/db');
 const { canPostToday } = require('../../lib/post-scheduler');
+const { selectBestTemplate, recordTemplateUsage } = require('../../lib/template-selector');
 
 const pool = getPool();
 
@@ -73,13 +74,44 @@ module.exports = async (req, res) => {
                 // Parse building data
                 const building = JSON.parse(post.building_data);
 
-                // Get post template or use default
-                const template = settings.facebookTemplate ||
-                    `🏠 New ${building.category} Available!\n\n` +
-                    `Serial: ${building.serialNumber}\n` +
-                    `Size: ${building.size}\n` +
-                    `Price: ${building.price}\n\n` +
-                    `Contact us for more details!`;
+                // Get available templates (array or single template)
+                let availableTemplates = [];
+                if (settings.facebookTemplates && Array.isArray(settings.facebookTemplates)) {
+                    // Multiple templates selected
+                    availableTemplates = settings.facebookTemplates;
+                } else if (settings.facebookTemplate) {
+                    // Single template (legacy)
+                    availableTemplates = [settings.facebookTemplate];
+                } else {
+                    // Default template
+                    availableTemplates = [
+                        `🏠 New ${building.category} Available!\n\n` +
+                        `Serial: ${building.serialNumber}\n` +
+                        `Size: ${building.size}\n` +
+                        `Price: ${building.price}\n\n` +
+                        `Contact us for more details!`
+                    ];
+                }
+
+                // Use smart template selection (avoids 10-day repetition, checks weekend templates)
+                const scheduledDate = new Date(post.scheduled_time);
+                const templateResult = await selectBestTemplate(
+                    post.user_id,
+                    availableTemplates,
+                    scheduledDate,
+                    false // isManual = false for automated posts
+                );
+
+                if (!templateResult.template) {
+                    console.log(`[Queue Processor] No suitable template found: ${templateResult.reason}`);
+                    // Reschedule for tomorrow to try again
+                    await rescheduleForTomorrow(post.id);
+                    skippedCount++;
+                    continue;
+                }
+
+                console.log(`[Queue Processor] Selected template: ${templateResult.reason}`);
+                const template = templateResult.template;
 
                 // Replace template variables
                 const message = replaceBuildingVariables(template, building);
@@ -93,6 +125,14 @@ module.exports = async (req, res) => {
                 );
 
                 if (postResult.success) {
+                    // Record template usage for smart rotation
+                    await recordTemplateUsage(
+                        post.user_id,
+                        template,
+                        false, // isManual = false
+                        building.serialNumber
+                    );
+
                     // Mark as posted
                     await pool.query(
                         `UPDATE facebook_post_queue

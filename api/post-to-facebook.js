@@ -5,6 +5,7 @@
 
 const { getPool } = require('../lib/db');
 const { verifyToken } = require('../lib/auth');
+const { recordTemplateUsage } = require('../lib/template-selector');
 
 const pool = getPool();
 
@@ -150,6 +151,14 @@ Call us at {{phone}} or visit our website to learn more!
                 });
             }
 
+            // Record template usage (manual post bypasses 10-day rule)
+            await recordTemplateUsage(
+                decoded.userId,
+                config.template || message,
+                true, // isManual = true
+                building.serialNumber
+            );
+
             return res.status(200).json({
                 success: true,
                 postId: result.id,
@@ -184,6 +193,14 @@ Call us at {{phone}} or visit our website to learn more!
                     fbError: result.error
                 });
             }
+
+            // Record template usage (manual post bypasses 10-day rule)
+            await recordTemplateUsage(
+                decoded.userId,
+                config.template || message,
+                true, // isManual = true
+                building.serialNumber
+            );
 
             return res.status(200).json({
                 success: true,
@@ -260,6 +277,14 @@ Call us at {{phone}} or visit our website to learn more!
                 fbError: postResult.error
             });
         }
+
+        // Record template usage (manual post bypasses 10-day rule)
+        await recordTemplateUsage(
+            decoded.userId,
+            config.template || message,
+            true, // isManual = true
+            building.serialNumber
+        );
 
         return res.status(200).json({
             success: true,
