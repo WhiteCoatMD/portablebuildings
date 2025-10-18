@@ -63,90 +63,88 @@ module.exports = async (req, res) => {
         // Calculate token expiration
         const expiresAt = new Date(Date.now() + (expires_in * 1000));
 
-        // Fetch account and location information
-        console.log('[GBP OAuth Callback] Fetching accounts...');
-        const accountsResponse = await fetch(
-            'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
-            {
-                headers: {
-                    'Authorization': `Bearer ${access_token}`,
-                },
-            }
-        );
-
-        if (!accountsResponse.ok) {
-            const errorText = await accountsResponse.text();
-            console.error('[GBP OAuth Callback] Failed to fetch accounts');
-            console.error('[GBP OAuth Callback] Status:', accountsResponse.status);
-            console.error('[GBP OAuth Callback] Response:', errorText);
-
-            // Handle rate limiting
-            if (accountsResponse.status === 429) {
-                return res.redirect('/admin.html?gbp_error=rate_limit');
-            }
-
-            return res.redirect(`/admin.html?gbp_error=failed_to_fetch_accounts&status=${accountsResponse.status}`);
-        }
-
-        const accountsData = await accountsResponse.json();
-        const accounts = accountsData.accounts || [];
-
-        if (accounts.length === 0) {
-            console.error('[GBP OAuth Callback] No accounts found');
-            return res.redirect('/admin.html?gbp_error=no_accounts_found');
-        }
-
-        // Use the first account
-        const account = accounts[0];
-        const accountId = account.name; // Format: accounts/{account_id}
-        const accountName = account.accountName || 'Unknown';
-
-        // Fetch locations for this account
-        console.log('[GBP OAuth Callback] Fetching locations...');
-        const locationsResponse = await fetch(
-            `https://mybusinessbusinessinformation.googleapis.com/v1/${accountId}/locations`,
-            {
-                headers: {
-                    'Authorization': `Bearer ${access_token}`,
-                },
-            }
-        );
-
-        let locationId = null;
-        let locationName = null;
-        let locationAddress = null;
-
-        if (locationsResponse.ok) {
-            const locationsData = await locationsResponse.json();
-            const locations = locationsData.locations || [];
-
-            if (locations.length > 0) {
-                const location = locations[0]; // Use first location
-                locationId = location.name; // Format: locations/{location_id}
-                locationName = location.title || location.locationName || 'Unknown';
-
-                // Build address string
-                if (location.storefrontAddress) {
-                    const addr = location.storefrontAddress;
-                    const parts = [
-                        addr.addressLines?.join(', '),
-                        addr.locality,
-                        addr.administrativeArea,
-                        addr.postalCode,
-                    ].filter(Boolean);
-                    locationAddress = parts.join(', ');
-                }
-            }
-        }
-
-        // Get userId from session or state parameter
-        // For now, we'll need to pass userId through the OAuth flow
-        // TODO: Implement proper session management or state parameter
+        // Get userId from state parameter
         const userId = state ? parseInt(state) : null;
 
         if (!userId) {
             console.error('[GBP OAuth Callback] No userId found');
             return res.redirect('/admin.html?gbp_error=no_user_id');
+        }
+
+        // Initialize account/location variables
+        let accountId = null;
+        let accountName = null;
+        let locationId = null;
+        let locationName = null;
+        let locationAddress = null;
+
+        // Try to fetch account and location information
+        // If rate limited, we'll save the connection anyway and fetch later
+        try {
+            console.log('[GBP OAuth Callback] Fetching accounts...');
+            const accountsResponse = await fetch(
+                'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
+                {
+                    headers: {
+                        'Authorization': `Bearer ${access_token}`,
+                    },
+                }
+            );
+
+            if (accountsResponse.ok) {
+                const accountsData = await accountsResponse.json();
+                const accounts = accountsData.accounts || [];
+
+                if (accounts.length > 0) {
+                    // Use the first account
+                    const account = accounts[0];
+                    accountId = account.name; // Format: accounts/{account_id}
+                    accountName = account.accountName || 'Unknown';
+
+                    // Fetch locations for this account
+                    console.log('[GBP OAuth Callback] Fetching locations...');
+                    const locationsResponse = await fetch(
+                        `https://mybusinessbusinessinformation.googleapis.com/v1/${accountId}/locations`,
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${access_token}`,
+                            },
+                        }
+                    );
+
+                    if (locationsResponse.ok) {
+                        const locationsData = await locationsResponse.json();
+                        const locations = locationsData.locations || [];
+
+                        if (locations.length > 0) {
+                            const location = locations[0]; // Use first location
+                            locationId = location.name; // Format: locations/{location_id}
+                            locationName = location.title || location.locationName || 'Unknown';
+
+                            // Build address string
+                            if (location.storefrontAddress) {
+                                const addr = location.storefrontAddress;
+                                const parts = [
+                                    addr.addressLines?.join(', '),
+                                    addr.locality,
+                                    addr.administrativeArea,
+                                    addr.postalCode,
+                                ].filter(Boolean);
+                                locationAddress = parts.join(', ');
+                            }
+                        }
+                    }
+                }
+            } else if (accountsResponse.status === 429) {
+                console.warn('[GBP OAuth Callback] Rate limited - will fetch account info later');
+                // Continue anyway - we'll fetch account info later
+            } else {
+                console.warn('[GBP OAuth Callback] Failed to fetch accounts:', accountsResponse.status);
+                // Continue anyway - we'll fetch account info later
+            }
+        } catch (fetchError) {
+            console.warn('[GBP OAuth Callback] Error fetching account info:', fetchError.message);
+            // Continue anyway - we have the tokens, we can fetch account info later
         }
 
         // Store connection in database
