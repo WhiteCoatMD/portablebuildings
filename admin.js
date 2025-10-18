@@ -4308,6 +4308,7 @@ window.addEventListener('message', (event) => {
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
 
+    // Handle Facebook OAuth callback
     if (urlParams.get('fb_success')) {
         const pageName = urlParams.get('page_name');
         showToast(`✅ Successfully connected to Facebook page: ${pageName}`);
@@ -4323,6 +4324,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Clean up URL
         window.history.replaceState({}, document.title, window.location.pathname + '#customization');
+    }
+
+    // Handle Google OAuth callback redirect
+    if (urlParams.get('tab') === 'marketing' && urlParams.get('platform') === 'google') {
+        // Wait a moment for page to fully load
+        setTimeout(() => {
+            // Switch to marketing tab
+            const marketingTab = document.querySelector('[data-tab="marketing"]');
+            if (marketingTab) {
+                marketingTab.click();
+            }
+
+            // Show Google section
+            setTimeout(() => {
+                showMarketingPlatform('google');
+
+                // Load connection status first
+                loadGoogleBusinessConnectionStatus();
+
+                // If location selector flag is present, open it after connection status loads
+                if (urlParams.get('show_location_selector') === 'true') {
+                    setTimeout(() => {
+                        // Check if multiple locations exist before showing selector
+                        const token = localStorage.getItem('auth_token');
+                        const user = window.currentUser;
+
+                        if (token && user && user.id) {
+                            fetch(`/api/google-business/list-locations?userId=${user.id}`, {
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success && data.locations && data.locations.length > 1) {
+                                    openLocationSelector();
+                                } else if (data.locations && data.locations.length === 1) {
+                                    showToast('✅ Connected to your Google Business location');
+                                }
+                            })
+                            .catch(err => console.error('Error checking locations:', err));
+                        }
+
+                        // Clean up URL
+                        window.history.replaceState({}, document.title, '/admin.html');
+                    }, 1000);
+                }
+            }, 300);
+        }, 100);
     }
 });
 
@@ -4371,7 +4419,9 @@ async function connectGoogleBusinessOAuth() {
                 if (event.data && event.data.type === 'oauth_success' && event.data.platform === 'google') {
                     window.removeEventListener('message', messageHandler);
                     showToast('✅ Google Business Profile connected successfully!');
-                    loadGoogleBusinessConnectionStatus();
+
+                    // Reload the page and navigate to Google section with a flag to show location selector
+                    window.location.href = '/admin.html?tab=marketing&platform=google&show_location_selector=true';
                 } else if (event.data && event.data.type === 'oauth_error' && event.data.platform === 'google') {
                     window.removeEventListener('message', messageHandler);
                     showToast(`❌ Failed to connect: ${event.data.error}`, true);
