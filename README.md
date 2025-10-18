@@ -6,6 +6,78 @@ Live at: https://shed-sync.com
 
 ---
 
+## 🛠️ Technology Stack
+
+### Frontend
+- **Core:** Vanilla JavaScript (ES6+), HTML5, CSS3
+- **UI/UX:** Custom dark theme with gradient backgrounds, responsive design
+- **Icons & Assets:** Custom SVG graphics, optimized image handling
+- **Client-Side Features:** JWT-based authentication, real-time form validation
+
+### Backend
+- **Runtime:** Node.js 22.x
+- **Architecture:** Serverless functions (Vercel Edge Functions)
+- **API Framework:** RESTful API with route-based file structure
+- **Authentication:** JWT tokens with bcrypt password hashing
+- **Session Management:** HTTP-only cookies for security
+
+### Database
+- **Primary Database:** PostgreSQL 14 (DigitalOcean Managed Database)
+- **Connection Pooling:** pg-pool for efficient connection management
+- **Schema Management:** SQL migration scripts
+- **Data Security:** Encrypted credentials, prepared statements (SQL injection protection)
+
+### Third-Party Integrations
+- **Payment Processing:**
+  - PayPal Subscriptions API (Primary - $99/month recurring)
+  - Stripe Payments API (Legacy, can be reactivated)
+- **Social Media:**
+  - Facebook Graph API v18.0 (OAuth 2.0, auto-posting to Business Pages)
+  - Google Business Profile API (OAuth 2.0, auto-posting with business.manage scope)
+- **Web Scraping:**
+  - Playwright (headless browser automation for GPB portal sync)
+- **File Storage:**
+  - Vercel Blob Storage (building photos, dealer logos)
+
+### DevOps & Hosting
+- **Hosting Platform:** Vercel (serverless infrastructure)
+- **Database Hosting:** DigitalOcean Managed PostgreSQL
+- **DNS & CDN:** Vercel DNS with multi-tenant subdomain routing
+- **SSL/TLS:** Automatic HTTPS via Vercel
+- **Environment Management:** Vercel environment variables (encrypted secrets)
+- **Version Control:** Git + GitHub
+- **CI/CD:** Automatic deployments via Vercel GitHub integration
+
+### Security & Compliance
+- **Authentication:** JWT with RS256 signing, bcrypt password hashing (10 rounds)
+- **API Security:** Rate limiting, CORS policies, input validation
+- **Data Protection:** HTTPS everywhere, encrypted database connections
+- **Compliance:** GDPR-compliant data deletion, CCPA privacy disclosures
+- **OAuth Security:** State parameters, PKCE flow for Facebook/Google
+
+### Monitoring & Performance
+- **Error Tracking:** Vercel function logs
+- **Performance:** Edge function optimization, database query indexing
+- **Uptime:** Vercel's built-in monitoring
+- **Analytics:** Custom event tracking (page views, conversions)
+
+### APIs & Services Used
+- **Facebook Graph API** - Pages management, OAuth, posting
+- **Google Business Profile API** - Account management, location info, posting
+- **PayPal REST API** - Subscription creation, webhook handling
+- **Stripe API** - Legacy payment processing
+- **Great Portable Buildings API** - Inventory sync (custom integration)
+- **Vercel Blob API** - Image storage and CDN delivery
+
+### Development Tools
+- **Code Editor:** VS Code
+- **API Testing:** Postman, cURL
+- **Database Management:** pgAdmin, psql CLI
+- **Version Control:** Git with GitHub
+- **Local Development:** Vercel CLI (`vercel dev`)
+
+---
+
 ## 🚀 What is ShedSync?
 
 ShedSync is a B2B SaaS platform that helps portable building dealers:
@@ -75,33 +147,6 @@ ShedSync is a B2B SaaS platform that helps portable building dealers:
 - [x] PostgreSQL on DigitalOcean
 - [x] Environment variables configured
 - [x] Custom domain DNS setup
-
----
-
-## 🔧 Technology Stack
-
-**Frontend:**
-- HTML5, CSS3, JavaScript (vanilla)
-- Dark theme with gradient backgrounds
-- Responsive design
-
-**Backend:**
-- Node.js 22.x
-- Serverless functions (Vercel API routes)
-- PostgreSQL database
-- JWT authentication
-- bcrypt password hashing
-
-**Integrations:**
-- Facebook Graph API v18.0
-- Stripe Payments API
-- Playwright (GPB portal automation)
-- Great Portable Buildings API
-
-**Hosting:**
-- Vercel (frontend + API)
-- DigitalOcean PostgreSQL (database)
-- Vercel DNS (multi-tenant routing)
 
 ---
 
